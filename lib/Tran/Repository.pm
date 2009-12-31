@@ -30,22 +30,7 @@ sub reset {
   delete $self->{versions};
 }
 
-sub get_versions {
-  my ($self, $name) = @_;
-  die if @_ != 2;
-  return if exists $self->{versions}->{$name};
-
-  my @versions;
-  if (opendir my $d, $self->directory . '/' . $name) {
-    foreach my $version (grep /^[\d\.]+$/, readdir $d) {
-      push @versions, version->new($version);
-    }
-    closedir $d;
-  } else {
-    $self->debug(sprintf "directory is not found : %s/%s", $self->directory, $name);
-  }
-  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
-}
+sub get_versions { die "implement in sub class"; }
 
 sub latest_version {
   my ($self, $name) = @_;
@@ -80,9 +65,15 @@ sub path_format {
 
 sub path_of {
   my ($self, $target, $version) = @_;
-  my $path = join "/", $self->directory,
-    $self->path_format ? sprintf($self->path_format, $target, $version): ($target, $version);
-  $path =~s{//}{/};
+  my $path = join "/", $self->directory;
+  unless (my $path_format = $self->path_format) {
+    $path = join "/", $path, $target, $version;
+  } else {
+    $path_format =~s{%n}{$target};
+    $path_format =~s{%v}{$version};
+    $path = join "/", $path, $path_format;
+  }
+  $path =~s{//}{/}g;
   return $path;
 }
 

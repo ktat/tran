@@ -121,11 +121,11 @@ finish translation(not yet implement):
    translation:
      jprp-modules:
        directory: /home/ktat/cvs/perldocjp/docs/modules/
-       path_format: "%s-%s"
+       path_format: "%n-%v"
  
      jpa:
        directory: /home/ktat/git/github/jpa-translation/
-       path_format: "%s-Doc-JA"
+       path_format: "%n-Doc-JA"
  
  resources:
    CPAN:

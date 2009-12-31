@@ -18,16 +18,15 @@ sub run {
   my @result = $r->get($target, $version);
   if (@result == 3) {
     if (defined $version and $version) {
-      $self->info("You have $target($result[2]) (original)");
+      $self->info("You have $target($result[2]) in original repository");
     } else {
-      $self->info("You have the latest version($result[2]) of $target (original)");
+      $self->info("You have the latest version($result[2]) of $target in original repository");
     }
   } else {
-    $version ||= '';
-    $self->info("Got $target $version");
+    $self->info("Got $target" . ($version || '') );
   }
   my($target_path, $translation_name, $files);
-  ($target_path, $translation_name, $version, $files) = @result; # version, files, translation
+  ($target_path, $translation_name, $version, $files) = @result;
 
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
@@ -39,7 +38,9 @@ sub run {
         $translation->merge($target_path, $prev_version, $version);
         $self->info("copy previous version($prev_version) to new version($version) with patch.");
       } else {
-        $self->info("translation for $prev_version is not found.");
+        $self->debug("translation for $prev_version is not found.");
+        $translation->copy_from_original($target_path, $version);
+        $self->info("copy original files to translation path.");
       }
     } else {
       $translation->copy_from_original($target_path, $version);

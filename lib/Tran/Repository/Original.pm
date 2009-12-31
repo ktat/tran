@@ -5,6 +5,23 @@ use Tran::Util -debug, -base;
 use File::Find qw/find/;
 use base qw/Tran::Repository/;
 
+sub get_versions {
+  my ($self, $name) = @_;
+  die if @_ != 2;
+  return if exists $self->{versions}->{$name};
+
+  my @versions;
+  if (opendir my $d, $self->directory . '/' . $name) {
+    foreach my $version (grep /^[\d\.]+$/, readdir $d) {
+      push @versions, version->new($version);
+    }
+    closedir $d;
+  } else {
+    $self->debug(sprintf "directory is not found : %s/%s", $self->directory, $name);
+  }
+  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+}
+
 1;
 
 =head1 NAME

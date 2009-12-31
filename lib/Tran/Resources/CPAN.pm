@@ -38,11 +38,11 @@ sub get {
 
   my $url;
   ($url, $version) = $self->get_module_info($target) unless $version;
-  $self->debug("$target $version : $url");
   return ($target_path, $self->target_translation($target), version->new($version))
     if $self->original_repository->has_version($target_path, $version);
 
   ($url) = $self->get_module_info($target, $version) unless $url;
+  $self->debug("$target $version : $url");
 
   $url = 'http://search.cpan.org/CPAN/authors/id/' . $url;
   $self->debug("get from $url");
