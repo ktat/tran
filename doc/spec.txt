@@ -1,0 +1,33 @@
+get things from resource
+save them to original
+copy them to translation
+ (if you have previous version of original and translation, merge them)
+notify
+
+
+Tran
+Tran::Cmd
+Tran::Config
+Tran::Log
+Tran::Notify
+Tran::VCS
+
+
+Tran::Repository -- 保存場所
+Tran::Repository::Original -- ~/.tran/original/ のマネージメトン
+Tran::Repository::Translation -- CPAN/他の翻訳場所の保存場所
+
+Tran::Resources -- CPAN/他
+Tran::Resources::CPAN  (リソースの種類)
+Tran::Resources::Target (リソースにある対象)
+
+
+Tran::Log::Stderr (ログ)
+
+Tran::Util
+Tran::Util::Base
+
+Tran::Cmd::Command::config
+Tran::Cmd::Command::finish
+Tran::Cmd::Command::init
+Tran::Cmd::Command::start.pm

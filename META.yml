@@ -1,0 +1,41 @@
+---
+abstract: 'Version Control for Translation'
+author:
+  - 'Ktat <ktat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tran
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::Cmd: 0
+  Archive::Tar: 0
+  Clone: 0
+  Cwd: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Slurp: 0
+  IO::Prompt: 0
+  IO::String: 0
+  IO::Uncompress::Gunzip: 0
+  LWP::Simple: 0
+  Module::Pluggable: 0
+  Storable: 0
+  Text::Diff3: 0
+  Util::Any: 0.17
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

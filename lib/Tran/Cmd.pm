@@ -1,0 +1,53 @@
+package Tran::Cmd;
+
+use warnings;
+use strict;
+use App::Cmd::Setup -app;
+
+sub new {
+  my ($self, $tran) = @_;
+  die "Tran object is needed" unless $tran;
+  my $obj = $self->SUPER::new;
+  $obj->{tran} = $tran;
+  $obj->{log} = $tran->log;
+  $obj->{plugin_search_path} = __PACKAGE__;
+  return $obj;
+}
+
+sub log {
+  my $self = shift;
+  $self->{log};
+}
+
+sub tran {
+  my $self = shift;
+  $self->{tran};
+}
+
+1;
+
+=head1 NAME
+
+Tran::Cmd
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+1; # End of Tran

@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use strict;
+use lib qw(./lib ../lib);
+use Tran;
+use Tran::Cmd;
+
+my $tran = Tran->new("$ENV{HOME}/.tran/config.yml");
+Tran::Cmd->new($tran)->run;
+
