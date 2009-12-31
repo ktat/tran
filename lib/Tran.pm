@@ -92,7 +92,6 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -104,6 +103,51 @@ start translation:
 finish translation(not yet implement):
 
  % tran finish CPAN Moose
+
+=head1 Config file
+
+~/.tran/config.yml
+
+ ---
+ tempolary_dir: /home/ktat/.tran/tmp/
+ log:
+   class: Stderr
+   level: debug
+ 
+ repository:
+   original:
+     directory: /home/ktat/.tran/original/
+ 
+   translation:
+     jprp-modules:
+       directory: /home/ktat/cvs/perldocjp/docs/modules/
+       path_format: "%s-%s"
+ 
+     jpa:
+       directory: /home/ktat/git/github/jpa-translation/
+       path_format: "%s-Doc-JA"
+ 
+ resources:
+   CPAN:
+     # default translation repository
+     translation: jprp-modules
+     metafile: /home/ktat/.cpan/Metadata
+     target_only:
+       - '*.pm'
+       - '*.pod'
+       - README
+       - Changes
+     # if only is specified, ignore is ignored
+     target_ignore:
+       - '*.t'
+     target_directory:
+       - lib
+     # not default translation repository
+     targets:
+       Moose:
+         translation: jpa
+       MooseX::Getopt:
+         translation: jpa
 
 =head1 AUTHOR
 
