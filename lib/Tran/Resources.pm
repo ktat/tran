@@ -8,10 +8,10 @@ sub new {
   my ($class, %self) = @_;
   my $target = $self{config}->{targets};
   my %target;
-  foreach my $name (keys %$target) {
-    $target{$name} = Tran::Resources::Target->new($target->{$name} || {});
-    # $target{$name}->versions($self->root->original_repository->get_versions($name))
-  }
+#  foreach my $name (keys %$target) {
+#    $target{$name} = Tran::Resources::Target->new($target->{$name} || {});
+#    # $target{$name}->versions($self->root->original_repository->get_versions($name))
+#  }
   $self{targets} = \%target;
   bless \%self, $class;
 }

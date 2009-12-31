@@ -13,16 +13,16 @@ Tran::Notify
 Tran::VCS
 
 
-Tran::Repository -- ÊİÂ¸¾ì½ê
-Tran::Repository::Original -- ~/.tran/original/ ¤Î¥Ş¥Í¡¼¥¸¥á¥È¥ó
-Tran::Repository::Translation -- CPAN/Â¾¤ÎËİÌõ¾ì½ê¤ÎÊİÂ¸¾ì½ê
+Tran::Repository -- ä¿å­˜å ´æ‰€
+Tran::Repository::Original -- ~/.tran/original/ ã®ãƒãƒãƒ¼ã‚¸ãƒ¡ãƒˆãƒ³
+Tran::Repository::Translation -- CPAN/ä»–ã®ç¿»è¨³å ´æ‰€ã®ä¿å­˜å ´æ‰€
 
-Tran::Resources -- CPAN/Â¾
-Tran::Resources::CPAN  (¥ê¥½¡¼¥¹¤Î¼ïÎà)
-Tran::Resources::Target (¥ê¥½¡¼¥¹¤Ë¤¢¤ëÂĞ¾İ)
+Tran::Resources -- CPAN/ä»–
+Tran::Resources::CPAN  (ãƒªã‚½ãƒ¼ã‚¹ã®ç¨®é¡)
+Tran::Resources::Target (ãƒªã‚½ãƒ¼ã‚¹ã«ã‚ã‚‹å¯¾è±¡)
 
 
-Tran::Log::Stderr (¥í¥°)
+Tran::Log::Stderr (ãƒ­ã‚°)
 
 Tran::Util
 Tran::Util::Base

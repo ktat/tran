@@ -26,6 +26,7 @@ requires
     'Storable'               => 0,
     ;
     
+install_script 'script/tran';
 auto_install;
 
 WriteAll;
