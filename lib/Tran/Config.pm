@@ -49,9 +49,13 @@ sub set_translation {
   $self->{config}->{translation}->{$kind} = $r;
 }
 
-sub tempolary_dir {
- my $self = shift;
-  $self->{config}->{tempolary_dir};
+sub notify {
+ my ($self, $key) = @_;
+ if (@_ == 2) {
+   $self->{config}->{notify}->{$key};
+ } else {
+   $self->{config}->{notify};
+ }
 }
 
 1;

@@ -38,10 +38,17 @@ sub new {
     $class = Class::Inspector->loaded($class) ? $class : 'Tran::Repository::Translation';
     $self->{translation}->{$key} = $class->new
       (
+       name     => $key,
        log      => $log,
        config   => $self->config->translation_repository->{$key},
        original => $original_repository,
       );
+  }
+
+  foreach my $key (keys %{$self->config->notify}) {
+    my $config = $self->config->notify($key);
+    my $class = __PACKAGE__ . '::Notify::' . $config->{class};
+    $self->{notify}->{$key} = $class->new(%$config, log => $log);
   }
 
   return $self;
@@ -79,6 +86,12 @@ sub translation {
   return @_ == 2 ? $self->{translation}->{$name} :  $self->{translation};
 }
 
+sub notify {
+  my $self = shift;
+  my ($name, @args) = @_;
+  Carp::croak(Dumper $self) unless $self->{notify}->{$name};
+  $self->{notify}->{$name}->notify(@args);
+}
 
 =head1 NAME
 

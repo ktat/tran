@@ -176,6 +176,11 @@ sub cmpmerge {
   return $source;
 }
 
+sub notify {
+  my ($self) = @_;
+  return $self->{config}{notify};
+}
+
 sub update_version_info { }
 
 1;

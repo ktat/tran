@@ -10,8 +10,13 @@ sub new {
   bless \%self => $class;
 }
 
+sub name {
+  my $self = shift;
+  $self->{name};
+}
+
 sub type {
-  my ($self) = @_;
+  my $self = shift;
   $self->{config}->{type};
 }
 

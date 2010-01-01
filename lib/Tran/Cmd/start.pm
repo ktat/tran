@@ -47,6 +47,7 @@ sub run {
       $self->info("copy original files to translation path.");
     }
     $translation->update_version_info($target_path, $version);
+    $tran->notify($translation->notify, 'start', $target, $version);
   } else {
     $self->info("translation files for $target $version are found.");
   }
