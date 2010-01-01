@@ -16,16 +16,8 @@ BEGIN {
       return CORE::warn(@_) unless ref $self;
       my $log = (ref $self) =~m{^Tran::Cmd} ? $self->app->{log} : $self->{log};
       if ($log->level >= $Tran::Log::LOG_LEVEL{$level}) {
-        $message = "[$lc_level] " . $message;
-        my $msg;
-        if ($log->can("_do_log")) {
-          $msg = $log->_do_log($message);
-          exit 255 if $level eq 'FATAL' or $level eq 'ERROR';
-          return $msg;
-        } else {
-          exit 255 if $level eq 'FATAL' or $level eq 'ERROR';
-          return $message;
-        }
+        my $method = lc $level;
+        $log->$method($message);
       }
     };
   }

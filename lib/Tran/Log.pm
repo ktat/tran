@@ -32,7 +32,7 @@ foreach my $level (keys %LOG_LEVEL) {
       $message = "[$lc_level] " . $message;
       if ($self->can("_do_log")) {
         my $msg = $self->_do_log($message);
-        if ($lc_level eq 'fatal' or $lc_level = 'error') {
+        if ($lc_level eq 'fatal' or $lc_level eq 'error') {
           exit 255;
         }
         return $msg;
