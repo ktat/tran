@@ -19,10 +19,18 @@ Tran::Notify
 =head1 SYNOPSIS
 
  notify:
-  class: NotificationClass
-  param1: value1
-  param2: value2
-  ...
+  notify_name:
+    class: NotificationClass
+    param1: value1
+    param2: value2
+    ...
+
+ repository:
+   # ...
+   translation:
+     translation_name:
+       # ...
+       notify: notify_name
 
 see Tran::Notify::* classes.
 

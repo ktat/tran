@@ -76,6 +76,13 @@ in config.yml:
      to: 'to@example.com'
      template_directory: /home/user/.tran/template/perldocjp/
 
+ repository:
+   # ...
+   translation:
+     jprp-modules:
+       # ...
+       notify: perldocjp
+
 =head1 OPTION
 
 =head2 template_directory
