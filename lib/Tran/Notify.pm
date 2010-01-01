@@ -16,6 +16,20 @@ sub new {
 
 Tran::Notify
 
+=head1 SYNOPSIS
+
+ notify:
+  class: NotificationClass
+  param1: value1
+  param2: value2
+  ...
+
+see Tran::Notify::* classes.
+
+=head1 SEE ALSO
+
+Tran::Notify::Email
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>

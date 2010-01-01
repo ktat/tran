@@ -126,6 +126,13 @@ finish translation(not yet implement):
  log:
    class: Stderr
    level: debug
+
+ notify:
+   perldocjp:
+     class: Email
+     from : 'from@example.com'
+     to   : 'to@example.com'
+     template_directory: /home/ktat/.tran/template/perldocjp/
  
  repository:
    original:
@@ -150,7 +157,7 @@ finish translation(not yet implement):
        - '*.pod'
        - README
        - Changes
-     # if only is specified, ignore is ignored
+     # if target_only is specified, target_ignore is ignored
      target_ignore:
        - '*.t'
      target_directory:

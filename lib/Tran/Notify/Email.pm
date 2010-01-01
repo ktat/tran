@@ -18,7 +18,6 @@ sub notify {
   $self->send_email($c);
 }
 
-# send_email([From => 'from@example.com'], {'content_type' => 'text/plain'}, \@parts);
 sub send_email {
   my ($self, $c) = @_;
   my $i = 0;
@@ -33,14 +32,14 @@ sub send_email {
 
   $header{ucfirst $_} = $self->{$_} foreach qw/from to/;
 
-  my $charset = $self->_charset(delete $header{charset}, \%header);
+  my $charset = $self->_charset(delete $header{charset}, \%header, \$body);
   sendmail(Email::MIME->create(attributes => \%attributes,
                                ($charset ? 'body_str'   : 'body'  ), $body,
                                ($charset ? 'header_str' : 'header'), [%header]));
 }
 
 sub _charset {
-  my($self, $charset, $header) = @_;
+  my($self, $charset, $header, $body) = @_;
   $charset ||= '';
   if ($charset =~ /iso[-_]2022[-_]jp/o or $charset =~ /\bjis$/o) {
     $charset = '';
@@ -50,6 +49,7 @@ sub _charset {
     }
     $header->{'conetnt_type'} = 'text/plain; charset=iso-2022-jp';
     $header->{'encoding'} = '7bit';
+    Encode::from_to($$body, "utf8", 'jis');
   } elsif ($charset) {
     $header->{'conetnt_type'} = 'text/plain';
     $header->{'encoding'} = 'base64';
@@ -62,6 +62,42 @@ sub _charset {
 =head1 NAME
 
 Tran::Notify::Email
+
+=head1 SYNOPSIS
+
+in config.yml:
+
+ notify:
+   perldocjp:
+     # use Tran::Notify::Email
+     class: Email
+     # parameter to pass Email class
+     from: 'from@example.com'
+     to: 'to@example.com'
+     template_directory: /home/user/.tran/template/perldocjp/
+
+=head1 OPTION
+
+=head2 template_directory
+
+  template_directory: /home/user/.tran/template/perldocjp/
+
+put files correspond to command name under the directory.
+For example.
+
+ /home/user/.tran/template/perldocjp/start
+
+Its content is:
+
+ Subject: [RFC] start translation of %n version %v
+ charset: jis
+ 
+ Hi
+ 
+ I've started to translate %n version %v.
+ 
+  -- 
+ Kato Atsushi (ktat)
 
 =head1 AUTHOR
 

@@ -20,6 +20,8 @@ Tran::Log::Stderr
 
 =head1 SYNOPSYS
 
+in config.yml:
+
  log:
    class: Stderr
    level: debug
