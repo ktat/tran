@@ -31,7 +31,9 @@ sub merge {
 
   my $omit_path = $option->{omit_path} || '';
 
-  @newer_original_files = grep {s{^/?$omit_path}{}} @newer_original_files;
+  if ($omit_path) {
+    @newer_original_files = grep {s{^/?$omit_path}{}} @newer_original_files;
+  }
 
   my %target;
   @target{@translated_files} = ();
@@ -51,15 +53,18 @@ sub merge {
 
   my $v = quotemeta($version->{original});
 
+  my $merge_method = $self->merge_method;
+  $merge_method ||= 'cmpmerge';
+
+
   foreach my $file (grep $_, @newer_original_files) {
     die $version unless $v;
-
     if (exists $target{$file}           and
         -f "$newer_original_path/$file" and
         -f "$older_original_path/$file" and
         -f "$translation_path/$file"
        ) {
-      my $merged = cmpmerge("$newer_original_path/$file",
+      my $merged = $self->$merge_method("$newer_original_path/$file",
                             "$older_original_path/$file",
                             "$translation_path/$file");
       $self->_write_file_auto_path("$new_translation_path/$file", $merged);
@@ -118,7 +123,7 @@ sub _copy_file_auto_path {
 }
 
 sub cmpmerge {
-  my ($newer_file, $older_file, $translation_file) = @_;
+  my ($self, $newer_file, $older_file, $translation_file) = @_;
   my $f = Text::Diff3::Factory->new;
 
   my $translation = $f->create_text([grep chomp, slurp($translation_file)]);
@@ -137,40 +142,57 @@ sub cmpmerge {
        if ( $r->type eq "A" ) { # conflict (all are different)
          $source .= "<<<<<<< $translation_file\n";
          $source .= $translation->as_string_range($r->range0);
-         ## $source .=  "||||||| $older_file\n";
-         ## $source .=  $old->as_string_at( $_ ) for $r->range2;
+         $source .= "||||||| $older_file\n";
+         $source .= $old->as_string_at( $_ ) for $r->range2;
          $source .= "=======\n";
          $source .= $new->as_string_range($r->range1);
          $source .= ">>>>>>> $newer_file\n";
        } elsif ( $r->type eq "0" ) { # translation is different, older == newer version
-         if ($new->as_string_range($r->range1)) {
-           $source .= "<<<<<<< $translation_file\n";
-           $source .= $translation->as_string_range($r->range0);
-           $source .= "=======\n";
-           $source .= $new->as_string_range($r->range1);
-           $source .= ">>>>>>> $newer_file\n";
-         } else {
-           $source .= $translation->as_string_range($r->range0);
-         }
+         $source .= $translation->as_string_range($r->range0);
        } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
-         ### it is something wrong that old is different.
-
-         # it should be ignore? just use newer version?
-         ### $source .=  "<<<<<<< $older_file";
-         ### $source .=  $old->as_string_range($r->range2);
-         ### $source .=  "=======\n";
-         ### $source .=  $new->as_string_range($r->range1);;
-         ### $source .=  ">>>>>>> $newer_file\n";
-
-         # just use newer version
+         # it should be ignore? just use newer version
          $source .=  $new->as_string_range($r->range1);;
        } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
-         # $source .= "--YOUR--", $r->type, "\n";
-         # $source .= "<<<<<<< $translation_file\n";
-         # $source .= $old->as_string_range($r->range2);
-         # $source .= "=======\n";
+         $source .= ">>>>>>> $newer_file\n";
          $source .= $new->as_string_range($r->range1);
-         # $source .= ">>>>>>> $newer_file\n";
+         $source .= "<<<<<<<\n";
+       }
+       $i2 = $r->hi2 + 1;
+     } );
+  $source .= $old->as_string_range($i2 .. $old->last_index);
+  return $source;
+}
+
+sub cmpmerge_least {
+  my ($self, $newer_file, $older_file, $translation_file) = @_;
+  my $f = Text::Diff3::Factory->new;
+
+  my $translation = $f->create_text([grep chomp, slurp($translation_file)]);
+  my $old = $f->create_text([grep chomp, slurp($older_file)]);
+  my $new = $f->create_text([grep chomp, slurp($newer_file)]);
+
+  my $p = $f->create_diff3;
+  my $d3 = $p->diff3( $translation, $old, $new );
+
+  my $i2 = 1; # line number start from 1 for this factory.
+  my $source;
+  $d3->each
+    (sub {
+       my ($r) = @_;
+       $source .=  $old->as_string_range($i2 .. $r->lo2 - 1);
+       if ( $r->type eq "A" ) { # conflict (all are different)
+         $source .= "<<<<<<< $translation_file\n";
+         $source .= $translation->as_string_range($r->range0);
+         $source .= "=======\n";
+         $source .= $new->as_string_range($r->range1);
+         $source .= ">>>>>>> $newer_file\n";
+       } elsif ( $r->type eq "0" ) { # translation is different, older == newer version
+         $source .= $translation->as_string_range($r->range0);
+       } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
+         # something wrong?
+         $source .= $new->as_string_range($r->range1);;
+       } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
+         $source .= $new->as_string_range($r->range1);
        }
        $i2 = $r->hi2 + 1;
      } );
@@ -184,6 +206,8 @@ sub notify {
 }
 
 sub update_version_info { }
+
+sub merge_method { }
 
 1;
 

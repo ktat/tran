@@ -12,6 +12,8 @@ sub copy_from_original {
   $self->SUPER::copy_from_original(@_, {omit_path => 'lib'});
 }
 
+sub merge_method { 'cmpmerge_least' } # or implement cmpmerge
+
 sub get_versions {
   # get only one version ..., need to use git(?) to fetch branches
   my ($self, $name) = @_;
