@@ -2,17 +2,17 @@ package Tran::Resources;
 
 use warnings;
 use strict;
-use Tran::Util -base;
+use Tran::Util -base, -debug;
 
 sub new {
   my ($class, %self) = @_;
   my $target = $self{config}->{targets};
-  my %target;
+#  my %target;
 #  foreach my $name (keys %$target) {
 #    $target{$name} = Tran::Resources::Target->new($target->{$name} || {});
 #    # $target{$name}->versions($self->root->original_repository->get_versions($name))
 #  }
-  $self{targets} = \%target;
+  $self{targets} = $target;
   bless \%self, $class;
 }
 
@@ -55,7 +55,7 @@ sub target_translation {
   my ($self, $target) = @_;
   my $t = $self->targets->{$target};
   if (defined $t) {
-    return $t->translation || $self->translation;
+    return $t->{translation} || $self->translation;
   } else {
     return $self->translation;
   }

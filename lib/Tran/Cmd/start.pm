@@ -28,6 +28,8 @@ sub run {
   my($target_path, $translation_name, $files);
   ($target_path, $translation_name, $version, $files) = @result;
 
+  $self->debug("translation_name: $translation_name");
+
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
 

@@ -63,10 +63,7 @@ sub prev_version {
   return $self->{versions}->{$name}->[-2];
 }
 
-sub path_format {
-  my $self = shift;
-  return $self->{config}{path_format};
-}
+sub path_format { '' }
 
 sub path_of {
   my ($self, $target, $version) = @_;

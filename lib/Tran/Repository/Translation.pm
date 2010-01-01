@@ -18,6 +18,8 @@ sub original_repository {
   $self->{original};
 }
 
+sub path_format { return "%n-%v" }
+
 sub merge {
   my ($self, $target_path, $prev_version, $version, $option) = @_;
   $option ||= {};

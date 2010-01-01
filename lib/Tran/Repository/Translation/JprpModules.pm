@@ -6,6 +6,8 @@ use Tran::Util -base;
 use version;
 use base qw/Tran::Repository::Translation/;
 
+sub path_format { return "%n-%v" }
+
 sub get_versions {
   my ($self, $name) = @_;
   die if @_ != 2;

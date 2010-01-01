@@ -89,8 +89,10 @@ sub translation {
 sub notify {
   my $self = shift;
   my ($name, @args) = @_;
-  Carp::croak(Dumper $self) unless $self->{notify}->{$name};
-  $self->{notify}->{$name}->notify(@args);
+  if (defined $name) {
+    $self->fatal("unkown notify name: $name") unless $self->{notify}->{$name};
+    $self->{notify}->{$name}->notify(@args);
+  }
 }
 
 =head1 NAME

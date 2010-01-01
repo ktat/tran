@@ -5,6 +5,8 @@ use strict;
 use Tran::Util -list, -file;
 use base qw/Tran::Repository::Translation/;
 
+sub path_format { return "%n-Doc-JA" }
+
 sub copy_from_original {
   my $self = shift;
   $self->SUPER::copy_from_original(@_, {omit_path => 'lib'});
