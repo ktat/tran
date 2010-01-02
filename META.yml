@@ -21,12 +21,18 @@ no_index:
 requires:
   App::Cmd: 0
   Archive::Tar: 0
+  Class::Inspector: 0
   Clone: 0
+  Cvs::Simple: 0
   Cwd: 0
+  Email::MIME: 0
+  Email::Sender::Simple: 0
   File::Copy: 0
   File::Find: 0
   File::Path: 0
   File::Slurp: 0
+  FindBin: 0
+  Git::Class: 0
   IO::Prompt: 0
   IO::String: 0
   IO::Uncompress::Gunzip: 0
@@ -35,6 +41,7 @@ requires:
   Storable: 0
   Text::Diff3: 0
   Util::Any: 0.17
+  YAML::XS: 0
   version: 0
 resources:
   license: http://dev.perl.org/licenses/

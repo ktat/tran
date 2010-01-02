@@ -34,7 +34,9 @@ sub run {
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
 
-  $translation->vcs->update($translation->path_of($target_path, $version));
+  if ($translation->vcs) {
+    $translation->vcs->update($translation->path_of($target_path, $version));
+  }
 
   unless ($translation->has_version($target_path, $version)) {
     my $prev_version = $original->prev_version($target_path) || $original->latest_version($target_path);

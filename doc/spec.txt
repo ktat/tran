@@ -22,9 +22,15 @@ Tran::Notify::Email -- notify by email
 
 Tran::Repository -- manage repository to store
 Tran::Repository::Original -- manage original documentation under ~/.tran/original/
-Tran::Repository::Translation -- manage translation repository (JprpModules, Jpa)
+Tran::Repository::Translation -- manage translation repository (JprpModules, Jpa etc.)
 Tran::Repository::Translation::JprpModules
+Tran::Repository::Translation::JprpCore
 Tran::Repository::Translation::Jpa
+
+Tran::VCS -- VCS for translation
+Tran::VCS::Jpa
+Tran::VCS::JprpModules
+Tran::VCS::JprpCore
 
 Tran::Resources -- resources
 Tran::Resources::CPAN  -- CPAN
