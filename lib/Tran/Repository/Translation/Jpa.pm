@@ -2,8 +2,9 @@ package Tran::Repository::Translation::Jpa;
 
 use warnings;
 use strict;
-use Tran::Util -list, -file;
+use Tran::Util -list, -file, -debug;
 use base qw/Tran::Repository::Translation/;
+use File::Slurp qw(write_file);
 
 sub path_format { return "%n-Doc-JA" }
 
@@ -28,8 +29,12 @@ sub get_versions {
   local $@;
   eval {$c = slurp($meta_file)};
   unless ($@) {
-    my ($version) = $c =~m{^version:\s*(.+)$}m;
-    push @versions, version->new($version);
+    if (my ($version) = $c =~m{^version:\s*(.+)$}m) {
+      $self->debug("read version from: $meta_file ($version)");
+      push @versions, version->new($version);
+    } else {
+      $self->debug("cannot read version information from metafile: $meta_file");
+    }
   } else {
     $self->debug("cannot open metafile: $meta_file");
   }
@@ -46,7 +51,7 @@ sub update_version_info {
     write_file($meta, $c);
     $self->info("meta file($meta) is updated.");
   } else {
-    wrtie_file($meta, "version: $version\ndistribution: $target_path");
+    write_file($meta, "version: $version\ndistribution: $target_path");
     $self->info("meta file($meta) is created.");
   }
 }

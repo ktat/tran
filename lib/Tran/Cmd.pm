@@ -3,6 +3,7 @@ package Tran::Cmd;
 use warnings;
 use strict;
 use App::Cmd::Setup -app;
+use IO::Prompt ();
 
 sub new {
   my ($self, $tran) = @_;
@@ -22,6 +23,13 @@ sub log {
 sub tran {
   my $self = shift;
   $self->{tran};
+}
+
+sub prompt {
+  my ($self, $message) = @_;
+  $message ||= '';
+  chomp(my $answer = IO::Prompt::prompt($message . '(Y/n)'));
+  return lc($answer) eq 'y' || 0;
 }
 
 1;

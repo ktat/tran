@@ -3,40 +3,60 @@ package Tran::VCS::Jpa;
 use strict;
 use Tran::Util -base;
 use base qw/Tran::VCS/;
-
-sub new {
-  my $class = shift;
-  my %opt = @_;
-  my $o = $class->SUPER::new(
-                             repo    => $opt{repo},
-                             type    => 'Git',
-                            );
-  return $o;
-}
+use Git::Class;
 
 sub connect {
   my ($self, $target) = @_;
-  my $vci = VCI->connect(type => $self->{type},
-                         repo => $self->{repo},
-                        );
-  return $self->{project} = $vci->get_project(name => "$target-Doc-JA");
+  my $git = Git::Class::Cmd->new(die_on_error => 1, verbose => 1);
+  return $git;
+}
+
+sub wd {
+  my $self = shift;
+  return $self->{wd} . '/'. $self->{plus_path};
+}
+
+sub update {
+  my ($self, $path) = @_;
+  $self->{plus_path} = $self->relative_path($path);
+  $self->_method
+    (
+     sub {
+       my $git = shift;
+       $git->git({}, 'pull');
+     });
 }
 
 sub add_files {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
-  
+  my ($self, $path) = @_;
+  $self->{plus_path} = $self->relative_path($path);
+  $self->_method
+    (
+     sub {
+       my ($git) = @_;
+       $git->git({}, 'add', "./");
+       $git->commit("./", {message => $self->msg('add_files')});
+     }
+    );
 }
 
 sub commit {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
-  
+  my ($self, $path) = @_;
+  $self->{plus_path} = $self->relative_path($path);
+  $self->_method
+    (
+     sub {
+       my ($git) = @_;
+       $git->commit({message => $self->msg('commit')});
+     }
+    );
 }
 
-sub finish_commit {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
+sub relative_path {
+  my ($self, $path) = @_;
+  my $wd = quotemeta($self->{wd});
+  $path =~s{^$wd/?}{};
+  return $path;
 }
 
 =head1 NAME
@@ -59,7 +79,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

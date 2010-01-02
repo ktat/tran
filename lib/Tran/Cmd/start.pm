@@ -6,6 +6,7 @@ use Tran::Cmd -command;
 use Tran;
 use Tran::Util -base, -debug;
 use File::Path qw/make_path/;
+use IO::Prompt;
 
 sub abstract {  'start new translation'; }
 
@@ -33,6 +34,8 @@ sub run {
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
 
+  $translation->vcs->update($translation->path_of($target_path, $version));
+
   unless ($translation->has_version($target_path, $version)) {
     my $prev_version = $original->prev_version($target_path) || $original->latest_version($target_path);
     if ($prev_version < $version) {
@@ -46,10 +49,15 @@ sub run {
       }
     } else {
       $translation->copy_from_original($target_path, $version);
-      $translation->vcs->commit($target_path, $version);
       $self->info("copy original files to translation path.");
     }
     $translation->update_version_info($target_path, $version);
+    if ($translation->vcs) {
+      if ($self->app->prompt("add files and commit to VCS ?")) {
+        $translation->vcs->add_files($translation->path_of($target_path, $version));
+        $self->info("vcs: add files and commit");
+      }
+    }
     $tran->notify($translation->notify, 'start', $target, $version);
   } else {
     $self->info("translation files for $target $version are found.");

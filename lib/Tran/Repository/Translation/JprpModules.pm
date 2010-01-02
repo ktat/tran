@@ -26,6 +26,11 @@ sub get_versions {
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
 }
 
+sub files {
+  my $self = shift;
+  return grep {!m{/CVS/} and !m{/CVSROOT/}} $self->SUPER::files(@_);
+}
+
 1;
 
 =head1 NAME

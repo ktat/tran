@@ -1,33 +1,73 @@
 package Tran::VCS::JprpModules;
 
 use strict;
-use Tran::Util -base;
+use Tran::Util -base, -file;
 use base qw/Tran::VCS/;
+use Cvs::Simple;
+use Cwd qw/cwd/;
 
 sub new {
   my $class = shift;
   my %opt = @_;
-  my $o = $class->SUPER::new(
-                             repo    => ":ext:$opt{vcs_user}\@cvs.sourceforge.jp:/cvsroot/perldocjp",
-                             type    => 'Cvs',
-                             project => '.',
-                            );
-  return $o;
+  my %self = (
+              wd      => $opt{wd},
+              path    => 'docs/modules/',
+              project => '.',
+             );
+  $self{repo} = ":ext:$opt{vcs_user}\@cvs.sourceforge.jp:/cvsroot/perldocjp"
+    if defined $opt{vcs_user};
+  return $class->SUPER::new(%self);
+}
+
+sub connect {
+  my $self = shift;
+  my $cwd = cwd;
+  chdir($self->{wd});
+  my $cvs = Cvs::Simple->new();
+  chdir($cwd);
+  return $cvs;
+
+}
+
+sub update {
+  my ($self, $path) = @_;
+  return $self->_method
+    (
+     sub {
+       my ($cvs) = @_;
+       chdir $path if defined $path;
+       $cvs->update;
+     }
+    );
 }
 
 sub add_files {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
+  my ($self, $target_path) = @_;
+  my @files = $self->files($target_path);
+  return $self->_method
+    (
+     sub {
+       my ($cvs) = @_;
+       $cvs->update;
+       if (@files) {
+         $cvs->add(@files);
+         $cvs->commit;
+       }
+     }
+    );
 }
 
 sub commit {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
-}
-
-sub finish_commit {
-  my ($self, $target, $version) = @_;
-  my $p = $self->connect;
+  my ($self, $path) = @_;
+  return $self->_method
+    (
+     sub {
+       my ($cvs) = @_;
+       chdir $path if defined $path;
+       $cvs->update;
+       $cvs->commit;
+     }
+    );
 }
 
 =head1 NAME
@@ -50,7 +90,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

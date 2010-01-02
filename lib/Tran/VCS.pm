@@ -3,32 +3,64 @@ package Tran::VCS;
 use warnings;
 use strict;
 use Tran::Util -base;
-use VCI;
+use Cwd qw/cwd/;
+
+my %MSG = (
+           update    => 'update files',
+           commit    => 'commit by tran',
+           add_files => 'add files & commit by tran'
+          );
 
 sub new {
   my $class = shift;
   my %self = @_;
+  $self{cwd} = cwd;
   bless \%self => $class;
 }
 
-sub connect {
-  my $self = shift;
-  my $vci = VCI->connect(type => $self->{type},
-                         repo => $self->{repo},
-                        );
-  return $self->{project} = $vci->get_project(name => $self->{project});
-}
-
-sub project {
-  my $self = shift;
-  return $self->{project};
-}
+sub connect { die "implement it in subclass" }
 
 sub add_files { die "implement it in subclass" }
 
 sub commit { die "implement it in subclass" }
 
 sub finish_commit { die "implement it in subclass" }
+
+sub files {
+  my ($self, $path) = @_;
+  my @f;
+  find({
+        wanted => sub {
+          my $f = $File::Find::name;
+          push @f, $f;
+        },
+        nochdir => 1,
+       },
+       $path);
+  return @f;
+}
+
+sub _method {
+  my ($self, $sub, @argv) = @_;
+  chdir($self->wd);
+  my $vcs = $self->connect;
+  my $r;
+  if (@_ > 1) {
+    $r = $sub->($vcs, @argv);
+  }
+  chdir($self->{cwd});
+  return $r;
+}
+
+sub wd {
+  my $self = shift;
+  return $self->{wd};
+}
+
+sub msg {
+  my ($self, $method) = @_;
+  return $MSG{$method};
+}
 
 =head1 NAME
 

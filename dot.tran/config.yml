@@ -26,8 +26,8 @@ repository:
   translation:
     jprp-modules:
       vcs:
-        # sourceforge.jp のアカウント
-        user: 'user'
+        # CVSのワーキングディレクトリ
+	wd: /home/ktat/tmp/hoge/
       # CVSで checkout したディレクトリ
       directory: /home/user/cvs/perldocjp/docs/modules/
       # 通知に上で設定した perldocjp を使う
@@ -44,7 +44,7 @@ repository:
     jpa:
       vcs:
         # git clone したディレクトリ
-        repo: /home/user/git/github/jpa-translation/
+        wd: /home/user/git/github/jpa-translation/
       directory: /home/user/git/github/jpa-translation/
 
 # リソースの設定

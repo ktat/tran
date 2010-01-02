@@ -14,7 +14,8 @@ sub new {
   if ($class =~s{::Repository::Translation::}{::VCS::}) {
     if (Class::Inspector->loaded($class)) {
       $o->debug("repository has vcs: $class");
-      $self{vcs} = $class->new(%{$self{config}->{vcs}});
+      $o->{vcs} = $class->new(%{$self{config}->{vcs}});
+      $o->{vcs}->{log} = $self{log};
     }
   }
   return $o;

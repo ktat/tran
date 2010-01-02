@@ -13,7 +13,7 @@ BEGIN {
     my $lc_level = lc $level;
     *{__PACKAGE__ . '::' . $lc_level} = sub {
       my ($self, $message) = @_;
-      return CORE::warn(@_) unless ref $self;
+      return Carp::carp(@_) unless ref $self;
       my $log = (ref $self) =~m{^Tran::Cmd} ? $self->app->{log} : $self->{log};
       my $method = lc $level;
       $log->$method($message);
