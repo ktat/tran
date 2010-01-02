@@ -9,7 +9,7 @@ our %LOG_LEVEL = (
                  WARN  => 2,
                  INFO  => 3,
                  DEBUG => 4,
-);
+                 );
 
 sub new {
   my ($class, %opt) = @_;

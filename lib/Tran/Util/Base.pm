@@ -15,10 +15,8 @@ BEGIN {
       my ($self, $message) = @_;
       return CORE::warn(@_) unless ref $self;
       my $log = (ref $self) =~m{^Tran::Cmd} ? $self->app->{log} : $self->{log};
-      if ($log->level >= $Tran::Log::LOG_LEVEL{$level}) {
-        my $method = lc $level;
-        $log->$method($message);
-      }
+      my $method = lc $level;
+      $log->$method($message);
     };
   }
 }

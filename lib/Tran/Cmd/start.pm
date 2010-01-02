@@ -46,6 +46,7 @@ sub run {
       }
     } else {
       $translation->copy_from_original($target_path, $version);
+      $translation->vcs->commit($target_path, $version);
       $self->info("copy original files to translation path.");
     }
     $translation->update_version_info($target_path, $version);

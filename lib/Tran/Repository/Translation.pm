@@ -8,6 +8,23 @@ use Text::Diff3;
 
 use base qw/Tran::Repository/;
 
+sub new {
+  my ($class, %self) = @_;
+  my $o = $class->SUPER::new(%self);
+  if ($class =~s{::Repository::Translation::}{::VCS::}) {
+    if (Class::Inspector->loaded($class)) {
+      $o->debug("repository has vcs: $class");
+      $self{vcs} = $class->new(%{$self{config}->{vcs}});
+    }
+  }
+  return $o;
+}
+
+sub vcs {
+  my $self = shift;
+  $self->{vcs};
+}
+
 sub original {
   my $self = shift;
   $self->{config}->{directory};
@@ -208,8 +225,6 @@ sub notify {
 sub update_version_info { }
 
 sub merge_method { }
-
-1;
 
 =head1 NAME
 
