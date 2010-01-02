@@ -9,7 +9,8 @@ use base qw/Tran::Repository::Translation/;
 sub path_format { return "%n-%v" }
 
 sub get_versions {
-  my ($self, $name) = @_;
+  my ($self, $target) = @_;
+  my $name = $self->target_path($target);
   die if @_ != 2;
   return if exists $self->{versions}->{$name};
 
@@ -29,6 +30,16 @@ sub get_versions {
 sub files {
   my $self = shift;
   return grep {!m{/CVS/} and !m{/CVSROOT/}} $self->SUPER::files(@_);
+}
+
+sub has_target {
+  my ($self, $target) = @_;
+  my $target_path = $self->target_path($target);
+  if (opendir my $dir, $self->directory) {
+    return any {/^$target_path\-[\d\.]+$/} readdir $dir ? 1 : 0;
+  } else {
+    $self->fatal("cannot open directory");
+  }
 }
 
 1;

@@ -42,7 +42,8 @@ sub get_versions {
 }
 
 sub update_version_info {
-  my ($self, $target_path, $version) = @_;
+  my ($self, $target, $version) = @_;
+  my $target_path = $self->target_path($target);
   my $target_dir = $self->path_of($target_path, $version) . '/';
   my $meta = $target_dir . '/META.yml';
   if (-e $meta) {
@@ -59,6 +60,12 @@ sub update_version_info {
 sub merge {
   my $self = shift;
   $self->SUPER::merge(@_, {omit_path => 'lib'});
+}
+
+sub has_target {
+  my ($self, $target) = @_;
+  my $target_path = $self->target_path($target);
+  return -d $self->directory . '/' . $target_path . '-Doc-JA' ? 1 : 0;
 }
 
 1;

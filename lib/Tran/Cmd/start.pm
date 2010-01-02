@@ -17,46 +17,50 @@ sub run {
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
   my @result = $r->get($target, $version);
-  if (@result == 3) {
+  if (@result == 2) {
     if (defined $version and $version) {
-      $self->info("You have $target($result[2]) in original repository");
+      $self->info("You have $target($result[1]) in original repository");
     } else {
-      $self->info("You have the latest version($result[2]) of $target in original repository");
+      $self->info("You have the latest version($result[1]) of $target in original repository");
     }
   } else {
     $self->info("Got $target" . ($version || '') );
   }
-  my($target_path, $translation_name, $files);
-  ($target_path, $translation_name, $version, $files) = @result;
+  my($translation_name, $files);
+  ($translation_name, $version, $files) = @result;
 
   $self->debug("translation_name: $translation_name");
 
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
-
   if ($translation->vcs) {
-    $translation->vcs->update($translation->path_of($target_path, $version));
+    if ($translation->has_target($target)) {
+      $translation->vcs->update($translation->path_of($target, $version))
+        and $self->info("vcs: update $target");
+    } elsif ($translation->vcs->can('checkout_target')) {
+      $translation->vcs->checkout_target($translation->target_path($target), $version)
+        and $self->info("vcs: checkout $target");
+    }
   }
-
-  unless ($translation->has_version($target_path, $version)) {
-    my $prev_version = $original->prev_version($target_path) || $original->latest_version($target_path);
+  unless ($translation->has_version($target, $version)) {
+    my $prev_version = $original->prev_version($target) || $original->latest_version($target);
     if ($prev_version < $version) {
-      if ($translation->has_version($target_path, $prev_version)) {
-        $translation->merge($target_path, $prev_version, $version);
+      if ($translation->has_version($target, $prev_version)) {
+        $translation->merge($target, $prev_version, $version);
         $self->info("copy previous version($prev_version) to new version($version) with patch.");
       } else {
         $self->debug("translation for $prev_version is not found.");
-        $translation->copy_from_original($target_path, $version);
+        $translation->copy_from_original($target, $version);
         $self->info("copy original files to translation path.");
       }
     } else {
-      $translation->copy_from_original($target_path, $version);
+      $translation->copy_from_original($target, $version);
       $self->info("copy original files to translation path.");
     }
-    $translation->update_version_info($target_path, $version);
+    $translation->update_version_info($target, $version);
     if ($translation->vcs) {
       if ($self->app->prompt("add files and commit to VCS ?")) {
-        $translation->vcs->add_files($translation->path_of($target_path, $version));
+        $translation->vcs->add_files($translation->path_of($target, $version));
         $self->info("vcs: add files and commit");
       }
     }

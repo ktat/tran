@@ -38,16 +38,29 @@ sub reset {
 sub get_versions { die "implement in sub class"; }
 
 sub latest_version {
-  my ($self, $name) = @_;
+  my ($self, $target) = @_;
   die if @_ != 2;
+
+  my $name = $self->target_path($target);
   $self->get_versions($name);
 
   return $self->{versions}->{$name}->[-1];
 }
 
+sub target_path {
+  my ($self, $target) = @_;
+  Carp::croak("taget name is required") if @_ == 1;
+  $target =~s{::}{\-}g;
+  return $target;
+}
+
+sub has_target { die "implement it in subclass"; }
+
 sub has_version {
-  my ($self, $name, $version) = @_;
+  my ($self, $target, $version) = @_;
   die if @_ != 3;
+
+  my $name = $self->target_path($target);
   $self->get_versions($name);
 
   foreach my $ver (@{$self->{versions}->{$name}}) {
@@ -57,21 +70,23 @@ sub has_version {
 }
 
 sub prev_version {
-  my ($self, $name) = @_;
+  my ($self, $target) = @_;
+  my $name = $self->target_path($target);
   die "not enough argument." if @_ != 2;
   $self->get_versions($name);
-  return $self->{versions}->{$name}->[-2];
+  return $self->{versions}->{$name}->[-2] || 0;
 }
 
 sub path_format { '' }
 
 sub path_of {
   my ($self, $target, $version) = @_;
+  my $target_path = $self->target_path($target);
   my $path = join "/", $self->directory;
   unless (my $path_format = $self->path_format) {
-    $path = join "/", $path, $target, $version;
+    $path = join "/", $path, $target_path, $version;
   } else {
-    $path_format =~s{%n}{$target};
+    $path_format =~s{%n}{$target_path};
     $path_format =~s{%v}{$version};
     $path = join "/", $path, $path_format;
   }
@@ -81,9 +96,10 @@ sub path_of {
 
 sub files {
   my ($self, $target, $version) = @_;
-  my $dir = quotemeta($self->path_of($target, $version));
+  my $path = $self->path_of($target, $version);
+  my $dir = quotemeta($path);
   my @files;
-  find({wanted => sub {push @files, $_}, no_chdir => 1}, $self->path_of($target, $version));
+  find({wanted => sub {push @files, $_}, no_chdir => 1}, $path);
   return grep {s{^$dir}{}} @files;
 }
 

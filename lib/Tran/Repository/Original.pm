@@ -6,7 +6,8 @@ use File::Find qw/find/;
 use base qw/Tran::Repository/;
 
 sub get_versions {
-  my ($self, $name) = @_;
+  my ($self, $target) = @_;
+  my $name = $self->target_path($target);
   die if @_ != 2;
   return if exists $self->{versions}->{$name};
 
@@ -20,6 +21,12 @@ sub get_versions {
     $self->debug(sprintf "directory is not found : %s/%s", $self->directory, $name);
   }
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+}
+
+sub has_target {
+  my ($self, $target) = @_;
+  my $target_path = $self->target_path($target);
+  return  -d $self->directory . '/' . $target_path ? 1 : 0;
 }
 
 1;

@@ -8,8 +8,14 @@ use base qw/Tran::Repository::Translation/;
 
 sub path_format { return "%v" }
 
+sub has_target {
+  my $self = shift;
+  return -d $self->directory ? 1 : 0;
+}
+
 sub get_versions {
-  my ($self, $name) = @_;
+  my ($self, $target) = @_;
+  my $name = $self->target_path($target);
   die if @_ != 2;
   return if exists $self->{versions}->{$name};
 

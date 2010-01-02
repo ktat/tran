@@ -38,7 +38,7 @@ sub get {
 
   my $url;
   ($url, $version) = $self->get_module_info($target) unless $version;
-  return ($target_path, $self->target_translation($target), version->new($version))
+  return ($self->target_translation($target), version->new($version))
     if $self->original_repository->has_version($target_path, $version);
 
   ($url) = $self->get_module_info($target, $version) unless $url;
@@ -92,7 +92,7 @@ sub get {
     }
   }
   $self->original_repository->reset;
-  return $target_path, $self->target_translation($target), version->new($version), \@files;
+  return ($self->target_translation($target), version->new($version), \@files);
 }
 
 # from Pod::Perldoc::ToPod

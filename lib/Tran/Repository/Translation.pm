@@ -2,7 +2,7 @@ package Tran::Repository::Translation;
 
 use warnings;
 use strict;
-use Tran::Util -debug, -base, -file;
+use Tran::Util -debug, -base, -file, -list;
 use File::Path ('make_path');
 use Text::Diff3;
 
@@ -26,6 +26,16 @@ sub vcs {
   $self->{vcs};
 }
 
+sub has_target {
+  my ($self, $target) = @_;
+  my $target_path = $self->target_path($target);
+  if (opendir my $dir, $self->directory) {
+    return any {/^$target_path\-/} readdir $dir ? 1 : 0;
+  } else {
+    $self->fatal("cannot open directory");
+  }
+}
+
 sub original {
   my $self = shift;
   $self->{config}->{directory};
@@ -39,7 +49,8 @@ sub original_repository {
 sub path_format { return "%n-%v" }
 
 sub merge {
-  my ($self, $target_path, $prev_version, $version, $option) = @_;
+  my ($self, $target, $prev_version, $version, $option) = @_;
+  my $target_path = $self->target_path($target);
   $option ||= {};
 
   my $original_repository   = $self->original_repository;
@@ -94,7 +105,8 @@ sub merge {
 }
 
 sub copy_from_original {
-  my ($self, $target_path, $version, $option) = @_;
+  my ($self, $target, $version, $option) = @_;
+  my $target_path = $self->target_path($target);
   $option ||= {};
   my $original_repository = $self->original_repository;
   my $original_path       = $original_repository->path_of($target_path, $version);
