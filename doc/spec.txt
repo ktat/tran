@@ -4,12 +4,15 @@
    'get' method is implemented in Tran::Repository::Original::*
    For example, Tran::Repository::Original::CPAN get tar.gz,
    extract it and abstract pod from pm.
+
 2. copy original to translation
-   If you have  previous version translation, merge old/new/translation with Text::Diff3.
+   If you have  previous version translation,
+   merge old original/new original/old translation with Text::Diff3.
    This is implemented in Tran::Repository::Translation,
-   getting version information etc. is implemente in its subclass.
+   some methods, for example getting version information etc., are implemented in its subclass.
 
 3. If needed, update version information(for example, version is written in file).
+
 4. do some notifys by command.
 
 [2] Module Structure

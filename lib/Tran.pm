@@ -96,8 +96,10 @@ sub notify {
   my $self = shift;
   my ($name, @args) = @_;
   if (defined $name) {
-    $self->fatal("unkown notify name: $name") unless $self->{notify}->{$name};
-    $self->{notify}->{$name}->notify(@args);
+    for my $n (ref $name eq 'ARRAY' ? @$name : $name) {
+      $self->fatal("unkown notify name: $n") unless $self->{notify}->{$n};
+      $self->{notify}->{$n}->notify(@args);
+    }
   }
 }
 
