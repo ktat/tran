@@ -1,33 +1,43 @@
-get things from resource
-save them to original
-copy them to translation
- (if you have previous version of original and translation, merge them)
-notify
+[1] Behavior
 
+1. get and extract files from resource to ~/.tran/original/ directory
+   'get' method is implemented in Tran::Repository::Original::*
+   For example, Tran::Repository::Original::CPAN get tar.gz,
+   extract it and abstract pod from pm.
+2. copy original to translation
+   If you have  previous version translation, merge old/new/translation with Text::Diff3.
+   This is implemented in Tran::Repository::Translation,
+   getting version information etc. is implemente in its subclass.
 
-Tran
-Tran::Cmd
-Tran::Config
+3. If needed, update version information(for example, version is written in file).
+4. do some notifys by command.
+
+[2] Module Structure
+
+Tran -- base module
+Tran::Config -- handle config file
+
+Tran::Notify -- notification
+Tran::Notify::Email -- notify by email
+
+Tran::Repository -- manage repository to store
+Tran::Repository::Original -- manage original documentation under ~/.tran/original/
+Tran::Repository::Translation -- manage translation repository (JprpModules, Jpa)
+Tran::Repository::Translation::JprpModules
+Tran::Repository::Translation::Jpa
+
+Tran::Resources -- resources
+Tran::Resources::CPAN  -- CPAN
+
 Tran::Log
-Tran::Notify
-Tran::VCS
-
-
-Tran::Repository -- 保存場所
-Tran::Repository::Original -- ~/.tran/original/ のマネージメトン
-Tran::Repository::Translation -- CPAN/他の翻訳場所の保存場所
-
-Tran::Resources -- CPAN/他
-Tran::Resources::CPAN  (リソースの種類)
-Tran::Resources::Target (リソースにある対象)
-
-
-Tran::Log::Stderr (ログ)
+Tran::Log::Stderr
 
 Tran::Util
-Tran::Util::Base
+Tran::Util::Base -- for mixin
 
-Tran::Cmd::Command::config
-Tran::Cmd::Command::finish
-Tran::Cmd::Command::init
-Tran::Cmd::Command::start.pm
+Tran::Cmd
+Tran::Cmd::init    -- initialize config file
+Tran::Cmd::start   -- start translation
+Tran::Cmd::finish  -- finish translation
+Tran::Cmd::join    -- join translatiing document (only notify?)
+Tran::Cmd::config  -- show config
