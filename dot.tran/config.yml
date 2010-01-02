@@ -1,55 +1,76 @@
-# copy dot.tran directory to your ~/.tran
+# dot.tran ディレクトリを ~/.tran に変更して、以下を編集すれば使えるはず...
 ---
+# ログの設定
 log:
+  # Log::Stderr を使う
   class: Stderr
   level: debug
 
+# 通知の設定
 notify:
   perldocjp:
+    # Notify::Email を使う
     class: Email
+    # 以下は、Notify::Emailに渡す設定
     from: 'from@example.com'
     to: 'to@example.com'
     template_directory: /home/user/.tran/template/perldocjp/
 
+# リポジトリの設定
 repository:
+  # オリジナルリポジトリの設定
   original:
     directory: /home/user/.tran/original/
-  
+
+  # 翻訳リポジトリの設定  
   translation:
     jprp-modules:
       vcs:
+        # sourceforge.jp のアカウント
         user: 'user'
+      # CVSで checkout したディレクトリ
       directory: /home/user/cvs/perldocjp/docs/modules/
+      # 通知に上で設定した perldocjp を使う
       notify: perldocjp
 
     jprp-core:
       vcs:
+        # sourceforge.jp のアカウント
         user: 'user'
+      # CVSで checkout したディレクトリ
       directory: /home/user/cvs/perldocjp/docs/perl/
       notify: perldocjp
         
     jpa:
       vcs:
+        # git clone したディレクトリ
         repo: /home/user/git/github/jpa-translation/
       directory: /home/user/git/github/jpa-translation/
-  
+
+# リソースの設定
 resources:
   CPAN:
+    # デフォルトの設定
+
+    # 翻訳リポジトリとして、jprp-modules を使う
     translation: jprp-modules
+    # ~/.cpan/Metadata へのパス
     metafile: /home/user/.cpan/Metadata
+    # 以下のファイルのみ対象とする
     target_only:
       - '*.pm'
       - '*.pod'
       - README
       - Changes
-    # if only is specified, ignore is ignored
+    # 以下のファイル以外を対象とする(target_onlyが指定されていたら無効)
     target_ignore:
       - '*.t'
-    target_directory:
-      - lib
 
+    # デフォルト以外の設定をモジュールごとに
     targets:
       Moose:
+        # 翻訳リポジトリとして jpa を使う
         translation: jpa
       MooseX::Getopt:
+        # 翻訳リポジトリとして jpa を使う
         translation: jpa
