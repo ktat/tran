@@ -27,17 +27,17 @@ repository:
     jprp-modules:
       vcs:
         # CVSのワーキングディレクトリ
-	wd: /home/ktat/tmp/hoge/
-      # CVSで checkout したディレクトリ
+	wd:  /home/user/cvs/perldocjp/
+      # CVSで checkout したディレクトリのmodulesへのフルパス
       directory: /home/user/cvs/perldocjp/docs/modules/
       # 通知に上で設定した perldocjp を使う
       notify: perldocjp
 
     jprp-core:
       vcs:
-        # sourceforge.jp のアカウント
-        user: 'user'
-      # CVSで checkout したディレクトリ
+        # CVSのワーキングディレクトリ
+	wd:  /home/user/cvs/perldocjp/
+      # CVSで checkout したディレクトリの docs/perlへのフルパス
       directory: /home/user/cvs/perldocjp/docs/perl/
       notify: perldocjp
         
@@ -45,6 +45,7 @@ repository:
       vcs:
         # git clone したディレクトリ
         wd: /home/user/git/github/jpa-translation/
+      # git clone したディレクトリ
       directory: /home/user/git/github/jpa-translation/
 
 # リソースの設定

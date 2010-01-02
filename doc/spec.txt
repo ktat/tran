@@ -47,3 +47,4 @@ Tran::Cmd::start   -- start translation
 Tran::Cmd::finish  -- finish translation
 Tran::Cmd::join    -- join translatiing document (only notify?)
 Tran::Cmd::config  -- show config
+

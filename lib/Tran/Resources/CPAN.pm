@@ -82,11 +82,15 @@ sub get {
       $name =~ s{\.pm}{.pod};
       $self->debug("write file: $name");
       open my $fh, ">", $name or die "cannot write $name";
+      printf $fh "=encoding %s\n\n", $self->encoding;
       $self->pm2pod($file->get_content, $fh);
       close $fh;
     } elsif($file->get_content) {
       $self->debug("write file: $name");
       open my $fh, ">", $name or die "cannot write $name";
+      if ($file->name =~ m{\.pod$}) {
+        printf $fh "=encoding %s\n\n", $self->encoding;
+      }
       print $fh $file->get_content;
       close $fh;
     }

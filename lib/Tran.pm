@@ -26,7 +26,8 @@ sub new {
       (root => $self,
        log  => $log,
        original => $original_repository,
-       config => $config->resources->{$kind}
+       config => $config->resources->{$kind},
+       encoding => $self->encoding,
       );
   }
 
@@ -57,6 +58,11 @@ sub new {
 sub log {
   my $self = shift;
   $self->{log};
+}
+
+sub encoding {
+  my $self = shift;
+  return $self->config->{encoding} || 'utf8';
 }
 
 sub resource {

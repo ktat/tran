@@ -21,6 +21,11 @@ sub get {
   die;
 }
 
+sub encoding {
+  my $self = shift;
+  $self->{encoding};
+}
+
 sub config {
   my $self = shift;
   return $self->{config};

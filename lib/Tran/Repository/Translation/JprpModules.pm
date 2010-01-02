@@ -2,7 +2,7 @@ package Tran::Repository::Translation::JprpModules;
 
 use warnings;
 use strict;
-use Tran::Util -base;
+use Tran::Util -base, -list;
 use version;
 use base qw/Tran::Repository::Translation/;
 
