@@ -1,76 +1,76 @@
-# dot.tran ¥Ç¥£¥ì¥¯¥È¥ê¤ò ~/.tran ¤ËÊÑ¹¹¤·¤Æ¡¢°Ê²¼¤òÊÔ½¸¤¹¤ì¤Ğ»È¤¨¤ë¤Ï¤º...
+# dot.tran ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’ ~/.tran ã«å¤‰æ›´ã—ã¦ã€ä»¥ä¸‹ã‚’ç·¨é›†ã™ã‚Œã°ä½¿ãˆã‚‹ã¯ãš...
 ---
-# ¥í¥°¤ÎÀßÄê
+# ãƒ­ã‚°ã®è¨­å®š
 log:
-  # Log::Stderr ¤ò»È¤¦
+  # Log::Stderr ã‚’ä½¿ã†
   class: Stderr
   level: debug
 
-# ÄÌÃÎ¤ÎÀßÄê
+# é€šçŸ¥ã®è¨­å®š
 notify:
   perldocjp:
-    # Notify::Email ¤ò»È¤¦
+    # Notify::Email ã‚’ä½¿ã†
     class: Email
-    # °Ê²¼¤Ï¡¢Notify::Email¤ËÅÏ¤¹ÀßÄê
+    # ä»¥ä¸‹ã¯ã€Notify::Emailã«æ¸¡ã™è¨­å®š
     from: 'from@example.com'
     to: 'to@example.com'
     template_directory: /home/user/.tran/template/perldocjp/
 
-# ¥ê¥İ¥¸¥È¥ê¤ÎÀßÄê
+# ãƒªãƒã‚¸ãƒˆãƒªã®è¨­å®š
 repository:
-  # ¥ª¥ê¥¸¥Ê¥ë¥ê¥İ¥¸¥È¥ê¤ÎÀßÄê
+  # ã‚ªãƒªã‚¸ãƒŠãƒ«ãƒªãƒã‚¸ãƒˆãƒªã®è¨­å®š
   original:
     directory: /home/user/.tran/original/
 
-  # ËİÌõ¥ê¥İ¥¸¥È¥ê¤ÎÀßÄê  
+  # ç¿»è¨³ãƒªãƒã‚¸ãƒˆãƒªã®è¨­å®š  
   translation:
     jprp-modules:
       vcs:
-        # sourceforge.jp ¤Î¥¢¥«¥¦¥ó¥È
+        # sourceforge.jp ã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ
         user: 'user'
-      # CVS¤Ç checkout ¤·¤¿¥Ç¥£¥ì¥¯¥È¥ê
+      # CVSã§ checkout ã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
       directory: /home/user/cvs/perldocjp/docs/modules/
-      # ÄÌÃÎ¤Ë¾å¤ÇÀßÄê¤·¤¿ perldocjp ¤ò»È¤¦
+      # é€šçŸ¥ã«ä¸Šã§è¨­å®šã—ãŸ perldocjp ã‚’ä½¿ã†
       notify: perldocjp
 
     jprp-core:
       vcs:
-        # sourceforge.jp ¤Î¥¢¥«¥¦¥ó¥È
+        # sourceforge.jp ã®ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ
         user: 'user'
-      # CVS¤Ç checkout ¤·¤¿¥Ç¥£¥ì¥¯¥È¥ê
+      # CVSã§ checkout ã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
       directory: /home/user/cvs/perldocjp/docs/perl/
       notify: perldocjp
         
     jpa:
       vcs:
-        # git clone ¤·¤¿¥Ç¥£¥ì¥¯¥È¥ê
+        # git clone ã—ãŸãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒª
         repo: /home/user/git/github/jpa-translation/
       directory: /home/user/git/github/jpa-translation/
 
-# ¥ê¥½¡¼¥¹¤ÎÀßÄê
+# ãƒªã‚½ãƒ¼ã‚¹ã®è¨­å®š
 resources:
   CPAN:
-    # ¥Ç¥Õ¥©¥ë¥È¤ÎÀßÄê
+    # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®è¨­å®š
 
-    # ËİÌõ¥ê¥İ¥¸¥È¥ê¤È¤·¤Æ¡¢jprp-modules ¤ò»È¤¦
+    # ç¿»è¨³ãƒªãƒã‚¸ãƒˆãƒªã¨ã—ã¦ã€jprp-modules ã‚’ä½¿ã†
     translation: jprp-modules
-    # ~/.cpan/Metadata ¤Ø¤Î¥Ñ¥¹
+    # ~/.cpan/Metadata ã¸ã®ãƒ‘ã‚¹
     metafile: /home/user/.cpan/Metadata
-    # °Ê²¼¤Î¥Õ¥¡¥¤¥ë¤Î¤ßÂĞ¾İ¤È¤¹¤ë
+    # ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ã¿å¯¾è±¡ã¨ã™ã‚‹
     target_only:
       - '*.pm'
       - '*.pod'
       - README
       - Changes
-    # °Ê²¼¤Î¥Õ¥¡¥¤¥ë°Ê³°¤òÂĞ¾İ¤È¤¹¤ë(target_only¤¬»ØÄê¤µ¤ì¤Æ¤¤¤¿¤éÌµ¸ú)
+    # ä»¥ä¸‹ã®ãƒ•ã‚¡ã‚¤ãƒ«ä»¥å¤–ã‚’å¯¾è±¡ã¨ã™ã‚‹(target_onlyãŒæŒ‡å®šã•ã‚Œã¦ã„ãŸã‚‰ç„¡åŠ¹)
     target_ignore:
       - '*.t'
 
-    # ¥Ç¥Õ¥©¥ë¥È°Ê³°¤ÎÀßÄê¤ò¥â¥¸¥å¡¼¥ë¤´¤È¤Ë
+    # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆä»¥å¤–ã®è¨­å®šã‚’ãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã”ã¨ã«
     targets:
       Moose:
-        # ËİÌõ¥ê¥İ¥¸¥È¥ê¤È¤·¤Æ jpa ¤ò»È¤¦
+        # ç¿»è¨³ãƒªãƒã‚¸ãƒˆãƒªã¨ã—ã¦ jpa ã‚’ä½¿ã†
         translation: jpa
       MooseX::Getopt:
-        # ËİÌõ¥ê¥İ¥¸¥È¥ê¤È¤·¤Æ jpa ¤ò»È¤¦
+        # ç¿»è¨³ãƒªãƒã‚¸ãƒˆãƒªã¨ã—ã¦ jpa ã‚’ä½¿ã†
         translation: jpa
