@@ -2,9 +2,9 @@ package Tran::Repository::Translation::JprpCore;
 
 use warnings;
 use strict;
-use Tran::Util -base;
+use Tran::Util -base, -prompt;
 use version;
-use base qw/Tran::Repository::Translation/;
+use base qw/Tran::Repository::Translation::JprpModules/;
 
 sub path_format { return "%v" }
 
@@ -29,6 +29,17 @@ sub get_versions {
     $self->debug(sprintf "directory is not found : %s", $self->directory);
   }
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+}
+
+sub _config {
+  my $self = shift;
+  return
+    {
+     vcs => {
+             wd => sub { prompt("directory you've checkouted for JPRP cvs repository") },
+            },
+     directory => sub { my $self = shift; return(\($self->{vcs}->{wd}), '/docs/perl/')  },
+    };
 }
 
 1;

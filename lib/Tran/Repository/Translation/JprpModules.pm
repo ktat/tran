@@ -2,7 +2,7 @@ package Tran::Repository::Translation::JprpModules;
 
 use warnings;
 use strict;
-use Tran::Util -base, -list;
+use Tran::Util -base, -list, -prompt;
 use version;
 use base qw/Tran::Repository::Translation/;
 
@@ -40,6 +40,17 @@ sub has_target {
   } else {
     $self->fatal("cannot open directory");
   }
+}
+
+sub _config {
+  my $self = shift;
+  return
+    {
+     vcs => {
+             wd => sub { prompt("directory you've checkouted for JPRP cvs repository") },
+            },
+     directory => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
+    };
 }
 
 1;

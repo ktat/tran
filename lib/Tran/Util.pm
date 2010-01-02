@@ -8,6 +8,22 @@ our $Utils = {
               %$Util::Any::Utils,
               '-base' =>  ['Tran::Util::Base'],
               '-file' =>  ['File::Slurp', 'File::Find', 'File::Copy'],
+              '-prompt' => [['IO::Prompt', '',
+                             { prompt =>
+                               sub {
+                                 sub {
+                                   my $message = shift;
+                                   my $answer = undef;
+                                 PROMPT:
+                                   {
+                                     $answer = IO::Prompt::prompt($message . ":");
+                                     $answer->{value} or redo PROMPT;
+                                   }
+                                   return $answer->{value};
+                                 }
+                               }
+                             }
+                            ]],
              };
 
 1;

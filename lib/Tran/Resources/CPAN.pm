@@ -120,6 +120,30 @@ sub pm2pod {
   return;
 }
 
+sub _config {
+  return
+    {
+     translation => 'jprp-modules',
+     metafile => "$ENV{HOME}/.cpan/Metadata",
+     target_only => [
+                     '*.pm',
+                     '*.pod',
+                    ],
+     'targets' => {
+                   'Moose'
+                   => {
+                       translation => 'jpa',
+                      },
+                   'MooseX::Getopt'
+                   => {
+                       translation => 'jpa',
+                      },
+
+                  }
+    };
+}
+
+
 1;
 
 =head1 NAME

@@ -3,17 +3,19 @@ package Tran::Config;
 use strict;
 use YAML::XS qw/Load Dump/;
 use File::Copy qw/copy/;
-use Util::Any -debug;
+use Tran::Util -debug, -file;
 use File::Slurp qw/slurp/;
 
 sub new {
   my ($self, $file) = @_;
   my $config = {};
-  if ($file =~m{\.ya?ml$} and -e $file) {
-    my $yaml = slurp $file;
-    $config = Load($yaml);
+  if ($file =~m{\.ya?ml$}) {
+    if (-e $file) {
+      my $yaml = slurp $file;
+      $config = Load($yaml);
+    }
   } else {
-    die "currenty only yaml is supported";
+    Carp::confess("currenty only yaml is supported");
   }
   return bless {config => $config,
                 file   => $file,
@@ -22,12 +24,12 @@ sub new {
 
 sub resources {
   my ($self, $kind) = @_;
-  return $self->{config}{resources};
+  return $self->{config}{resources} || {};
 }
 
 sub original_repository {
   my ($self) = @_;
-  $self->{config}->{repository}->{original};
+  $self->{config}->{repository}->{original} || {};
 }
 
 sub translation_repository {
@@ -35,7 +37,7 @@ sub translation_repository {
   if (@_ == 2) {
     $self->{config}->{repository}{translation}->{$kind} || {};
   } else {
-    $self->{config}->{repository}{translation};
+    $self->{config}->{repository}{translation} || {};
   }
 }
 
@@ -54,8 +56,13 @@ sub notify {
  if (@_ == 2) {
    $self->{config}->{notify}->{$key};
  } else {
-   $self->{config}->{notify};
+   $self->{config}->{notify} || {};
  }
+}
+
+sub save {
+  my $self = shift;
+  write_file($self->{file}, Dump($self->{config}));
 }
 
 1;

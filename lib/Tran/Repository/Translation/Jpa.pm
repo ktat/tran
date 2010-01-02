@@ -2,7 +2,7 @@ package Tran::Repository::Translation::Jpa;
 
 use warnings;
 use strict;
-use Tran::Util -list, -file, -debug;
+use Tran::Util -list, -file, -prompt, -debug;
 use base qw/Tran::Repository::Translation/;
 use File::Slurp qw(write_file);
 
@@ -66,6 +66,17 @@ sub has_target {
   my ($self, $target) = @_;
   my $target_path = $self->target_path($target);
   return -d $self->directory . '/' . $target_path . '-Doc-JA' ? 1 : 0;
+}
+
+sub _config {
+  my $self = shift;
+  return
+    {
+     vcs => {
+              wd => sub { prompt("directory you've cloned for jpa translation") },
+            },
+     directory => sub { my $self = shift; return(\($self->{vcs}->{wd})) },
+    };
 }
 
 1;
