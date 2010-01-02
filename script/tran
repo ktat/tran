@@ -1,7 +1,8 @@
 #!/usr/bin/perl
 
 use strict;
-use lib qw(./lib ../lib);
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Tran;
 use Tran::Cmd;
 

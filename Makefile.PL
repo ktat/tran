@@ -14,6 +14,7 @@ requires
     'Cwd'		     => 0,
     'Email::MIME'            => 0,
     'Email::Sender::Simple'  => 0,
+    'FindBin'                => 0,
     'File::Copy'	     => 0,
     'File::Find'	     => 0,
     'File::Path'	     => 0,
