@@ -1,0 +1,55 @@
+# copy dot.tran directory to your ~/.tran
+---
+log:
+  class: Stderr
+  level: debug
+
+notify:
+  perldocjp:
+    class: Email
+    from: 'from@example.com'
+    to: 'to@example.com'
+    template_directory: /home/user/.tran/template/perldocjp/
+
+repository:
+  original:
+    directory: /home/user/.tran/original/
+  
+  translation:
+    jprp-modules:
+      vcs:
+        user: 'user'
+      directory: /home/user/cvs/perldocjp/docs/modules/
+      notify: perldocjp
+
+    jprp-core:
+      vcs:
+        user: 'user'
+      directory: /home/user/cvs/perldocjp/docs/perl/
+      notify: perldocjp
+        
+    jpa:
+      vcs:
+        repo: /home/user/git/github/jpa-translation/
+      directory: /home/user/git/github/jpa-translation/
+  
+resources:
+  CPAN:
+    translation: jprp-modules
+    metafile: /home/user/.cpan/Metadata
+    target_only:
+      - '*.pm'
+      - '*.pod'
+      - README
+      - Changes
+    # if only is specified, ignore is ignored
+    target_ignore:
+      - '*.t'
+    target_directory:
+      - lib
+
+    targets:
+      Moose:
+        translation: jpa
+      MooseX::Getopt:
+        translation: jpa

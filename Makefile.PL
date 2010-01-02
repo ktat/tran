@@ -28,10 +28,10 @@ requires
     'Util::Any'		     => '0.17',
     'YAML::XS'               => 0,
     'version'                => 0,
+    'VCI'                    => 0,
     ;
     
 install_script 'script/tran';
 auto_install;
 
 WriteAll;
-
