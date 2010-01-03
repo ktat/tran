@@ -41,16 +41,6 @@ sub translation_repository {
   }
 }
 
-sub set_original {
-  my ($self, $kind, $r) = @_;
-  $self->{config}->{original}->{$kind} = $r;
-}
-
-sub set_translation {
-  my ($self, $kind, $r) = @_;
-  $self->{config}->{translation}->{$kind} = $r;
-}
-
 sub notify {
  my ($self, $key) = @_;
  if (@_ == 2) {
