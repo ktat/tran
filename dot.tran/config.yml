@@ -27,7 +27,7 @@ repository:
     jprp-modules:
       vcs:
         # CVSのワーキングディレクトリ
-	wd:  /home/user/cvs/perldocjp/
+        wd:  /home/user/cvs/perldocjp/
       # CVSで checkout したディレクトリのmodulesへのフルパス
       directory: /home/user/cvs/perldocjp/docs/modules/
       # 通知に上で設定した perldocjp を使う
@@ -36,7 +36,7 @@ repository:
     jprp-core:
       vcs:
         # CVSのワーキングディレクトリ
-	wd:  /home/user/cvs/perldocjp/
+        wd:  /home/user/cvs/perldocjp/
       # CVSで checkout したディレクトリの docs/perlへのフルパス
       directory: /home/user/cvs/perldocjp/docs/perl/
       notify: perldocjp
