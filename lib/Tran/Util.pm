@@ -14,10 +14,11 @@ our $Utils = {
                                  sub {
                                    my $message = shift;
                                    my $check   = shift || sub {1};
+                                   my @opt = @_;
                                    my $answer;
                                  PROMPT:
                                    {
-                                     $answer = IO::Prompt::prompt($message . ": ");
+                                     $answer = IO::Prompt::prompt($message . ": ", @opt);
                                      $answer->{value} ||= '';
                                      my $r = $check->($answer->{value});
                                      last PROMPT if $r;

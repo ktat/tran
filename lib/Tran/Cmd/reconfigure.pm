@@ -42,16 +42,25 @@ sub run {
       $self->{_config} = $_config;
       $self->{_target_config} = $target_config;
       $self->visit($_config);
-      # $class =~ s{^Tran::}{};
-      # my (@separate) = map decamelize($_), split /::/, $class;
-      # my $sub_config = $config{shift @separate} ||= {};
-      # $sub_config = $sub_config->{$_} ||= {} for @separate;
-      # %$sub_config = %$config;
       $self->info("finish configuring $class");
     }
   }
   %{$c->{config}} = %config;
   $c->save ? $self->info("file is created.") : $self->fatal("faile to craete file.");
+}
+
+sub yours_or_default {
+  my ($key, $yours, $default) = @_;
+  my $answer = prompt
+    ("use your seting for $key? (y = $yours, n = $default)",
+     sub { my $answer = shift; return ($answer eq 'y' or $answer eq 'n') ? 1 : 0;});
+  return $answer eq 'y' ? $yours : $default;
+}
+
+sub confirm_change {
+  my ($key, $yours) = @_;
+  return prompt("you want to change the value of $key ?(y/n) ($yours)",
+                sub {return ($_[0] eq 'y' or $_[0] eq 'n')}, -yn, -default => 'n') eq 'y' ? 1 : 0;
 }
 
 sub visit_hash {
@@ -64,30 +73,36 @@ sub visit_hash {
       $self->visit_hash($data);
       $self->{_target_config} = $org;
     } elsif (ref $data eq 'CODE') {
-      my (@values) = ($data->($self->{_config}));
-      my $code;
-      $code = pop @values if $values[-1] eq 'CODE';
-      foreach my $v (@values) {
-        if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-          if (ref $$v eq 'CODE') {
-            $v = $$v = $$v->($self->{_config}) || $org->{$key};
-          } elsif ($$v ne $org->{$key}) {
-            my $answer = prompt("use your seting for $key? (y = $org->{$key}, n = $$v)",
-                                sub { my $answer = shift; return ($answer eq 'y' or $answer eq 'n') ? 1 : 0;});
-            $v = $answer eq 'y' ? $org->{$key} : $$v;
-          } else {
-            $v = $$v;
+      if (confirm_change($key, $org->{$key}) == 0) {
+        $data = $org->{$key};
+      } else {
+        my (@values) = ($data->($self->{_config}));
+        my $code;
+        $code = pop @values if $values[-1] eq 'CODE';
+        foreach my $v (@values) {
+          if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
+            if (ref $$v eq 'CODE') {
+              if (confirm_change($key, $org->{$key}) == 0) {
+                $v = $$v = $$v->($self->{_config}) || $org->{$key};
+              } else {
+                $v = $$v = $org->{$key};
+              }
+            } elsif ($$v ne $org->{$key}) {
+              $v = yours_or_default($key, $org->{$key}, $$v);
+            } else {
+              $v = $$v;
+            }
           }
         }
+        unless ($code) {
+          $data = join "", @values;
+          $data =~s{/+}{/}g;
+        } else {
+          $data = $code->(@values);
+        }
       }
-      unless ($code) {
-        $data = join "", @values;
-        $data =~s{/+}{/}g;
-      } else {
-        $data = $code->(@values);
-      }
-    } else {
-      $data = $org->{$key};
+    } elsif ($org->{$key} ne $data) {
+      $data = yours_or_default($key, $org->{$key}, $data);
     }
     $org->{$key} = $hash->{$key} = $data;
   }
