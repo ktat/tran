@@ -13,11 +13,22 @@ our $Utils = {
                                sub {
                                  sub {
                                    my $message = shift;
-                                   my $answer = undef;
+                                   my $check   = shift || sub {1};
+                                   my $answer;
                                  PROMPT:
                                    {
                                      $answer = IO::Prompt::prompt($message . ":");
-                                     $answer->{value} or redo PROMPT;
+                                     $answer->{value} ||= '';
+                                     my $r = $check->($answer->{value});
+                                     last PROMPT if $r;
+
+                                     if (not $r) {
+                                       warn "$answer->{value} is invalid!\n";
+                                       redo PROMPT;
+                                     } elsif (not $answer->{value}) {
+                                       warn "required!\n";
+                                       redo PROMPT;
+                                     }
                                    }
                                    return $answer->{value};
                                  }

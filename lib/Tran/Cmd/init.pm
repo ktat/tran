@@ -10,12 +10,20 @@ use base qw/Data::Visitor/;
 
 sub abstract { 'initialize config file'; }
 
+sub opt_spec {
+  return (
+          ['force|f', "forcely initialize config file" ]
+         );
+}
+
 sub run {
-  my $self = shift;
+  my ($self, $opt, $args) = @_;
   my $config_dir = $ENV{HOME} . '/.tran';
   my $config = "$config_dir/config.yml";
 
-  $self->fatal("config file exists: $config") if -e $config;
+  if (-e $config and not $opt->{force}) {
+    $self->fatal("config file exists: $config");
+  }
   my $c = Tran::Config->new($config);
 
   my %config = (
@@ -27,6 +35,7 @@ sub run {
                );
   foreach my $class (Tran->plugins) {
     if ($class->can('_config')) {
+      $self->info("start to config $class");
       my $_config = $class->_config;
       $self->{_config} = $_config;
       $config = $self->visit($_config);
@@ -43,6 +52,7 @@ sub run {
       my $sub_config = $config{shift @separate} ||= {};
       $sub_config = $sub_config->{$_} ||= {} for @separate;
       %$sub_config = %$config;
+      $self->info("finish configuring $class");
     }
   }
   %{$c->{config}} = %config;
@@ -53,10 +63,14 @@ sub visit_hash {
   my ($self, $hash) = @_;
   foreach my $key (keys %$hash) {
     my $data = $hash->{$key};
-    if (ref $data eq 'CODE') {
+    if (ref $data eq "HASH") {
+      $self->visit_hash($data);
+    } elsif (ref $data eq 'CODE') {
       my (@values) = ($data->($self->{_config}));
+      my $code;
+      $code = pop @values if $values[-1] eq 'CODE';
       foreach my $v (@values) {
-        if (ref $v eq 'REF') {
+        if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
           if (ref $$v eq 'CODE') {
             $v = $$v = $$v->($self->{_config});;
           } else {
@@ -64,7 +78,12 @@ sub visit_hash {
           }
         }
       }
-      $data = join "", @values;
+      unless ($code) {
+        $data = join "", @values;
+        $data =~s{/+}{/}g;
+      } else {
+        $data = $code->(@values);
+      }
     }
     $hash->{$key} = $data;
   }

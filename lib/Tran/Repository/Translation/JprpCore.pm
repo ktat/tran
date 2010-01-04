@@ -36,7 +36,16 @@ sub _config {
   return
     {
      vcs => {
-             wd => sub { prompt("directory you've checkouted for JPRP cvs repository") },
+             wd => sub { prompt("directory you've checkouted for JPRP cvs repository",
+                                sub {
+                                  if (-d shift) {
+                                    return 1
+                                  } else {
+                                    $self->info("directory is not found.");
+                                    return 0;
+                                  }
+                                }
+                               ) },
             },
      directory => sub { my $self = shift; return(\($self->{vcs}->{wd}), '/docs/perl/')  },
     };

@@ -33,7 +33,7 @@ sub _config {
   return
     {
      original => {
-                  directory => "$ENV{HOME}/.tran/orginal",
+                  directory => "$ENV{HOME}/.tran/orginal/",
                  }
     };
 }
