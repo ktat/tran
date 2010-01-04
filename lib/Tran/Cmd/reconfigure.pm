@@ -52,15 +52,14 @@ sub run {
 sub yours_or_default {
   my ($key, $yours, $default) = @_;
   my $answer = prompt
-    ("use your seting for $key? (y = $yours, n = $default)",
-     sub { my $answer = shift; return ($answer eq 'y' or $answer eq 'n') ? 1 : 0;});
+    ("use your seting for $key? (y = $yours, n = $default)", sub { 1 }, -yn);
   return $answer eq 'y' ? $yours : $default;
 }
 
 sub confirm_change {
   my ($key, $yours) = @_;
   return prompt("you want to change the value of $key ?(y/n) ($yours)",
-                sub {return ($_[0] eq 'y' or $_[0] eq 'n')}, -yn, -default => 'n') eq 'y' ? 1 : 0;
+                sub { 1 }, -yn, -default => 'n') eq 'y' ? 1 : 0;
 }
 
 sub visit_hash {

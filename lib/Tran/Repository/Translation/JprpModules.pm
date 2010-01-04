@@ -49,10 +49,10 @@ sub _config {
      vcs => {
              wd => sub { prompt("directory you've checkouted for JPRP cvs repository",
                                 sub {
-                                  if (-d shift) {
+                                  if (-d shift(@_) . '/CVS') {
                                     return 1
                                   } else {
-                                    $self->warn("directory is not found.");
+                                    $self->info("directory is not found or not directory CVS checkouted");
                                     return 0;
                                   }
                                 }
