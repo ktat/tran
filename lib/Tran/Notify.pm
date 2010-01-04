@@ -3,7 +3,7 @@ package Tran::Notify;
 use warnings;
 use strict;
 use version;
-use Tran::Util -base;
+use Tran::Util -common;
 
 sub new {
   my ($class, %self) = @_;

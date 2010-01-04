@@ -2,19 +2,27 @@ package Tran::Cmd::config;
 
 use warnings;
 use strict;
-use Tran::Util -base, -file;
+use Tran::Util -common, -file;
 use Tran::Cmd -command;
+use YAML::XS qw/Dump/;
 sub abstract {  'show config file'; }
 
 sub run {
-  print slurp $ENV{HOME} . '/.tran/config.yml';
+  my ($self, $opt, $args) = @_;
+  if (defined $args) {
+    my %config;
+    @config{@$args} = @{$self->app->tran->config->{config}}{@$args};
+    print Dump(\%config);
+  } else {
+    print slurp $ENV{HOME} . '/.tran/config.yml';
+  }
 }
 
 1;
 
 =head1 NAME
 
-Tran::
+Tran::Cmd::Config
 
 =head1 AUTHOR
 

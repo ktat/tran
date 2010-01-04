@@ -1,7 +1,7 @@
 package Tran::VCS::JprpModules;
 
 use strict;
-use Tran::Util -base, -file;
+use Tran::Util -common, -file;
 use base qw/Tran::VCS/;
 use Cvs::Simple;
 use Cwd qw/cwd/;

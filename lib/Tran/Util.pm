@@ -6,7 +6,7 @@ use Clone qw/clone/;
 
 our $Utils = {
               %$Util::Any::Utils,
-              '-base' =>  ['Tran::Util::Base'],
+              '-common' =>  ['Tran::Util::Base'],
               '-file' =>  ['File::Slurp', 'File::Find', 'File::Copy'],
               '-prompt' => [['IO::Prompt', '',
                              { prompt =>
@@ -17,7 +17,7 @@ our $Utils = {
                                    my $answer;
                                  PROMPT:
                                    {
-                                     $answer = IO::Prompt::prompt($message . ":");
+                                     $answer = IO::Prompt::prompt($message . ": ");
                                      $answer->{value} ||= '';
                                      my $r = $check->($answer->{value});
                                      last PROMPT if $r;
@@ -35,7 +35,30 @@ our $Utils = {
                                }
                              }
                             ]],
+              '-string' => [[
+                             'String::CamelCase', '',
+                             {
+                              camelize => sub {
+                                sub {
+                                  my $str = shift;
+                                  $str = String::CamelCase::camelize($str);
+                                  $str =~s{\-}{}go;
+                                  return $str;
+                                }
+                              },
+                              decamelize => sub {
+                                sub {
+                                  my $str = shift;
+                                  $str = String::CamelCase::decamelize($str);
+                                  $str =~s{_}{-}go;
+                                  return $str;
+                                }
+                              }
+                             }
+                            ]]
              };
+
+delete $Utils->{string};
 
 1;
 

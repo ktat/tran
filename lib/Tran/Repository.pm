@@ -3,7 +3,7 @@ package Tran::Repository;
 use warnings;
 use strict;
 use version;
-use Tran::Util -file => ['find'], -base;
+use Tran::Util -file => ['find'], -common;
 
 sub new {
   my ($class, %self) = @_;

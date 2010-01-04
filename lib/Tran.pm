@@ -2,7 +2,7 @@ package Tran;
 
 use warnings;
 use strict;
-use Tran::Util -debug, -base, -string;
+use Tran::Util -debug, -string, -common;
 use Class::Inspector;
 use Module::Pluggable search_path => ['Tran'], require => 1;
 
@@ -12,7 +12,7 @@ sub new {
   my ($class, $config_file) = @_;
   my $config = Tran::Config->new($config_file);
   my $log_opt = ($config->{config}{log} ||= {class => 'Stderr', level => 'info'});
-  my $log_class = __PACKAGE__ . '::Log::' . delete $log_opt->{class};
+  my $log_class = __PACKAGE__ . '::Log::' . camelize(delete $log_opt->{class});
   my $log = $log_class->new(%$log_opt);
   my $self = bless {config => $config, log => $log}, $class;
   $self->{resources} = {};
@@ -21,6 +21,7 @@ sub new {
     (config => $config->original_repository, log => $log);
 
   foreach my $kind (keys %{$config->resources}) {
+    $kind = camelize($kind);
     my $class = "Tran::Resources::$kind";
     $self->{resources}->{$kind} = $class->new
       (root => $self,
@@ -35,6 +36,7 @@ sub new {
     my $class = $key;
     $class = camelize($class);
     $class =~s{\-}{}g;
+    $class = camelize($class);
     $class = 'Tran::Repository::Translation::' . $class;
     $class = Class::Inspector->loaded($class) ? $class : 'Tran::Repository::Translation';
     $self->{translation}->{$key} = $class->new
@@ -48,7 +50,7 @@ sub new {
 
   foreach my $key (keys %{$self->config->notify}) {
     my $config = $self->config->notify($key);
-    my $class = __PACKAGE__ . '::Notify::' . $config->{class};
+    my $class = __PACKAGE__ . '::Notify::' . camelize($config->{class});
     $self->{notify}->{$key} = $class->new(%$config, log => $log);
   }
 

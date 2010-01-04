@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Tran::Cmd -command;
 use Tran;
-use Tran::Util -base, -debug;
+use Tran::Util -common, -debug, -string;
 use File::Path qw/make_path/;
 use IO::Prompt;
 
@@ -13,6 +13,8 @@ sub abstract {  'start new translation'; }
 sub run {
   my ($self, $opt, $args) = @_;
   my ($resource, $target, $version) = @$args;
+
+  $resource = camelize($resource);
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);

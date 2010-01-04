@@ -2,7 +2,7 @@ package Tran::Cmd::finish;
 
 use warnings;
 use strict;
-use Tran::Util -base;
+use Tran::Util -common;
 use Tran::Cmd -command;
 
 sub abstract {  'finish translation'; }

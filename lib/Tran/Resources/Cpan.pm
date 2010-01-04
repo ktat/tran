@@ -1,11 +1,11 @@
-package Tran::Resources::CPAN;
+package Tran::Resources::Cpan;
 
 use warnings;
 use strict;
 use base qw/Tran::Resources/;
 use File::Path ();
 use Cwd qw/cwd/;
-use Tran::Util -debug, -list, -base;
+use Tran::Util -debug, -list, -common;
 use File::Path qw/make_path/;
 use LWP::Simple ();
 use Storable qw/retrieve/;

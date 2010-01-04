@@ -2,7 +2,7 @@ package Tran::VCS;
 
 use warnings;
 use strict;
-use Tran::Util -base, -file;
+use Tran::Util -common, -file;
 use Cwd qw/cwd/;
 
 my %MSG = (

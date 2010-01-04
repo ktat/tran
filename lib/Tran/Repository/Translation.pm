@@ -2,7 +2,7 @@ package Tran::Repository::Translation;
 
 use warnings;
 use strict;
-use Tran::Util -debug, -base, -file, -list;
+use Tran::Util -debug, -common, -file, -list;
 use File::Path ('make_path');
 use Text::Diff3;
 

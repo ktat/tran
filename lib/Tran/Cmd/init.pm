@@ -2,10 +2,9 @@ package Tran::Cmd::init;
 
 use warnings;
 use strict;
-use Tran::Util -base, -string;
+use Tran::Util -common, -string;
 use Tran::Cmd -command;
 use Tran::Config;
-use IO::Prompt;
 use base qw/Data::Visitor/;
 
 sub abstract { 'initialize config file'; }
@@ -40,15 +39,7 @@ sub run {
       $self->{_config} = $_config;
       $config = $self->visit($_config);
       $class =~ s{^Tran::}{};
-      my (@separate) = split /::/, $class;
-      $separate[0] = lc($separate[0]);
-      if ($separate[0] eq 'repository') {
-        $separate[1] = lc($separate[1])
-      }
-      if (@separate == 3) {
-        $separate[2] = lc(decamelize($separate[2]));
-        $separate[2] =~ s{_}{-}g;
-      }
+      my (@separate) = map decamelize($_), split /::/, $class;
       my $sub_config = $config{shift @separate} ||= {};
       $sub_config = $sub_config->{$_} ||= {} for @separate;
       %$sub_config = %$config;

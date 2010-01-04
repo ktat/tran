@@ -1,7 +1,7 @@
 package Tran::VCS::Jpa;
 
 use strict;
-use Tran::Util -base;
+use Tran::Util -common;
 use base qw/Tran::VCS/;
 use Git::Class;
 

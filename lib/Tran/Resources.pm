@@ -2,7 +2,7 @@ package Tran::Resources;
 
 use warnings;
 use strict;
-use Tran::Util -base, -debug;
+use Tran::Util -common, -debug;
 
 sub new {
   my ($class, %self) = @_;

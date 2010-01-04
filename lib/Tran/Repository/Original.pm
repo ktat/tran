@@ -1,7 +1,7 @@
 package Tran::Repository::Original;
 
 use strict;
-use Tran::Util -debug, -base, -prompt;
+use Tran::Util -debug, -common, -prompt;
 use File::Find qw/find/;
 use base qw/Tran::Repository/;
 
