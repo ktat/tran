@@ -53,7 +53,7 @@ sub run {
 sub yours_or_default {
   my ($key, $yours, $default) = @_;
   my $answer = prompt
-    ("use your seting for $key? (y = $yours, n = $default)", sub { 1 }, -yn);
+    ("use your setting for $key? (y = $yours, n = $default)", sub { 1 }, -yn);
   return $answer eq 'y' ? $yours : $default;
 }
 

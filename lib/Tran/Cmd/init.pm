@@ -81,9 +81,8 @@ sub visit_hash {
     if (ref $data eq "HASH") {
       $self->visit_hash($data);
     } elsif (ref $data eq 'CODE') {
-      $data = _exec_code($data, $self->{_config});
+      $hash->{$key} = _exec_code($data, $self->{_config});
     }
-    $hash->{$key} = $data;
   }
   return $hash;
 }
