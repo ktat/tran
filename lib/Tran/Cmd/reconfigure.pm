@@ -74,9 +74,9 @@ sub _exec_code {
         if (confirm_change($key, $org) == 0) {
           $v = $$v = $$v->($config) || $org;
         } else {
-          $v = $$v = _exec_code($$v, $config);
+          $v = $$v = _exec_code($$v, $config, $key, $org);
         }
-      } elsif ($$v ne $org->{$key}) {
+      } elsif ($$v ne $org) {
         $v = yours_or_default($key, $org, $$v);
       } else {
         $v = $$v;
