@@ -58,10 +58,8 @@ sub _exec_code {
   foreach my $v (@values) {
     if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
       if (ref $$v eq 'CODE') {
-        CORE::warn
         $v = $$v = _exec_code($v, $config);
       } else {
-        CORE::warn
         $v = $$v;
       }
     }
