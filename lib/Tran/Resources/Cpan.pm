@@ -18,7 +18,7 @@ my $metadata;
 
 sub get_module_info {
   my ($self, $target, $version) = @_;
-  my $metadata ||= retrieve($self->config->{metafile});
+  $metadata ||= retrieve($self->config->{metafile});
   my $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
   unless ($version) {
     $version = $module_info->{CPAN_VERSION};
@@ -29,9 +29,11 @@ sub get_module_info {
   return $module_info->{CPAN_FILE}, $version;
 }
 
+sub _cpan_core_target_path {}
+
 sub get {
   my ($self, $target, $version) = @_;
-  my $target_path = $target;
+  my $target_path = $self->_cpan_core_target_path || $target;
   $target_path =~s{::}{-}g;
 
   my $config = $self->config;
@@ -148,7 +150,7 @@ sub _config {
 
 =head1 NAME
 
-Tran::Resources::CPAN
+Tran::Resources::Cpan
 
 =head1 AUTHOR
 

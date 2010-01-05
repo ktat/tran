@@ -43,6 +43,13 @@ foreach my $level (keys %LOG_LEVEL) {
   };
 }
 
+sub _config {
+  return {
+          class => 'Stderr',
+          level => 'info',
+         };
+}
+
 1;
 
 =head1 NAME

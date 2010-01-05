@@ -50,6 +50,32 @@ sub run {
   $c->save ? $self->info("file is created.") : $self->fatal("faile to craete file.");
 }
 
+sub _exec_code {
+  my ($code, $config) = @_;
+  my @values = $code->($config);
+  my $join_code;
+  $join_code = pop @values if ref $values[-1] eq 'CODE';
+  foreach my $v (@values) {
+    if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
+      if (ref $$v eq 'CODE') {
+        CORE::warn
+        $v = $$v = _exec_code($v, $config);
+      } else {
+        CORE::warn
+        $v = $$v;
+      }
+    }
+  }
+  my $data;
+  unless ($join_code) {
+    $data = join "", @values;
+    $data =~s{/+}{/}g;
+  } else {
+    $data = $join_code->(@values);
+  }
+  return $data;
+}
+
 sub visit_hash {
   my ($self, $hash) = @_;
   foreach my $key (keys %$hash) {
@@ -57,24 +83,7 @@ sub visit_hash {
     if (ref $data eq "HASH") {
       $self->visit_hash($data);
     } elsif (ref $data eq 'CODE') {
-      my (@values) = ($data->($self->{_config}));
-      my $code;
-      $code = pop @values if $values[-1] eq 'CODE';
-      foreach my $v (@values) {
-        if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-          if (ref $$v eq 'CODE') {
-            $v = $$v = $$v->($self->{_config});;
-          } else {
-            $v = $$v;
-          }
-        }
-      }
-      unless ($code) {
-        $data = join "", @values;
-        $data =~s{/+}{/}g;
-      } else {
-        $data = $code->(@values);
-      }
+      $data = _exec_code($data, $self->{_config});
     }
     $hash->{$key} = $data;
   }

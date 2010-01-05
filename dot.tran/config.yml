@@ -4,7 +4,7 @@
 log:
   # Log::Stderr を使う
   class: Stderr
-  level: debug
+  level: info
 
 # 通知の設定
 notify:
@@ -50,7 +50,7 @@ repository:
 
 # リソースの設定
 resources:
-  CPAN:
+  cpan:
     # デフォルトの設定
 
     # 翻訳リポジトリとして、jprp-modules を使う

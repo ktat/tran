@@ -9,17 +9,18 @@ use base qw/Data::Visitor/;
 
 sub abstract { 'recofigure config file'; }
 
+sub validate_args {
+  my $self = shift;
+  $self->usage_error("need arguemnt(s)") if @{$_[1]} < 1;
+}
+
 sub run {
   my ($self, $opt, $args) = @_;
   my $config_dir = $ENV{HOME} . '/.tran';
   my $config = "$config_dir/config.yml";
 
   unless (-e $config) {
-    $self->fatal("config file does not exist. use init command at first.");
-  }
-
-  unless(@$args) {
-    $self->fatal("need argument(s)");
+    $self->usage_error("config file does not exist. use init command at first.");
   }
 
   my $c = Tran::Config->new($config);
@@ -62,6 +63,36 @@ sub confirm_change {
                 sub { 1 }, -yn, -default => 'n') eq 'y' ? 1 : 0;
 }
 
+sub _exec_code {
+  my ($code, $config, $key, $org) = @_;
+  my @values = $code->($config);
+  my $join_code;
+  $join_code = pop @values if ref $values[-1] eq 'CODE';
+  foreach my $v (@values) {
+    if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
+      if (ref $$v eq 'CODE') {
+        if (confirm_change($key, $org) == 0) {
+          $v = $$v = $$v->($config) || $org;
+        } else {
+          $v = $$v = _exec_code($$v, $config);
+        }
+      } elsif ($$v ne $org->{$key}) {
+        $v = yours_or_default($key, $org, $$v);
+      } else {
+        $v = $$v;
+      }
+    }
+  }
+  my $data;
+  unless ($join_code) {
+    $data = join "", @values;
+    $data =~s{/+}{/}g;
+  } else {
+    $data = $code->(@values);
+  }
+  return $data;
+}
+
 sub visit_hash {
   my ($self, $hash) = @_;
   foreach my $key (keys %$hash) {
@@ -75,30 +106,7 @@ sub visit_hash {
       if (confirm_change($key, $org->{$key}) == 0) {
         $data = $org->{$key};
       } else {
-        my (@values) = ($data->($self->{_config}));
-        my $code;
-        $code = pop @values if $values[-1] eq 'CODE';
-        foreach my $v (@values) {
-          if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-            if (ref $$v eq 'CODE') {
-              if (confirm_change($key, $org->{$key}) == 0) {
-                $v = $$v = $$v->($self->{_config}) || $org->{$key};
-              } else {
-                $v = $$v = $org->{$key};
-              }
-            } elsif ($$v ne $org->{$key}) {
-              $v = yours_or_default($key, $org->{$key}, $$v);
-            } else {
-              $v = $$v;
-            }
-          }
-        }
-        unless ($code) {
-          $data = join "", @values;
-          $data =~s{/+}{/}g;
-        } else {
-          $data = $code->(@values);
-        }
+        $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
       }
     } elsif ($org->{$key} ne $data) {
       $data = yours_or_default($key, $org->{$key}, $data);

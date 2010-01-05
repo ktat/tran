@@ -8,58 +8,56 @@ our $Utils = {
               %$Util::Any::Utils,
               '-common' =>  ['Tran::Util::Base'],
               '-file' =>  ['File::Slurp', 'File::Find', 'File::Copy'],
-              '-prompt' => [['IO::Prompt', '',
-                             { prompt =>
-                               sub {
-                                 sub {
-                                   my $message = shift;
-                                   my $check   = shift || sub {1};
-                                   my @opt = @_;
-                                   my $answer;
-                                 PROMPT:
-                                   {
-                                     $answer = IO::Prompt::prompt($message . ": ", @opt);
-                                     $answer->{value} ||= '';
-                                     my $r = $check->($answer->{value});
-                                     last PROMPT if $r;
+              '-prompt' => {'IO::Prompt' =>
+                            { prompt =>
+                              sub {
+                                sub {
+                                  my $message = shift;
+                                  my $check   = shift || sub {1};
+                                  my @opt = @_;
+                                  my $answer;
+                                PROMPT:
+                                  {
+                                    $answer = IO::Prompt::prompt($message . ": ", @opt);
+                                    $answer->{value} ||= '';
+                                    my $r = $check->($answer->{value});
+                                    last PROMPT if $r;
 
-                                     if (not $r) {
-                                       warn "$answer->{value} is invalid!\n";
-                                       redo PROMPT;
-                                     } elsif (not $answer->{value}) {
-                                       warn "required!\n";
-                                       redo PROMPT;
-                                     }
-                                   }
-                                   return $answer->{value};
-                                 }
-                               }
-                             }
-                            ]],
-              '-string' => [[
-                             'String::CamelCase', '',
-                             {
-                              camelize => sub {
-                                sub {
-                                  my $str = shift;
-                                  $str = String::CamelCase::camelize($str);
-                                  $str =~s{\-}{}go;
-                                  return $str;
-                                }
-                              },
-                              decamelize => sub {
-                                sub {
-                                  my $str = shift;
-                                  $str = String::CamelCase::decamelize($str);
-                                  $str =~s{_}{-}go;
-                                  return $str;
+                                    if (not $r) {
+                                      warn "$answer->{value} is invalid!\n";
+                                      redo PROMPT;
+                                    } elsif (not $answer->{value}) {
+                                      warn "required!\n";
+                                      redo PROMPT;
+                                    }
+                                  }
+                                  return $answer->{value};
                                 }
                               }
+                            }
+                           },
+              '-string' => {
+                            'String::CamelCase',
+                            {
+                             camelize => sub {
+                               sub {
+                                 my $str = shift;
+                                 $str = String::CamelCase::camelize($str);
+                                 $str =~s{\-}{}go;
+                                 return $str;
+                               }
+                             },
+                             decamelize => sub {
+                               sub {
+                                 my $str = shift;
+                                 $str = String::CamelCase::decamelize($str);
+                                 $str =~s{_}{-}go;
+                                 return $str;
+                               }
                              }
-                            ]]
+                            }
+                           }
              };
-
-delete $Utils->{string};
 
 1;
 
