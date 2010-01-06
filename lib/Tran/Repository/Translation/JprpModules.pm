@@ -52,7 +52,7 @@ sub _config {
                                   if (-d shift(@_) . '/CVS') {
                                     return 1
                                   } else {
-                                    $self->info("directory is not found or not directory CVS checkouted");
+                                    $self->warn("directory is not found or not directory CVS checkouted");
                                     return 0;
                                   }
                                 }
