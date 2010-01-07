@@ -57,7 +57,7 @@ sub _exec_code {
   $join_code = pop @values if ref $values[-1] eq 'CODE';
   foreach my $v (@values) {
     if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-      if (ref $$v eq 'CODE') {
+      if (ref $$v eq 'PROMPT' or ref $$v eq 'CODE') {
         $v = $$v = _exec_code($v, $config);
       } else {
         $v = $$v;
@@ -80,7 +80,7 @@ sub visit_hash {
     my $data = $hash->{$key};
     if (ref $data eq "HASH") {
       $self->visit_hash($data);
-    } elsif (ref $data eq 'CODE') {
+    } elsif (ref $data eq 'CODE' or ref $data eq 'PROMPT') {
       $hash->{$key} = _exec_code($data, $self->{_config});
     }
   }
@@ -91,7 +91,7 @@ sub visit_hash {
 
 =head1 NAME
 
-Tran::
+Tran::Cmd::init
 
 =head1 AUTHOR
 

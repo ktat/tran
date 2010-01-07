@@ -73,8 +73,8 @@ sub _config {
   return
     {
      vcs => {
-             wd   => sub { prompt("directory you've cloned for jpa translation", sub {-d shift}) },
-             user => sub { prompt("your github account name", sub {1})},
+             wd   => bless(sub { prompt("directory you've cloned for jpa translation", sub {-d shift || 0}) }, 'PROMPT'),
+             user => bless(sub { prompt("your github account name", sub {1})}, 'PROMPT'),
             },
      directory => sub { my $self = shift; return(\($self->{vcs}->{wd})) },
     };

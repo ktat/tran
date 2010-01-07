@@ -70,14 +70,14 @@ sub _exec_code {
   $join_code = pop @values if ref $values[-1] eq 'CODE';
   foreach my $v (@values) {
     if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-      if (ref $$v eq 'CODE') {
+      if (ref $$v eq 'PROMPT') {
         if (confirm_change($key, $org) == 0) {
           $v = $$v = $$v->($config) || $org;
         } else {
           $v = $$v = _exec_code($$v, $config, $key, $org);
         }
-      } elsif ($$v ne $org) {
-        $v = yours_or_default($key, $org, $$v);
+      } elsif (ref $$v eq 'CODE') {
+        $v = $$v = _exec_code($$v, $config, $key, $org);
       } else {
         $v = $$v;
       }
@@ -102,12 +102,14 @@ sub visit_hash {
       $self->{_target_config} = $org->{$key};
       $self->visit_hash($data);
       $self->{_target_config} = $org;
-    } elsif (ref $data eq 'CODE') {
+    } elsif (ref $data eq 'PROMPT') {
       if (confirm_change($key, $org->{$key}) == 0) {
         $data = $org->{$key};
       } else {
         $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
       }
+    } elsif (ref $data eq 'CODE') {
+      $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
     } elsif ($org->{$key} ne $data) {
       $data = yours_or_default($key, $org->{$key}, $data);
     }

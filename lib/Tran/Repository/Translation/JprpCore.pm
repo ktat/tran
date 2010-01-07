@@ -36,7 +36,7 @@ sub _config {
   return
     {
      vcs => {
-             wd => sub { prompt("directory you've checkouted for JPRP cvs repository",
+             wd => bless(sub { prompt("directory you've checkouted for JPRP cvs repository",
                                 sub {
                                   if (-d shift(@_) . '/CVS') {
                                     return 1
@@ -45,7 +45,7 @@ sub _config {
                                     return 0;
                                   }
                                 }
-                               ) },
+                               ) }, "PROMPT"),
             },
      directory => sub { my $self = shift; return(\($self->{vcs}->{wd}), '/docs/perl/')  },
     };
