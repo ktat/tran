@@ -32,7 +32,7 @@ sub has_target {
   if (opendir my $dir, $self->directory) {
     return any {/^$target_path\-/} readdir $dir ? 1 : 0;
   } else {
-    $self->fatal("cannot open directory");
+    $self->fatal(sprintf "cannot open directory %s", $self->directory);
   }
 }
 

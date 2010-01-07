@@ -27,16 +27,13 @@ sub new {
       (root => $self,
        log  => $log,
        original => $original_repository,
-       config => $config->resources->{$kind},
+       config => $config->resources->{decamelize($kind)},
        encoding => $self->encoding,
       );
   }
 
   foreach my $key (keys %{$self->config->translation_repository}) {
-    my $class = $key;
-    $class = camelize($class);
-    $class =~s{\-}{}g;
-    $class = camelize($class);
+    my $class = camelize($key);
     $class = 'Tran::Repository::Translation::' . $class;
     $class = Class::Inspector->loaded($class) ? $class : 'Tran::Repository::Translation';
     $self->{translation}->{$key} = $class->new

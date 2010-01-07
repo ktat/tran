@@ -18,7 +18,11 @@ my $metadata;
 
 sub get_module_info {
   my ($self, $target, $version) = @_;
-  $metadata ||= retrieve($self->config->{metafile});
+  local $@;
+  eval {
+    $metadata ||= retrieve($self->config->{metafile});
+  };
+  $self->fatal("cannot read metafile:" . $self->config->{metafile}) if $@; 
   my $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
   unless ($version) {
     $version = $module_info->{CPAN_VERSION};
@@ -73,6 +77,7 @@ sub get {
 
   my $cwd = cwd();
   my $original_dir = $self->original_repository->directory;
+
   foreach my $file ($tar->get_files(@files)) {
     my $name = $original_dir . $file->full_path;
     $name =~s{/$target_path-([^/]+)/}{/$target_path/$1/};
