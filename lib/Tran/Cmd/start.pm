@@ -18,6 +18,7 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
+  my $_target = '';
   my @result = $r->get($target, $version);
   if (@result == 2) {
     if (defined $version and $version) {
@@ -44,7 +45,7 @@ sub run {
         and $self->info("vcs: checkout $target");
     }
   }
-  unless ($translation->has_version($target, $version)) {
+  if (not $translation->has_version($target, $version)) {
     my $prev_version = $original->prev_version($target) || $original->latest_version($target);
     if ($prev_version < $version) {
       if ($translation->has_version($target, $prev_version)) {

@@ -35,7 +35,7 @@ sub run {
   }
 
   foreach my $class (Tran->plugins) {
-    next unless $class =~m{^$target_class};
+    next unless $class eq $target_class;
 
     if ($class->can('_config')) {
       $self->info("start to recofnigure $class");
@@ -98,18 +98,20 @@ sub visit_hash {
   foreach my $key (keys %$hash) {
     my $data = $hash->{$key};
     my $org = $self->{_target_config};
-    if (ref $data eq "HASH") {
-      $self->{_target_config} = $org->{$key};
-      $self->visit_hash($data);
-      $self->{_target_config} = $org;
-    } elsif (ref $data eq 'PROMPT') {
-      if (confirm_change($key, $org->{$key}) == 0) {
-        $data = $org->{$key};
-      } else {
+    if (defined ref $data) {
+      if (ref $data eq "HASH") {
+        $self->{_target_config} = $org->{$key};
+        $self->visit_hash($data);
+        $self->{_target_config} = $org;
+      } elsif (ref $data eq 'PROMPT') {
+        if (confirm_change($key, $org->{$key}) == 0) {
+          $data = $org->{$key};
+        } else {
+          $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
+        }
+      } elsif (ref $data eq 'CODE') {
         $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
       }
-    } elsif (ref $data eq 'CODE') {
-      $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
     } elsif ($org->{$key} ne $data) {
       $data = yours_or_default($key, $org->{$key}, $data);
     }
