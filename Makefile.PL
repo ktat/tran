@@ -22,6 +22,7 @@ requires
     'IO::Prompt'	     => 0,
     'IO::String'	     => 0,
     'IO::Uncompress::Gunzip' => 0,
+    'IO::Uncompress::Bunzip2'=> 0,
     'LWP::Simple'	     => 0,
     'Module::Pluggable'	     => 0,
     'Storable'               => 0,
