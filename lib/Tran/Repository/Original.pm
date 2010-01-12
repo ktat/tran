@@ -23,6 +23,25 @@ sub get_versions {
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
 }
 
+sub resource {
+  my ($self, $resource) = @_;
+  $self->{resource} = $resource if @_ == 2;
+  return $self->{resource};
+}
+
+sub resource_directory {
+  my ($self, $resource) = @_;
+  Carp::croak("set resource at first") unless $self->resource;
+  return join "/", $self->directory, $self->resource , '';
+}
+
+sub target_path {
+  my ($self, $target) = @_;
+  Carp::croak("set resource at first") unless $self->resource;
+  Carp::croak("taget name is required") if @_ == 1;
+  return join '/', lc($self->resource), $self->SUPER::target_path($target);
+}
+
 sub has_target {
   my ($self, $target) = @_;
   my $target_path = $self->target_path($target);

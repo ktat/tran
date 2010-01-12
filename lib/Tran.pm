@@ -20,6 +20,8 @@ sub new {
   my $original_repository = Tran::Repository::Original->new
     (config => $config->original_repository, log => $log);
 
+  $self->{original} = $original_repository;
+
   foreach my $kind (keys %{$config->resources}) {
     $kind = camelize($kind);
     my $class = "Tran::Resources::$kind";
@@ -66,7 +68,10 @@ sub encoding {
 
 sub resource {
   my ($self, $resource) = @_;
-  return $self->{resources}->{$resource}  if exists $self->{resources}->{$resource};
+  if (exists $self->{resources}->{$resource}) {
+    $self->original->resource($resource);
+    return $self->{resources}->{$resource};
+  }
   $self->fatal("no such resource: $resource");
 }
 
@@ -82,7 +87,6 @@ sub config {
 
 sub original {
   my $self = shift;
-  die join "--", caller;
   return $self->{original};
 }
 

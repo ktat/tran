@@ -8,9 +8,8 @@ use File::Slurp qw(write_file);
 
 sub path_format { return "%n-Doc-JA" }
 
-sub copy_from_original {
-  my $self = shift;
-  $self->SUPER::copy_from_original(@_, {omit_path => 'lib'});
+sub copy_option {
+  return {omit_path => 'lib'};
 }
 
 sub merge_method { 'cmpmerge_least' } # or implement cmpmerge

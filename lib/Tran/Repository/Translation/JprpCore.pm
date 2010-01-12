@@ -13,6 +13,10 @@ sub has_target {
   return -d $self->directory ? 1 : 0;
 }
 
+sub copy_option {
+  return {omit_path => 'pod'};
+}
+
 sub get_versions {
   my ($self, $target) = @_;
   my $name = $self->target_path($target);

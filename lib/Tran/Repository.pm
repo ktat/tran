@@ -42,7 +42,7 @@ sub latest_version {
   die if @_ != 2;
 
   my $name = $self->target_path($target);
-  $self->get_versions($name);
+  $self->get_versions($target);
 
   return $self->{versions}->{$name}->[-1];
 }
@@ -61,7 +61,7 @@ sub has_version {
   die if @_ != 3;
 
   my $name = $self->target_path($target);
-  $self->get_versions($name);
+  $self->get_versions($target);
 
   foreach my $ver (@{$self->{versions}->{$name}}) {
     return 1 if $ver eq $version;
@@ -73,7 +73,7 @@ sub prev_version {
   my ($self, $target) = @_;
   my $name = $self->target_path($target);
   die "not enough argument." if @_ != 2;
-  $self->get_versions($name);
+  $self->get_versions($target);
   return $self->{versions}->{$name}->[-2] || 0;
 }
 

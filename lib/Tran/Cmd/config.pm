@@ -9,7 +9,7 @@ sub abstract {  'show config file'; }
 
 sub run {
   my ($self, $opt, $args) = @_;
-  if (defined $args) {
+  if (defined $args and @$args) {
     my %config;
     @config{@$args} = @{$self->app->tran->config->{config}}{@$args};
     print Dump(\%config);

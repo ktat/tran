@@ -104,19 +104,41 @@ sub merge {
   return \%diff;
 }
 
+sub copy_option { {} };
+
 sub copy_from_original {
-  my ($self, $target, $version, $option) = @_;
+  my ($self, $target, $version) = @_;
+  my $option = $self->copy_option || {};
   my $target_path = $self->target_path($target);
-  $option ||= {};
   my $original_repository = $self->original_repository;
   my $original_path       = $original_repository->path_of($target_path, $version);
   my $translation_path    = $self->path_of($target_path, $version);
   my @original_files      = $original_repository->files($target_path, $version);
-  my $omit_path = $option->{omit_path} || '';
-  if ($omit_path) {
-    @original_files = grep {s{^/?$omit_path}{}} @original_files;
+  my $opt_omit_path   = $option->{omit_path} || [];
+  my $opt_target_path = $option->{target_path} || [];
+  $opt_omit_path   = [$opt_omit_path]   if $opt_omit_path   and not ref $opt_omit_path;
+  $opt_target_path = [$opt_target_path] if $opt_target_path and not ref $opt_target_path;
+  my $has_omit   = @$opt_omit_path   ? 1 : 0;
+  my $has_target = @$opt_target_path ? 1 : 0;
+  foreach my $f (@original_files) {
+    if ($has_omit) {
+      foreach my $omit (@$opt_omit_path) {
+        if ($f =~s{^/?$omit/}{}) {
+          $self->_copy_file_auto_path($f, "$original_path/$omit", $translation_path)
+        }
+      }
+    }
+    if($has_target) {
+      foreach my $target (@$opt_target_path) {
+        if ($f =~m{^/?$target/}) {
+          $self->_copy_file_auto_path($f, "$original_path/", $translation_path)
+        }
+      }
+    }
+    if (not $has_target and not $has_omit) {
+      $self->_copy_file_auto_path($f, "$original_path/", $translation_path);
+    }
   }
-  $self->_copy_file_auto_path($_, "$original_path/$omit_path", $translation_path) for grep $_, @original_files;
 }
 
 sub _write_file_auto_path {
@@ -144,9 +166,9 @@ sub _copy_file_auto_path {
       if (-d "$original/$dir/$file") {
         make_path("$translation/$dir/$file") or die "$translation/$dir/$file";
       } else {
-        $self->debug("copy file: $file from $original to $translation");
+        $self->debug("copy file: $file from $original/$dir/ to $translation/$dir/");
         copy "$original/$dir/$file", "$translation/$dir/$file"
-          or $self->fatal("cannot copy file");
+          or $self->fatal("cannot copy file $file: $!");
       }
     }
   }

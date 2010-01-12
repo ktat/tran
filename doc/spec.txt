@@ -51,3 +51,16 @@ Tran::Cmd::finish  -- finish translation
 Tran::Cmd::join    -- join translatiing document (only notify?)
 Tran::Cmd::config  -- show config
 
+1. need to change handling of Perl core modules.
+
+currently,
+
+ original/cpan/perl/5.10.1/lib/*.pm
+ original/cpan/perl/5.10.1/pod/*.pod
+
+future,
+
+ original/cpan/perl/5.10.1/pod/*.pod
+ original/cpan/SDBM_File/1.05/SDBI_File.pod
+
+2. confirm before updating vcs

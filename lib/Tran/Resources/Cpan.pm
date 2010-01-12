@@ -31,8 +31,7 @@ sub get_module_info {
   } elsif ($_target ne 'perl' and $self->_is_perl($module_info->{CPAN_FILE})) {
     ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+)\.tar\.(gz|bz2)};
   } else {
-    $module_info->{CPAN_FILE} =~ s{-([\d\.]+)\.tar\.gz}{-$version.tar.gz}
-      or $module_info->{CPAN_FILE} =~ s{-([\d\.]+)\.tar\.bz2}{-$version.tar.bz2};
+    $module_info->{CPAN_FILE} =~ s{-(?:[\d\.]+)\.tar\.(gz|bz2)}{-$version.tar.$1};
   }
   return $module_info->{CPAN_FILE}, $version;
 }
@@ -117,7 +116,7 @@ sub get {
   }
 
   my $cwd = cwd();
-  my $original_dir = $self->original_repository->directory;
+  my $original_dir = $self->original_repository->resource_directory;
 
   foreach my $file ($tar->get_files(@files)) {
     my $name = $original_dir . $file->full_path;
@@ -194,9 +193,6 @@ sub _config {
                   }
     };
 }
-
-
-1;
 
 =head1 NAME
 
