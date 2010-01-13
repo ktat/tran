@@ -32,7 +32,7 @@ sub resource {
 sub resource_directory {
   my ($self, $resource) = @_;
   Carp::croak("set resource at first") unless $self->resource;
-  return join "/", $self->directory, $self->resource , '';
+  return join "/", $self->directory, lc($self->resource) , '';
 }
 
 sub target_path {

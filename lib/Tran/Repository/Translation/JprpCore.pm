@@ -14,7 +14,10 @@ sub has_target {
 }
 
 sub copy_option {
-  return {omit_path => 'pod'};
+  my $self = shift;
+  my $opt = $self->SUPER::copy_option;
+  $opt->{omit_path} = 'pod';
+  $opt;
 }
 
 sub get_versions {

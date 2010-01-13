@@ -125,46 +125,13 @@ sub get {
     if (not -e $out_dir) {
       make_path($out_dir) or die $out_dir;
     }
-    if ($file->name =~ m{\.pm$}) {
-      $name =~ s{\.pm}{.pod};
-      $self->debug("write file: $name");
-      open my $fh, ">", $name or die "cannot write $name";
-      printf $fh "=encoding %s\n\n", $self->encoding;
-      $self->pm2pod($file->get_content, $fh);
-      close $fh;
-    } elsif($file->get_content) {
-      $self->debug("write file: $name");
-      open my $fh, ">", $name or die "cannot write $name";
-      if ($file->name =~ m{\.pod$}) {
-        printf $fh "=encoding %s\n\n", $self->encoding;
-      }
-      print $fh $file->get_content;
-      close $fh;
-    }
+    $self->debug("write file: $name");
+    open my $fh, ">", $name or die "cannot write $name";
+    print $fh $file->get_content;
+    close $fh;
   }
   $self->original_repository->reset;
   return ($self->target_translation($target), version->new($version), \@files);
-}
-
-# from Pod::Perldoc::ToPod
-sub pm2pod {
-  my($self, $content, $outfh) = @_;
-  my $cut_mode = 1;
-
-  # A hack for finding things between =foo and =cut, inclusive
-  local $_;
-  foreach (split /[\n\r]/, $content) {
-    if(  m/^=(\w+)/s ) {
-      if($cut_mode = ($1 eq 'cut')) {
-        print $outfh "\n=cut\n\n" or die "Can't print to $outfh: $!";
-         # Pass thru the =cut line with some harmless
-         #  (and occasionally helpful) padding
-      }
-    }
-    next if $cut_mode;
-    print $outfh $_, "\n" or die "Can't print to $outfh: $!";
-  }
-  return;
 }
 
 sub _config {

@@ -56,7 +56,40 @@ our $Utils = {
                                }
                              }
                             }
-                           }
+                           },
+              '-pod' => {
+                         'Tran::Util',
+                         {
+                          pm2pod_name => sub {
+                            sub { my ($self, $name) = @_; $name =~ s{\.pm}{\.pod}; return $name}
+                          },
+                          pm2pod => sub {
+                            sub {
+                              # from Pod::Perldoc::ToPod
+                              my($self, $name, $content) = @_;
+                              return if ($name !~ m{\.pm} and $name !~ m{\.pod$});
+                              my $out = '';
+                              my $outfh = IO::String->new(\$out);
+                              printf $outfh "=encoding %s\n\n", $self->encoding;
+                              my $cut_mode = 1;
+                              # A hack for finding things between =foo and =cut, inclusive
+                              local $_;
+                              foreach (split /[\n\r]/, $content) {
+                                if(  m/^=(\w+)/s ) {
+                                  if($cut_mode = ($1 eq 'cut')) {
+                                    print $outfh "\n=cut\n\n" or die "Can't print to $outfh: $!";
+                                    # Pass thru the =cut line with some harmless
+                                    #  (and occasionally helpful) padding
+                                  }
+                                }
+                                next if $cut_mode;
+                                print $outfh $_, "\n" or die "Can't print to $outfh: $!";
+                              }
+                              return $out;
+                            }
+                          }
+                         }
+                        },
              };
 
 1;

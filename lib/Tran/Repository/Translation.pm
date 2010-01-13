@@ -21,6 +21,11 @@ sub new {
   return $o;
 }
 
+sub encoding {
+  my $self = shift;
+  $self->{encoding};
+}
+
 sub vcs {
   my $self = shift;
   $self->{vcs};
@@ -104,6 +109,15 @@ sub merge {
   return \%diff;
 }
 
+sub _write_file_auto_path {
+  my ($self, $file, $content) = @_;
+  my $dir = $file;
+  if ($dir =~s{([^/]+)$}{}) {
+    make_path($dir);
+  }
+  write_file($file, $content);
+}
+
 sub copy_option { {} };
 
 sub copy_from_original {
@@ -114,61 +128,78 @@ sub copy_from_original {
   my $original_path       = $original_repository->path_of($target_path, $version);
   my $translation_path    = $self->path_of($target_path, $version);
   my @original_files      = $original_repository->files($target_path, $version);
-  my $opt_omit_path   = $option->{omit_path} || [];
-  my $opt_target_path = $option->{target_path} || [];
-  $opt_omit_path   = [$opt_omit_path]   if $opt_omit_path   and not ref $opt_omit_path;
-  $opt_target_path = [$opt_target_path] if $opt_target_path and not ref $opt_target_path;
-  my $has_omit   = @$opt_omit_path   ? 1 : 0;
-  my $has_target = @$opt_target_path ? 1 : 0;
-  foreach my $f (@original_files) {
-    if ($has_omit) {
-      foreach my $omit (@$opt_omit_path) {
-        if ($f =~s{^/?$omit/}{}) {
-          $self->_copy_file_auto_path($f, "$original_path/$omit", $translation_path)
-        }
-      }
-    }
-    if($has_target) {
-      foreach my $target (@$opt_target_path) {
-        if ($f =~m{^/?$target/}) {
-          $self->_copy_file_auto_path($f, "$original_path/", $translation_path)
-        }
-      }
-    }
-    if (not $has_target and not $has_omit) {
-      $self->_copy_file_auto_path($f, "$original_path/", $translation_path);
-    }
-  }
-}
 
-sub _write_file_auto_path {
-  my ($self, $file, $content) = @_;
-  my $dir = $file;
-  if ($dir =~s{([^/]+)$}{}) {
-    make_path($dir);
+  foreach my $name (qw/omit_path target_path ignore_path/) {
+    $option->{$name} = [$option->{$name} || ()] unless ref $option->{$name};
   }
-  write_file($file, $content);
+  foreach my $f (@original_files) {
+    next if not -f "$original_path/$f";
+    $self->_copy_file_auto_path($f, $original_path, $translation_path, $option);
+  }
 }
 
 sub _copy_file_auto_path {
-  my ($self, $file, $original, $translation) = @_;
+  my ($self, $file, $original, $translation, $option) = @_;
+  my $to_file = $file;
+  my $contents = '';
+  my $is_target = 0;
+
   Carp::croak("file is required") unless $file;
-  my $dir = $file;
+  foreach my $target (@{$option->{target_path}}) {
+    if ($file =~ m{^/?$target/}) {
+      $is_target = 1;
+      last;
+    }
+  }
+  foreach my $ignore (@{$option->{ignore_path}}) {
+    if ($file =~ m{^/?$ignore/}) {
+      return;
+    }
+  }
+  return if @{$option->{target_path}} and not $is_target;
+
+  foreach my $omit (@{$option->{omit_path}}) {
+    if ($to_file =~ s{^/?$omit/}{}) {
+      last;
+    }
+  }
+
+  if ($option->{exchange_path}) {
+    my $_translation = $option->{exchange_path}->($self, $translation);
+    $translation = $_translation if $_translation;
+  }
+
+  if ($option->{name_filter}) {
+    $to_file = $option->{name_filter}->($self,$to_file);
+  }
+
+  if ($option->{contents_filter}) {
+    $contents = slurp("$original/$file");
+    $contents = $option->{contents_filter}->($self, $file, $contents);
+  }
+
+  my $dir = $to_file;
   if ($dir =~s{([^/]+)$}{}) {
-    my $file = $1;
+    my $to_file = $1;
     if (!-e  "$translation/$dir") {
       $self->debug("create directory: $translation/$dir");
       make_path("$translation/$dir") or die "$translation/$dir";
     } elsif (! -d "$translation/$dir") {
       $self->fatal("$translation/$dir exists, but not directory.");
     }
-    if (! -e "$translation/$dir/$file") {
-      if (-d "$original/$dir/$file") {
-        make_path("$translation/$dir/$file") or die "$translation/$dir/$file";
+    if (! -e "$translation/$dir/$to_file") {
+      if (-d "$original/$file") {
+        # make_path("$translation/$dir/$to_file") or die "$translation/$dir/$to_file";
       } else {
-        $self->debug("copy file: $file from $original/$dir/ to $translation/$dir/");
-        copy "$original/$dir/$file", "$translation/$dir/$file"
-          or $self->fatal("cannot copy file $file: $!");
+        if ($contents) {
+          $self->debug("copy file: $original/$file to $translation/$dir/$to_file (with modification)");
+          $self->_write_file_auto_path("$translation/$dir/$to_file", $contents)
+            or $self->fatal("cannot copy write $translation/$to_file: $!");
+        } else {
+          $self->debug("copy file: $original/$file to $translation/$dir/$to_file");
+          copy "$original/$file", "$translation/$dir/$to_file"
+            or $self->fatal("cannot copy file $file: $!");
+        }
       }
     }
   }

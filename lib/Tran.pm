@@ -30,7 +30,6 @@ sub new {
        log  => $log,
        original => $original_repository,
        config => $config->resources->{decamelize($kind)},
-       encoding => $self->encoding,
       );
   }
 
@@ -44,6 +43,7 @@ sub new {
        log      => $log,
        config   => $self->config->translation_repository->{$key},
        original => $original_repository,
+       encoding => $self->encoding,
       );
   }
 
