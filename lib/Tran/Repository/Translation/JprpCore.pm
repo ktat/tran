@@ -17,6 +17,22 @@ sub copy_option {
   my $self = shift;
   my $opt = $self->SUPER::copy_option;
   $opt->{omit_path} = 'pod';
+  $opt->{exchange_path} = sub {
+    my ($self, $f, $original_path, $translation_path) = @_;
+    return unless $f =~m{^/?lib/.+\.pm};
+    local $@;
+    eval {
+      require "$original_path/$f";
+    };
+    unless ($@) {
+      $f =~s{^/?lib/}{};
+      $f =~s{/}{::}g;
+      $f =~s{\.pm$}{};
+      my $version = $f->VERSION;
+      $f =~s{::}{-}g;
+      return "$translation_path/../../modules/$f-$version";
+    }
+  };
   $opt;
 }
 

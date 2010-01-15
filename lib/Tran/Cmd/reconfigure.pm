@@ -14,6 +14,10 @@ sub validate_args {
   $self->usage_error("need arguemnt(s)") if @{$_[1]} < 1;
 }
 
+sub usage_desc {
+  "tran reconfigure [item] [item]";
+}
+
 sub run {
   my ($self, $opt, $args) = @_;
   my $config_dir = $ENV{HOME} . '/.tran';

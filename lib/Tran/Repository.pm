@@ -59,10 +59,8 @@ sub has_target { die "implement it in subclass"; }
 sub has_version {
   my ($self, $target, $version) = @_;
   die if @_ != 3;
-
   my $name = $self->target_path($target);
   $self->get_versions($target);
-
   foreach my $ver (@{$self->{versions}->{$name}}) {
     return 1 if $ver eq $version;
   }

@@ -10,22 +10,10 @@ sub path_format { return "%n-%v" }
 
 sub copy_option {
   return {
-          exchange_path => sub {
-            my ($f, $original_path, $translation_path) = @_;
-            return unless $f =~m{^/lib/.+\.pm};
-            require "$original_path/$f";
-            $f =~s{/}{::}g;
-            $f =~s{\.pm}{};
-            my $version = $f->VERSION;
-            $f =~s{^/?lib}{};
-            $f =~s{::}{-}g;
-            return "$translation_path/../../modules/$f-$version";
-          },
           ignore_path     => ['t', 'inc'],
           # see Tran::Util
           contents_filter => \&pm2pod,
           name_filter     => \&pm2pod_name,
-
          };
 }
 

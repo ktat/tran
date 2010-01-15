@@ -165,7 +165,7 @@ sub _copy_file_auto_path {
   }
 
   if ($option->{exchange_path}) {
-    my $_translation = $option->{exchange_path}->($self, $translation);
+    my $_translation = $option->{exchange_path}->($self, $file, $original, $translation);
     $translation = $_translation if $_translation;
   }
 
@@ -290,7 +290,16 @@ sub notify {
 
 sub update_version_info { }
 
-sub merge_method { }
+sub merge_method {
+  my $self = shift;
+  $self->{config}{merge_method};
+}
+
+sub _config {
+  return {
+          merge_method => 'cmpmerge',
+         };
+}
 
 =head1 NAME
 

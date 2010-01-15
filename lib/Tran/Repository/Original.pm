@@ -14,11 +14,13 @@ sub get_versions {
   my @versions;
   if (opendir my $d, $self->directory . '/' . $name) {
     foreach my $version (grep /^[\d\.]+$/, readdir $d) {
+      next if $version =~ m{^\.\.?$};
       push @versions, version->new($version);
     }
     closedir $d;
   } else {
     $self->debug(sprintf "directory is not found : %s/%s", $self->directory, $name);
+    return;
   }
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
 }

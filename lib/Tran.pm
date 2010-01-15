@@ -26,13 +26,13 @@ sub new {
     $kind = camelize($kind);
     my $class = "Tran::Resources::$kind";
     $self->{resources}->{$kind} = $class->new
-      (root => $self,
+      (
        log  => $log,
        original => $original_repository,
        config => $config->resources->{decamelize($kind)},
       );
   }
-
+  my $merge_method = $self->config->translation_repository->{merge_method} || 'cmpmerge';
   foreach my $key (keys %{$self->config->translation_repository}) {
     my $class = camelize($key);
     $class = 'Tran::Repository::Translation::' . $class;
@@ -44,6 +44,7 @@ sub new {
        config   => $self->config->translation_repository->{$key},
        original => $original_repository,
        encoding => $self->encoding,
+       merge_method => $merge_method,
       );
   }
 

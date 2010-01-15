@@ -26,16 +26,6 @@ sub config {
   return $self->{config};
 }
 
-sub root_config {
-  my $self = shift;
-  return $self->{root}{config};
-}
-
-sub root {
-  my $self = shift;
-  return $self->{root};
-}
-
 sub targets {
   my $self = shift;
   return $self->{targets};

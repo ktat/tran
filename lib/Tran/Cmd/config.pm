@@ -5,6 +5,7 @@ use strict;
 use Tran::Util -common, -file;
 use Tran::Cmd -command;
 use YAML::XS qw/Dump/;
+
 sub abstract {  'show config file'; }
 
 sub run {
@@ -18,7 +19,9 @@ sub run {
   }
 }
 
-1;
+sub usage_desc {
+  "tran config [items ...]";
+}
 
 =head1 NAME
 

@@ -2,22 +2,28 @@ package Tran::Repository::Translation::Jpa;
 
 use warnings;
 use strict;
-use Tran::Util -list, -file, -prompt, -debug;
+use Tran::Util -list, -file, -prompt, -debug, -pod;
 use base qw/Tran::Repository::Translation/;
 use File::Slurp qw(write_file);
 
 sub path_format { return "%n-Doc-JA" }
 
 sub copy_option {
-  return {omit_path => 'lib'};
+  return {
+          target_path => 'lib',
+          omit_path   => 'lib',
+          contents_filter => \&pm2pod,
+          name_filter     => \&pm2pod_name,
+         };
 }
 
-sub merge_method { 'cmpmerge_least' } # or implement cmpmerge
+# sub merge_method { 'cmpmerge_least' } # or implement cmpmerge
 
 sub get_versions {
   # get only one version ..., need to use git(?) to fetch branches
-  my ($self, $name) = @_;
-  Carp::croak("name is required as first argument")  if @_ != 2;
+  my ($self, $target) = @_;
+  Carp::croak("target is required as first argument")  if @_ != 2;
+  my $name = $self->target_path($target);
   return if exists $self->{versions}->{$name};
 
   my $translation_target_dir = $self->path_of($name);
