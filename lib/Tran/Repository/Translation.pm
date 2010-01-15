@@ -86,24 +86,32 @@ sub merge {
   }
 
   my $v = quotemeta($version->{original});
+  die $version unless $v;
+
+  my $copy_option = $self->copy_option;
+  foreach my $name (qw/omit_path target_path ignore_path/) {
+    $copy_option->{$name} = [$copy_option->{$name} || ()] unless ref $copy_option->{$name};
+  }
 
   my $merge_method = $self->merge_method;
   $merge_method ||= 'cmpmerge';
-
+  my $name_filter = $copy_option->{name_filter};
 
   foreach my $file (grep $_, @newer_original_files) {
-    die $version unless $v;
-    if (exists $target{$file}           and
-        -f "$newer_original_path/$file" and
-        -f "$older_original_path/$file" and
-        -f "$translation_path/$file"
-       ) {
-      my $merged = $self->$merge_method("$newer_original_path/$file",
-                            "$older_original_path/$file",
-                            "$translation_path/$file");
-      $self->_write_file_auto_path("$new_translation_path/$file", $merged);
-    } elsif (-f "$newer_original_path/$file") {
-      $self->_copy_file_auto_path($file, $newer_original_path, $new_translation_path);
+    my $nf = "$newer_original_path/$file";
+    my $of = "$older_original_path/$file";
+    my $tf = "$translation_path/$file";
+    if ($name_filter) {
+      $tf = $name_filter->($self, $tf);
+      $file = $name_filter->($self, $file);
+    }
+    if (exists $target{$file} and -f $nf and -f $of and -f $tf) {
+      my $merged = $self->$merge_method($nf, $of, $tf);
+      my $ntf = "$new_translation_path/$file";
+      $ntf = $name_filter->($self, $ntf) if $name_filter;
+      $self->_write_file_auto_path($ntf, $merged);
+    } elsif (-f $nf) {
+      $self->_copy_file_auto_path($file, $newer_original_path, $new_translation_path, $copy_option);
     }
   }
   return \%diff;
