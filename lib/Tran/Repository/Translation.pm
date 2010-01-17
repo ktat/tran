@@ -63,27 +63,16 @@ sub merge {
   my @newer_original_files = $original_repository->files($target_path, $version);
   my @translated_files     = $self->files($target_path, $prev_version);
 
-  my $omit_path = $option->{omit_path} || '';
-
-  if ($omit_path) {
-    @newer_original_files = grep {s{^/?$omit_path}{}} @newer_original_files;
-  }
-
   my %target;
   @target{@translated_files} = ();
   my %diff;
 
   my $translation_dir = $self->directory;
 
-  my $translation_path     = $self->path_of($target_path, $prev_version);
-  my $new_translation_path = $self->path_of($target_path, $version);
-  my $newer_original_path  = $original_repository->path_of($target_path, $version);
-  my $older_original_path  = $original_repository->path_of($target_path, $prev_version);
-
-  if ($omit_path) {
-    $newer_original_path .= "/$omit_path";
-    $older_original_path .= "/$omit_path";
-  }
+  my $translation_path     = $self->path_of($target, $prev_version);
+  my $new_translation_path = $self->path_of($target, $version);
+  my $newer_original_path  = $original_repository->path_of($target, $version);
+  my $older_original_path  = $original_repository->path_of($target, $prev_version);
 
   my $v = quotemeta($version->{original});
   die $version unless $v;
@@ -97,20 +86,60 @@ sub merge {
   $merge_method ||= 'cmpmerge';
   my $name_filter = $copy_option->{name_filter};
 
+ FILE:
   foreach my $file (grep $_, @newer_original_files) {
-    my $nf = "$newer_original_path/$file";
-    my $of = "$older_original_path/$file";
-    my $tf = "$translation_path/$file";
-    if ($name_filter) {
-      $tf = $name_filter->($self, $tf);
-      $file = $name_filter->($self, $file);
+    my $_file = $file;
+    my $_translation_path     = $translation_path;
+    my $_new_translation_path = $new_translation_path;
+    my $_newer_original_path  = $newer_original_path;
+    my $_older_original_path  = $older_original_path;
+
+    my $is_target = 0;
+    foreach my $target (@{$copy_option->{target_path}}) {
+      if ($_file =~ m{^/?$target/}) {
+        $is_target = 1;
+        last;
+      }
     }
-    if (exists $target{$file} and -f $nf and -f $of and -f $tf) {
-      my $merged = $self->$merge_method($nf, $of, $tf);
-      my $ntf = "$new_translation_path/$file";
+
+    foreach my $ignore (@{$copy_option->{ignore_path}}) {
+      if ($_file =~ m{^/?$ignore/}) {
+        next FILE;
+      }
+    }
+    next FILE if @{$copy_option->{target_path}} and not $is_target;
+
+    foreach my $omit (@{$copy_option->{omit_path}}) {
+      if ($_file =~ s{^/?$omit/}{/}) {
+        $_newer_original_path .= "/$omit";
+        $_older_original_path .= "/$omit";
+        last
+      }
+    }
+
+    if ($copy_option->{exchange_path}) {
+      my $__translation_path = $copy_option->{exchange_path}->($self, $_file, $_newer_original_path, $_translation_path);
+      $_translation_path = $__translation_path if $__translation_path;
+      my $__new_translation_path = $copy_option->{exchange_path}->($self, $_file, $_newer_original_path, $_new_translation_path);
+      $_new_translation_path = $__new_translation_path if $__new_translation_path;
+    }
+
+    my $nf = "$_newer_original_path/$_file";
+    my $of = "$_older_original_path/$_file";
+    my $translation_file = $_file;
+    if ($name_filter) {
+      $translation_file = $name_filter->($self, $_file);
+    }
+    my $tf = "$_translation_path/$translation_file";
+
+    if (exists $target{$translation_file} and -f $nf and -f $of and -f $tf) {
+      $self->debug("merge target: $translation_file");
+      my $merged = $self->$merge_method($nf, $of, $tf, $copy_option->{contents_filter});
+      my $ntf = "$_new_translation_path/$translation_file";
       $ntf = $name_filter->($self, $ntf) if $name_filter;
       $self->_write_file_auto_path($ntf, $merged);
     } elsif (-f $nf) {
+      $self->debug("copy target: $file");
       $self->_copy_file_auto_path($file, $newer_original_path, $new_translation_path, $copy_option);
     }
   }
@@ -148,11 +177,12 @@ sub copy_from_original {
 
 sub _copy_file_auto_path {
   my ($self, $file, $original, $translation, $option) = @_;
+  Carp::croak("file is required") unless $file;
+
   my $to_file = $file;
   my $contents = '';
   my $is_target = 0;
 
-  Carp::croak("file is required") unless $file;
   foreach my $target (@{$option->{target_path}}) {
     if ($file =~ m{^/?$target/}) {
       $is_target = 1;
@@ -164,6 +194,7 @@ sub _copy_file_auto_path {
       return;
     }
   }
+
   return if @{$option->{target_path}} and not $is_target;
 
   foreach my $omit (@{$option->{omit_path}}) {
@@ -206,7 +237,7 @@ sub _copy_file_auto_path {
         } else {
           $self->debug("copy file: $original/$file to $translation/$dir/$to_file");
           copy "$original/$file", "$translation/$dir/$to_file"
-            or $self->fatal("cannot copy file $file: $!");
+            or $self->fatal("cannot copy file $original/$file => $translation/$dir/$to_file: $!");
         }
       }
     }
@@ -214,12 +245,18 @@ sub _copy_file_auto_path {
 }
 
 sub cmpmerge {
-  my ($self, $newer_file, $older_file, $translation_file) = @_;
+  my ($self, $newer_file, $older_file, $translation_file, $contents_filter) = @_;
   my $f = Text::Diff3::Factory->new;
 
   my $translation = $f->create_text([grep chomp, slurp($translation_file)]);
-  my $old = $f->create_text([grep chomp, slurp($older_file)]);
-  my $new = $f->create_text([grep chomp, slurp($newer_file)]);
+  my ($old, $new);
+  if (ref $contents_filter eq 'CODE') {
+    $old = $f->create_text([split /\n/, $contents_filter->($self, $older_file, scalar slurp($older_file))]);
+    $new = $f->create_text([split /\n/, $contents_filter->($self, $newer_file, scalar slurp($newer_file))]);
+  } else {
+    $old = $f->create_text([grep chomp, slurp($older_file)]);
+    $new = $f->create_text([grep chomp, slurp($newer_file)]);
+  }
 
   my $p = $f->create_diff3;
   my $d3 = $p->diff3( $translation, $old, $new );
@@ -255,13 +292,18 @@ sub cmpmerge {
 }
 
 sub cmpmerge_least {
-  my ($self, $newer_file, $older_file, $translation_file) = @_;
+  my ($self, $newer_file, $older_file, $translation_file, $contents_filter) = @_;
   my $f = Text::Diff3::Factory->new;
 
   my $translation = $f->create_text([grep chomp, slurp($translation_file)]);
-  my $old = $f->create_text([grep chomp, slurp($older_file)]);
-  my $new = $f->create_text([grep chomp, slurp($newer_file)]);
-
+  my ($old, $new);
+  if (ref $contents_filter eq 'CODE') {
+    $old = $f->create_text([split /\n/, $contents_filter->($self, $older_file, scalar slurp($older_file))]);
+    $new = $f->create_text([split /\n/, $contents_filter->($self, $newer_file, scalar slurp($newer_file))]);
+  } else {
+    $old = $f->create_text([grep chomp, slurp($older_file)]);
+    $new = $f->create_text([grep chomp, slurp($newer_file)]);
+  }
   my $p = $f->create_diff3;
   my $d3 = $p->diff3( $translation, $old, $new );
 

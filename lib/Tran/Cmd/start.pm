@@ -73,7 +73,7 @@ sub run {
         $self->info("vcs: add files and commit");
       }
     }
-    if ($self->app->prompt("notify?")) {
+    if ($translation->notify and $self->app->prompt("notify?")) {
       $tran->notify($translation->notify, 'start', $target, $version);
     }
   } else {
