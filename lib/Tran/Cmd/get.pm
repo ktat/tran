@@ -18,7 +18,6 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $_target = '';
   my @result = $r->get($target, $version, @rest);
   if (@result == 2) {
     if (defined $version and $version) {
@@ -29,6 +28,7 @@ sub run {
   } else {
     $self->info("Got $target " . ($version || '') );
   }
+  return @result;
 }
 
 sub usage_desc {

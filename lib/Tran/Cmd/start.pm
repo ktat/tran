@@ -14,23 +14,11 @@ sub run {
   my ($self, $opt, $args) = @_;
   my ($resource, $target, $version, @rest) = @$args;
 
-  $resource = camelize($resource);
-
-  my $tran = $self->app->tran;
-  my $r = $tran->resource($resource);
-  my $_target = '';
-  my @result = $r->get($target, $version, @rest);
-  if (@result == 2) {
-    if (defined $version and $version) {
-      $self->info("You have $target($result[1]) in original repository");
-    } else {
-      $self->info("You have the latest version($result[1]) of $target in original repository");
-    }
-  } else {
-    $self->info("Got $target" . ($version || '') );
-  }
   my($translation_name, $files);
-  ($translation_name, $version, $files) = @result;
+  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run($opt, $args);
+
+  $resource = camelize($resource);
+  my $tran = $self->app->tran;
 
   $self->debug("translation_name: $translation_name");
 
@@ -82,7 +70,7 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran start RESOURCE TARGET [VERSION]';
+  return 'tran start RESOURCE TARGET [VERSION/URL]';
 }
 
 sub validate_args {
