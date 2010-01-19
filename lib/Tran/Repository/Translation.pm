@@ -234,10 +234,12 @@ sub _copy_file_auto_path {
           $self->debug("copy file: $original/$file to $translation/$dir/$to_file (with modification)");
           $self->_write_file_auto_path("$translation/$dir/$to_file", $contents)
             or $self->fatal("cannot copy write $translation/$to_file: $!");
-        } else {
+        } elsif (! $option->{contents_filter}) {
           $self->debug("copy file: $original/$file to $translation/$dir/$to_file");
           copy "$original/$file", "$translation/$dir/$to_file"
             or $self->fatal("cannot copy file $original/$file => $translation/$dir/$to_file: $!");
+        } else {
+          $self->debug("ignore file: $original/$file is empty.");
         }
       }
     }

@@ -33,6 +33,7 @@ requires
     'Git::Class'             => 0,
     'Cvs::Simple'            => 0,
     'Data::Visitor'          => 0,
+#    'Text::Diff'             => 0,
     ;
     
 install_script 'script/tran';

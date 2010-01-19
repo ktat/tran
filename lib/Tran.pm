@@ -15,7 +15,7 @@ sub new {
   my $log_class = __PACKAGE__ . '::Log::' . camelize(delete $log_opt->{class});
   my $log = $log_class->new(%$log_opt);
   my $self = bless {config => $config, log => $log}, $class;
-  $self->{resources} = {};
+  $self->{resource} = {};
 
   my $original_repository = Tran::Repository::Original->new
     (config => $config->original_repository, log => $log);
@@ -24,8 +24,8 @@ sub new {
 
   foreach my $kind (keys %{$config->resources}) {
     $kind = camelize($kind);
-    my $class = "Tran::Resources::$kind";
-    $self->{resources}->{$kind} = $class->new
+    my $class = "Tran::Resource::$kind";
+    $self->{resource}->{$kind} = $class->new
       (
        log  => $log,
        original => $original_repository,
@@ -69,16 +69,16 @@ sub encoding {
 
 sub resource {
   my ($self, $resource) = @_;
-  if (exists $self->{resources}->{$resource}) {
+  if (exists $self->{resource}->{$resource}) {
     $self->original->resource($resource);
-    return $self->{resources}->{$resource};
+    return $self->{resource}->{$resource};
   }
   $self->fatal("no such resource: $resource");
 }
 
 sub resources {
   my $self = shift;
-  $self->{resources};
+  $self->{resource};
 }
 
 sub config {
@@ -161,7 +161,7 @@ finish translation(not yet implement):
        directory: /home/ktat/git/github/jpa-translation/
        path_format: "%n-Doc-JA"
  
- resources:
+ resource:
    CPAN:
      # default translation repository
      translation: jprp-modules

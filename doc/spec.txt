@@ -35,8 +35,8 @@ Tran::VCS::Jpa
 Tran::VCS::JprpModules
 Tran::VCS::JprpCore
 
-Tran::Resources -- resources
-Tran::Resources::Cpan  -- Cpan
+Tran::Resoruce -- resoruce
+Tran::Resoruce::Cpan  -- Cpan
 
 Tran::Log
 Tran::Log::Stderr

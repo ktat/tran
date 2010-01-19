@@ -1,8 +1,8 @@
-package Tran::Resources::Cpan;
+package Tran::Resource::Cpan;
 
 use warnings;
 use strict;
-use base qw/Tran::Resources/;
+use base qw/Tran::Resource/;
 use File::Path ();
 use Cwd qw/cwd/;
 use Tran::Util -debug, -list, -common;
@@ -229,7 +229,7 @@ sub _config {
 
 =head1 NAME
 
-Tran::Resources::Cpan
+Tran::Resource::Cpan
 
 =head1 AUTHOR
 

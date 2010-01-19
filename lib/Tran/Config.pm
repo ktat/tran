@@ -24,7 +24,7 @@ sub new {
 
 sub resources {
   my ($self, $kind) = @_;
-  return $self->{config}{resources} || {};
+  return $self->{config}{resource} || {};
 }
 
 sub original_repository {

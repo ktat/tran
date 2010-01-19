@@ -1,4 +1,4 @@
-package Tran::Resources;
+package Tran::Resource;
 
 use warnings;
 use strict;
@@ -9,7 +9,7 @@ sub new {
   my $target = $self{config}->{targets};
 #  my %target;
 #  foreach my $name (keys %$target) {
-#    $target{$name} = Tran::Resources::Target->new($target->{$name} || {});
+#    $target{$name} = Tran::Resource::Target->new($target->{$name} || {});
 #    # $target{$name}->versions($self->root->original_repository->get_versions($name))
 #  }
   $self{targets} = $target;
@@ -55,7 +55,7 @@ sub target_translation {
 
 =head1 NAME
 
-Tran::Resources
+Tran::Resource
 
 =head1 AUTHOR
 

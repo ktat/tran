@@ -62,10 +62,10 @@ sub update_version_info {
   }
 }
 
-sub merge {
-  my $self = shift;
-  $self->SUPER::merge(@_, {omit_path => 'lib'});
-}
+# sub merge {
+#   my $self = shift;
+#   $self->SUPER::merge(@_, {omit_path => 'lib'});
+# }
 
 sub has_target {
   my ($self, $target) = @_;
