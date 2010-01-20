@@ -208,12 +208,12 @@ JPAの場合、
  tran get cpan Module::Name 0.01
 
 のようにバージョンを指定して取得します。
-CPANの場合、Authourが変わっている場合、うまくいきません。
+CPANの場合、Authorが変わっている場合、うまくいきません。
 その場合は、以下のようにURLを指定します。
 
  tran get cpan http://..../Module-Name-0.01.tar.gz
 
-これで、オリジナル野ソースを取得できます。
+これで、オリジナルのソースを取得できます。
 
 =head2 3. Module::Nameの翻訳を開始する
 
@@ -352,6 +352,8 @@ tran の初期設定を行います。
 
  tran init [-f|--force]
 
+既にファイルが存在する場合は、何もしませんが、-f オプションで強制的に初期化できます。
+
 =head2 start
 
 翻訳を開始するときに使うコマンドです。
@@ -448,17 +450,17 @@ mergeコマンドを使って、手動でマージすることが出来ます。
 
 =over 4
 
-=item Tran::Manual::Extend::JA (予定)
+=item Tran::Manual::Extend::JA
 
-他のリソースや、翻訳リポジトリの作り方。
+他のリソースや、翻訳リポジトリのためのクラスの作り方の解説。
 
 =back
 
-=head1 AUTHOR
+=head1 著者
 
 Ktat, C<< <ktat at cpan.org> >>
 
-=head1 COPYRIGHT & LICENSE
+=head1 コピーライト & ライセンス
 
 Copyright 2010 Ktat.
 
