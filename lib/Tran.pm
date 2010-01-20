@@ -201,6 +201,8 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+    perldoc Tran::Manual::JA
+
 =head1 ACKNOWLEDGEMENTS
 
 

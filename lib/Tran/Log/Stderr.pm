@@ -10,6 +10,8 @@ sub _do_log {
   print STDERR $message, "\n";
 }
 
+sub _config { {} }
+
 1;
 
 =pod

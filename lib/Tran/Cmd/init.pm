@@ -2,7 +2,7 @@ package Tran::Cmd::init;
 
 use warnings;
 use strict;
-use Tran::Util -common, -string;
+use Tran::Util -common, -string, -prompt;
 use Tran::Cmd -command;
 use Tran::Config;
 use base qw/Data::Visitor/;
@@ -32,18 +32,22 @@ sub run {
                        },
                 notify => {},
                );
-  foreach my $class (Tran->plugins) {
+  foreach my $class (sort Tran->plugins) {
     if ($class->can('_config')) {
-      $self->info("start to config $class");
       my $_config = $class->_config;
-      $self->{_config} = $_config;
-      $config = $self->visit($_config);
-      $class =~ s{^Tran::}{};
-      my (@separate) = map decamelize($_), split /::/, $class;
-      my $sub_config = $config{shift @separate} ||= {};
-      $sub_config = $sub_config->{$_} ||= {} for @separate;
-      %$sub_config = %$config;
-      $self->info("finish configuring $class");
+      if (%$_config) {
+        $self->info("start to config $class");
+        if (prompt("you want to configure $class?", sub {1}, -ynd => 'y')) {
+          $self->{_config} = $_config;
+          $config = $self->visit($_config);
+          $class =~ s{^Tran::}{};
+          my (@separate) = map decamelize($_), split /::/, $class;
+          my $sub_config = $config{shift @separate} ||= {};
+          $sub_config = $sub_config->{$_} ||= {} for @separate;
+          %$sub_config = %$config;
+          $self->info("finish configuring $class");
+        }
+      }
     }
   }
   %{$c->{config}} = %config;

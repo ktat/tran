@@ -49,7 +49,7 @@ repository:
       directory: /home/user/git/github/jpa-translation/
 
 # リソースの設定
-resources:
+resource:
   cpan:
     # デフォルトの設定
 

@@ -1,0 +1,471 @@
+=encoding utf8
+
+=head1 名前
+
+Tran::Manual::JA - tran のマニュアル
+
+=head1 概要
+
+今まで、PerlのモジュールやPerlのコアドキュメントをいくつか訳してきましたが、最近は、あんまり訳していません。
+
+
+Perlモジュールの翻訳というのは、若干だるくて、しんどい作業だからです。
+というのも...
+
+=over 4
+
+=item 1. モジュールは更新される
+
+もちろん、バージョンアップされますよね。
+バージョンアップされるということは、翻訳者はバージョン管理システムか何かでモジュールの
+バージョンを管理する必要があるということです。そうしないと、バージョン間の差分を取るのが大変です。
+もちろん、多くのモジュールは、それ自身リポジトリを持っていることがあります。
+ですが、各モジュールで違った場所にあるので、面倒です。一ヶ所で管理したいものですね。
+
+=item 2. 差分のマージが大変
+
+翻訳者がモジュールのコードのバージョン管理をしたとしても、バージョン間の
+差分と差分をマージする作業が必要です。
+diff3 は今回のケースではあんまり役に立ちませんし、翻訳者がそういったコマンドラインツールを
+使いこなせるかはわかりません。
+
+=item 3. 同じこと繰り返したくない
+
+DRYであるべき。同じことを何度も繰り返したくありません。
+perldoc -u ModuleName を何回もやったので、もう飽きました。
+
+=back
+
+そんなわけで、"tran"を作りました。
+"tran"は翻訳作業の助けになります。とりあえず、始めてみましょう。
+
+=head1 tranで使われる用語
+
+と、その前に、用語の整理をしておきます。
+
+=head2 リソース
+
+翻訳するターゲットのあるリソース(例:CPAN)
+
+=head2 ターゲット
+
+翻訳するリソースの中にある、翻訳対象(例:モジュール)
+
+=head2 リポジトリ
+
+ファイルの置き場所
+
+=head2 オリジナルリポジトリ
+
+翻訳するオリジナルのファイルを保存するリポジトリ。
+.tran/original/リソース名/ 以下に保存される。
+
+=head2 翻訳リポジトリ
+
+翻訳されたファイルを保存するリポジトリ。
+任意の場所に、JPRPやJPAなどの流儀にしたがって、保存される。
+
+=head1 tranを準備する
+
+翻訳を始める前に、tran の準備をしないといけません。
+次のコマンドで行います。
+
+ % tran init
+
+いくつか質問がされますので、答えてください。
+
+コマンドが終了すると、ホームディレクトリ下の".tran"ディレクトリに、
+設定ファイルが作成されます。
+設定ファイルの内容は次のコマンドで確認できます。
+
+ % tran config
+
+これは、 ~/.tran/config.yml の中身を表示しています。
+
+ ---
+ log:
+   class: Stderr
+   level: info
+ notify: {}
+ repository:
+   original:
+     directory: /home/user/.tran/original/
+   translation:
+     jpa:
+       directory: /home/user/git/github/jpa-translation/
+       vcs:
+         user: ktat
+         wd: /home/user/git/github/jpa-translation/
+     jprp-core:
+       directory: /home/user/cvs/perldocjp/docs/perl/
+       vcs:
+         wd: /home/user/cvs/perldocjp/docs/perl/
+     jprp-modules:
+       directory: /home/user/cvs/perldocjp/docs/modules/
+       vcs:
+         wd: /home/user/cvs/perldocjp/docs/perl/
+     merge_method: cmpmerge
+ resource:
+   cpan:
+     metafile: /home/user/.cpan/Metadata
+     target_only:
+     - '*.pm'
+     - '*.pod'
+     targets:
+       Moose:
+         translation: jpa
+       MooseX::Getopt:
+         translation: jpa
+       perl:
+         translation: jprp-core
+     translation: jprp-modules
+
+設定ファイルについては、後で説明します。
+まずは、翻訳を始めましょう。
+
+=head1 翻訳の流れ
+
+以下、どういうふうにtranを使うかを説明しますが、想定しいている翻訳の流れをここでまとめておきます。
+
+=head2 (A)新しく翻訳を開始する
+
+=over 4
+
+=item 1. Module::Nameの翻訳を開始する
+
+=item 2. 最新のModule::Nameを訳す
+
+=back
+
+
+=head2 (B)以前に翻訳したことのあるものにtranを使いたい
+
+=over 4
+
+=item 1. 以前の翻訳のディレクトリを整える
+
+=item 2. 以前の翻訳のオリジナルのバージョンを取得する
+
+=item 3. Module::Nameの翻訳を開始する
+
+=item 4. 最新のModule::Nameを訳す
+
+=back
+
+=head1 (A)新しく翻訳を開始する
+
+=head2 1. start コマンドで翻訳を開始する
+
+startコマンドを使います。start コマンドはリソース名とターゲット名(ここではモジュール名)を取ります。
+
+ % tran start cpan Module::Name
+
+このコマンドの意味は、「リソース cpan のターゲット Module::Name の翻訳を始める」
+という意味です。なお、必要なら、バージョン番号を後ろに続けることができます。
+
+tran は、Module::NameをCPANから取得して、"~/.tran/original/cpan/"以下に展開します。
+Module::Name の最新のバージョンが 0.1の場合、実際には次のディレクトリに展開されます。
+
+ ~/.tran/original/cpan/Module-Name/0.1/
+
+=head1 2. 最新のModule::Nameを訳す
+
+時が経ち、モジュールのバージョンが上がった場合も、また、startコマンドを使います。
+
+ % tran start cpan Module::Name
+
+開始とまったく一緒です。今回は、以前のバージョンのオリジナルと、以前のバージョンの翻訳
+があるので、オリジナル間の差分を以前のバージョンの翻訳にマージしたものを、
+新しいバージョンの翻訳のとっかかりとして、使うことができます。
+
+=head1 (B)以前に翻訳したことのあるものにtranを使いたい
+
+この場合、若干作業が複雑になりますが。
+
+=head2 1. 以前の翻訳のディレクトリを整える
+
+以前の翻訳のファイル構成が、翻訳リポジトリの想定しているものと違う場合、
+翻訳リポジトリに合うように、設定しないといけません。
+
+JPRPの場合、
+
+ Module-Name-VERSION/lib/Module/Name.pod
+
+というファイル構成ですし。
+
+JPAの場合、
+
+ Module-Name-Doc-JA/Module/Name.pod
+
+です。また、
+
+ Module-Name-Doc-JA/Module/META.yml
+
+が必要になります(が、JPAは、統一されたファイル構成になっているので実際には、作業は必要ないです)。
+
+=head2 2. 以前の翻訳のオリジナルのバージョンを取得する
+
+ tran get cpan Module::Name 0.01
+
+のようにバージョンを指定して取得します。
+CPANの場合、Authourが変わっている場合、うまくいきません。
+その場合は、以下のようにURLを指定します。
+
+ tran get cpan http://..../Module-Name-0.01.tar.gz
+
+これで、オリジナル野ソースを取得できます。
+
+=head2 3. Module::Nameの翻訳を開始する
+
+次は、前と同様に、start してください。
+
+ tran start cpan Module::Name
+
+前述の(A)と同じです。最新のバージョンのオリジナルを取得し、
+以前のバージョンのオリジナルとの差分を取り、
+その差分を、以前の翻訳にマージしたファイルが、
+最新のバージョンの翻訳リポジトリに作られます。
+
+=head2 4. 最新のModule::Nameを訳す
+
+前述の(A)と同様、また、start コマンドを使うだけです。
+
+ tran start cpan Module::Name
+
+=head1 設定ファイル解説
+
+=head2 log
+
+ログの設定です。
+
+ log:
+   class: Stderr
+   level: info
+
+Tran::Logのサブクラスで実装されている方法が使えますが、現在のところ、Stderrしかありません。
+
+より詳しい情報が欲しい場合は、levelをdebugに指定してください。
+
+=head2 notify
+
+通知の設定です。
+
+ notify:
+   perldocjp:
+    class: Email
+    from: from@example.com
+    to: to@example.com
+    template_directory: /home/user/.tran/template/perldocjp/
+
+Tran::Notifyのサブクラスで実装されている方法が使えますが、現在のところ、Emailしかありません。
+
+テンプレートとしては、以下のようなものを用意します。
+ファイル名は、コマンド名と同じにします。
+
+"/home/user/.tran/template/perldocjp/start"
+
+ Subject: [RFC]%n %v 翻訳開始しました
+ charset: jis
+ 
+ あなたの名前です。
+ 
+ %n %v の翻訳を開始しました。
+ 
+ -- 
+ Your Name
+ mailto: from@example.com
+
+%n にターゲット名。%v にバージョン名が入ります。
+
+=head2 repository/original
+
+オリジナルリポジトリの設定です。
+
+   original:
+     directory: /home/user/.tran/original/
+
+ここは特にいじる必要はありません。
+
+=head2 repository/translation
+
+翻訳リポジトリの設定です。
+
+   translation:
+     jpa:
+       directory: /home/user/git/github/jpa-translation/
+       vcs:
+         user: ktat
+         wd: /home/user/git/github/jpa-translation/
+     merge_method: cmpmerge
+
+directory に翻訳ターゲットを展開するルートディレクトリを指定します。
+vcs は、バックエンドのバージョンコントロールシステムの指定です。
+基本的に、自動で設定されます。
+merge_methodは、マージで使うメソッド名の指定です。
+Tran::Repository::Translationに実装されているものから選べます。
+今のところ、cmpmerge と cmpmerge_least の2つしかありません。
+
+=head2 resource
+
+リソースの設定です。
+
+ resource:
+   cpan:
+     metafile: /home/user/.cpan/Metadata
+     target_only:
+     - '*.pm'
+     - '*.pod'
+     translation: jprp-modules
+     targets:
+       Moose:
+         translation: jpa
+       MooseX::Getopt:
+         translation: jpa
+       perl:
+         translation: jprp-core
+
+
+特徴があるのは、translation と、targetsになります。
+translationは、リソースに対するデフォルトの翻訳リポジトリを指定します。
+targets は、リソースのターゲットごとで違った設定をする場合に使います。
+ここでは、ターゲットが、Mooseと MooseX::Getoptは、翻訳リポジトリが jpaで、
+perl の場合は、翻訳リポジトリが jprp-core という指定になっています。
+
+
+例えば、JPRPにはまったく参加しておらず、JPAでしか作業をしないのであれば、
+
+ resource:
+   cpan:
+     metafile: /home/user/.cpan/Metadata
+     target_only:
+     - '*.pm'
+     - '*.pod'
+     translation: jpa
+
+のようにしてしまってもいいでしょう。
+
+=head1 コマンド解説
+
+=head2 init
+
+tran の初期設定を行います。
+
+ tran init [-f|--force]
+
+=head2 start
+
+翻訳を開始するときに使うコマンドです。
+
+ tran start リソース ターゲット [バージョン]
+
+以下のような動きをします。
+
+=over 4
+
+=item 1. ソースを取得する
+
+リソースからソースを取得します
+
+=item 2. 前のバージョンとの差分をマージする(あれば)
+
+前のバージョンのオリジナルと前のバージョンの翻訳があれば、
+オリジナル間の差分を、前の翻訳にマージしたものを、
+新しいバージョンの翻訳として、翻訳リポジトリに保存します。
+
+=item 3. ファイルのコピー(必要なら加工する).
+
+例えば、モジュールからドキュメント部分を抜き出すとか、
+.pm から、.pod とファイル名を変更するとか、
+翻訳リポジトリに合わせて、ファイルの構成を変更するとか。
+といったことをします。
+
+=back
+
+=head2 get
+
+リソースからオリジナルを取得する時に使います。
+
+ tran get リソース ターゲット [バージョン]
+
+=head2 config
+
+設定ファイルの内容を表示します。
+
+ tran config [設定項目]
+
+設定項目を渡さない場合は、全設定を表示します。
+
+ tran config resource
+
+リソースの設定のみ表示します。
+
+ tran config repository
+
+リポジトリの設定のみ表示します。
+
+=head2 reconfigure
+
+再設定を行います。
+
+ tran reconfigure [設定項目 [サブ項目]]
+
+再設定したい場所を指定できます。
+
+=head2 merge
+
+手動でマージを行います。
+
+ tran merge 翻訳リポジトリ名 古いオリジナルのファイル 新しいオリジナルのファイル 古い翻訳ファイル [新しい翻訳ファイル]
+
+start でマージを自動で行いますが、例えば、バージョン間でファイルの置き場所が違う場合、
+うまくいきません。例えば、
+
+VCS::Lite 0.04のディレクトリ構成は、
+
+ VCS-Lite/0.04/Lite.pod
+ VCS-Lite/0.04/lib/VCS/Lite/Delta.pod
+
+なのですが、0.09のディレクトリ構成は、
+
+ VCS-Lite/0.09/lib/VCS/Lite.pod
+ VCS-Lite/0.09/lib/VCS/Lite/Delta.pod
+
+です。
+
+この場合，Lite.pod のマージがうまくいきません。
+mergeコマンドを使って、手動でマージすることが出来ます。
+
+ tran merge jprp-modules cpan/VCS-Lite/0.04/Lite.pod cpan/VCS-Lite/0.09/lib/VCS/Lite.pod \
+                              VCS-Lite-0.04/Lite.pod      VCS-Lite-0.09/lib/VCS/Lite.pod
+
+のように指定することで、マージされた結果が標準出力に表示されます。
+新しい翻訳ファイルを最後の引数に渡した場合は、そこに書き込まれます。
+
+絶対パス、もしくは、オリジナルは、オリジナルリポジトリのdirectoryからの相対パス、
+翻訳は、翻訳リポジトリの directoryからの相対パスでも指定できます。
+
+=head1 他のドキュメント
+
+=over 4
+
+=item Tran::Manual::Extend::JA (予定)
+
+他のリソースや、翻訳リポジトリの作り方。
+
+=back
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

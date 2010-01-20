@@ -38,10 +38,10 @@ sub run {
     $target_config = $target_config->{$class};
   }
 
-  foreach my $class (Tran->plugins) {
+  foreach my $class (sort Tran->plugins) {
     next unless $class eq $target_class;
 
-    if ($class->can('_config')) {
+    if ($class->can('_config') and %{$class->_config}) {
       $self->info("start to recofnigure $class");
       my $_config = $class->_config;
       $self->{_config} = $_config;

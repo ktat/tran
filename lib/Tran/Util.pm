@@ -18,13 +18,14 @@ our $Utils = {
                                   my $answer;
                                 PROMPT:
                                   {
-                                    $answer = IO::Prompt::prompt($message . ": ", @opt);
+                                    $message .= ": " unless $message =~ m{[\?:]\s*$};
+                                    $answer = IO::Prompt::prompt($message, @opt);
                                     $answer->{value} ||= '';
                                     my $r = $check->($answer->{value});
                                     last PROMPT if $r;
 
                                     if (not $r) {
-                                      warn "$answer->{value} is invalid!\n";
+                                      warn "'$answer->{value}' is invalid!\n";
                                       redo PROMPT;
                                     } elsif (not $answer->{value}) {
                                       warn "required!\n";
