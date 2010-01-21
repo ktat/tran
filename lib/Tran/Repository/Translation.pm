@@ -326,7 +326,9 @@ sub cmpmerge_least {
          # something wrong?
          $source .= $new->as_string_range($r->range1);;
        } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
+         $source .= "<<<<<<< $newer_file\n";
          $source .= $new->as_string_range($r->range1);
+         $source .= ">>>>>>> END\n";
        }
        $i2 = $r->hi2 + 1;
      } );
