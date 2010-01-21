@@ -6,7 +6,8 @@ Tran::Manual::JA - tran のマニュアル
 
 =head1 概要
 
-今まで、PerlのモジュールやPerlのコアドキュメントをいくつか訳してきましたが、最近は、あんまり訳していません。
+今まで、PerlのモジュールやPerlのコアドキュメントをいくつか訳してきましたが、
+最近は、あんまり訳していません。
 
 
 Perlモジュールの翻訳というのは、若干だるくて、しんどい作業だからです。
@@ -104,7 +105,7 @@ perldoc -u ModuleName を何回もやったので、もう飽きました。
        directory: /home/user/cvs/perldocjp/docs/modules/
        vcs:
          wd: /home/user/cvs/perldocjp/docs/perl/
-     merge_method: cmpmerge
+     merge_method: cmpmerge_least
  resource:
    cpan:
      metafile: /home/user/.cpan/Metadata
@@ -136,7 +137,6 @@ perldoc -u ModuleName を何回もやったので、もう飽きました。
 =item 2. 最新のModule::Nameを訳す
 
 =back
-
 
 =head2 (B)以前に翻訳したことのあるものにtranを使いたい
 
@@ -180,7 +180,7 @@ Module::Name の最新のバージョンが 0.1の場合、実際には次のデ
 
 =head1 (B)以前に翻訳したことのあるものにtranを使いたい
 
-この場合、若干作業が複雑になりますが。
+この場合、若干作業が必要になりますが。
 
 =head2 1. 以前の翻訳のディレクトリを整える
 
@@ -296,14 +296,14 @@ Tran::Notifyのサブクラスで実装されている方法が使えますが�
        vcs:
          user: ktat
          wd: /home/user/git/github/jpa-translation/
-     merge_method: cmpmerge
+     merge_method: cmpmerge_least
 
 directory に翻訳ターゲットを展開するルートディレクトリを指定します。
 vcs は、バックエンドのバージョンコントロールシステムの指定です。
 基本的に、自動で設定されます。
 merge_methodは、マージで使うメソッド名の指定です。
 Tran::Repository::Translationに実装されているものから選べます。
-今のところ、cmpmerge と cmpmerge_least の2つしかありません。
+今のところ、cmpmerge_least(デフォルト) と cmpmerge の2つしかありません。
 
 =head2 resource
 
@@ -440,8 +440,8 @@ mergeコマンドを使って、手動でマージすることが出来ます。
  tran merge jprp-modules cpan/VCS-Lite/0.04/Lite.pod cpan/VCS-Lite/0.09/lib/VCS/Lite.pod \
                               VCS-Lite-0.04/Lite.pod      VCS-Lite-0.09/lib/VCS/Lite.pod
 
-のように指定することで、マージされた結果が標準出力に表示されます。
-新しい翻訳ファイルを最後の引数に渡した場合は、そこに書き込まれます。
+のように指定することで、マージされた結果が VCS-Lite-0.09/lib/VCS/Lite.podに書き込まれます。
+最後の引数に新しい翻訳ファイルを渡さない場合は、標準出力に表示されます。
 
 絶対パス、もしくは、オリジナルは、オリジナルリポジトリのdirectoryからの相対パス、
 翻訳は、翻訳リポジトリの directoryからの相対パスでも指定できます。
@@ -452,7 +452,7 @@ mergeコマンドを使って、手動でマージすることが出来ます。
 
 =item Tran::Manual::Extend::JA
 
-他のリソースや、翻訳リポジトリのためのクラスの作り方の解説。
+他のリソースや、翻訳リポジトリのためのサブクラスの作り方のマニュアル。
 
 =back
 

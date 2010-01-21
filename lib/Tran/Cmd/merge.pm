@@ -38,9 +38,9 @@ sub run {
 
   my $class = $tran->translation->{$translation};
   my $copy_option = $class->copy_option || {};
-  my $merge_method = $class->merge_method || 'cmpmerge';
+  my $merge_method = $class->merge_method;
   my $merged = $class->$merge_method
-    ($older, $newer, $translated, $copy_option->{contents_filter});
+    ($newer, $older, $translated, $copy_option->{contents_filter});
 
   unless($new_file) {
     print $merged;
@@ -51,7 +51,7 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE';
+  return 'tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE [NEWER_TRANSLATION_FILE]';
 }
 
 sub validate_args {

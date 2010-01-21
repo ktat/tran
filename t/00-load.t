@@ -1,5 +1,6 @@
-#!perl -T
+package _testing_;
 
+use Moose;
 use Test::More tests => 1;
 
 BEGIN {

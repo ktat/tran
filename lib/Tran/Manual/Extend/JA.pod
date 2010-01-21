@@ -12,6 +12,19 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 このマニュアルでは、サブクラスの作成方法について解説します。
 
+=head1 クラス名の命名規則
+
+クラス名は、以下の正規表現にマッチしなければいけません。
+
+ ^([A-Z][a-z\d]+)+$
+
+大文字が2文字以上連続してはいけません。
+以下、クラス名と設定ファイルに書かれる名前との対応例:
+
+ Abc -> abc
+ AbcDef -> abc-def
+ AbcDefGhi -> abc-def-ghi
+
 =head1 Tran::Resourceのサブクラス
 
 リソースに関するクラスです。
@@ -29,7 +42,7 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 返値には、2パターンあります。
 
-既に指定されたバージョン(省略された場合は最新の)オリジナルを取得済みの場合、
+既に指定されたバージョンか、省略された場合は最新の、オリジナルを取得済みの場合、
 
  ($self->target_translation($target), version->new($version))
 
@@ -37,7 +50,12 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
  ($self->target_translation($target), version->new($version), \@files);
 
-@files は、保存するファイルのオリジナルリポジトリのディレクトリからの相対パスを指定します。
+@files は、保存するファイルのオリジナルリポジトリのターゲットのディレクトリからの相対パスを指定します。
+リソースcpanの、Module::Name 0.01の場合は、
+
+ .tran/original/cpan/Module-Name/0.01/
+
+より後ろのファイル名になります。
 
 =head2 _config
 
@@ -70,7 +88,7 @@ Resource::Cpanの内容を例として書いておきます。
                    }
      };
  }
-
+n
 =head1 Tran::Repository::Translationのサブクラス
 
 翻訳リポジトリに関するクラスです。
@@ -79,8 +97,13 @@ Resource::Cpanの内容を例として書いておきます。
 =head2 path_format
 
 ターゲット名とバージョンをどのように保存するかを決めます。
+JPRPでは、以下のようになります。
 
  sub path_format { return "%n-%v" }
+
+JPAでは以下のようになります。
+
+ sub path_format { return "%n-Doc-JA" }
 
 %n がターゲット名で、%v がバージョンになります。
 
@@ -89,12 +112,14 @@ Resource::Cpanの内容を例として書いておきます。
  $translation->has_target($target);
 
 翻訳リポジトリに既にターゲットがあるかないかをチェックします。
+このメソッドではバージョンをチェックしませんので、
+以前に翻訳したものがあれば、1を返し、そうでなければ、0を返します。
 
 =head2 copy_option
 
  $translation->copy_option
 
-オリジナルリポジトリから翻訳リポジトリにコピーする際のオプションを返します。
+オリジナルリポジトリから翻訳リポジトリにコピーやマージする際のオプションを返します。
 参考に Translation::JprpModulesのオプションを書いておきます。
 
  sub copy_option {
@@ -109,6 +134,18 @@ Resource::Cpanの内容を例として書いておきます。
 ignore_path は、無視するパスの設定です。
 contents_filter は、関数リファレンスで、オリジナルのファイル内容を変換して翻訳リポジトリに保存する場合に、指定します。
 name_filter は、ファイル名がオリジナルから変更される場合に指定します。
+
+contents_filter の引数は、
+
+ $contents_filter->($self, $name, $content)
+
+で、変更された $contentを返します。
+
+name_filter の引数は、
+
+ $name_filter->($self, $name);
+
+で、変更された $nameを返します。
 
 =head2 get_versions
 
@@ -145,7 +182,7 @@ Translation::JprpModulesの内容を例として書いておきます。
      };
  }
 
-wd C<< bless sub {...} 'PROMPT' >> というオブジェクトになっています。
+wd は、C<< bless sub {...} 'PROMPT' >> というオブジェクトになっています。
 単純に関数リファレンスの場合は、値として、その関数の実行結果が入りますが、
 "PROMPT"にblessされたオブジェクトにすることで、それがインタラクティブな設定であることを明示できます。
 
@@ -158,7 +195,7 @@ $self は、_config が返すハッシュリファレンスそのものです。
 C<< $self->{vcs}->{wd} >>とは、先ほど説明した、C<< bless sub {...} 'PROMPT' >> というオブジェクトになります。
 ここで、さらにそのリファレンスが返されているのに注意してください。
 その先にある値が代入されるのですが、先にある値が関数リファレンスなどの場合は、実行結果が代入されます。
-なお、ここで、return は二つの値を返していますが、これらは単純に join されます。
+なお、ここで、return は2つの値を返していますが、これらは単純に join されます。
 
 =head1 Tran::VCSのサブクラス
 
@@ -195,6 +232,74 @@ VCSに$target_path以下のファイルを add します。
  $vcs->commit($path);
 
 VCSに$path以下をコミットします。
+
+=head1 Tran::Notify のサブクラス
+
+通知に使うサブクラスです。
+以下のメソッドを実装します。
+
+=head2 notify
+
+ $notify->notify($cmd, $target, $version);
+
+のように呼ばれます。$cmd は、tran で定義されているコマンド名です。
+すべてのコマンドが、notifyを呼び出しているわけではありません。
+
+=head1 Tran::Utilユーティリティ関数
+
+Tran::Utilには、Tranで使っているいくつかのユーティリティ関数があります。
+
+=head2 -common
+
+ use Tran::Util -common
+
+tran全体で使われる関数群を export します。が、現在のところ、logに関連したメソッドのみをexportします。
+なお、これは、関数ではなく、メソッドです。
+
+ $object->warn($message);
+ $object->error($message);
+ $object->fatal($message);
+ $object->info($message);
+ $object->debug($message);
+
+これらは、設定ファイルで定義されているログクラスへの proxy になっているだけです。
+実際の実装は、ログクラスに依存します。
+
+=head2 -file
+
+ use Tran::Util -file;
+
+File::Slurp, File::Find, File::Copy の関数を export します。
+
+=head2 -string
+
+ use Tran::Util -string;
+
+tranで使われる、クラス名と設定ファイル内の名前との相互変換のための、
+camelize, decamelizeを export します。
+
+ camelize('abc-def'); # AbcDef
+ decamelize('AbcDef'); # abc-def
+
+=head2 SEE ALSO
+
+各サブクラスのベースクラスもチェックしておいてください。
+
+=over 4
+
+=item Tran::Resource
+
+=item Tran::Repository
+
+=item Tran::Repository::Original
+
+=item Tran::Repository::Translation
+
+=item Tran::Notify
+
+=item Tran::VCS
+
+=back
 
 =head1 著者
 

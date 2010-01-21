@@ -229,7 +229,7 @@ sub _config {
 
 =head1 NAME
 
-Tran::Resource::Cpan
+Tran::Resource::Cpan - for CPAN
 
 =head1 AUTHOR
 

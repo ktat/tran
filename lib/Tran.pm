@@ -32,7 +32,7 @@ sub new {
        config => $config->resources->{decamelize($kind)},
       );
   }
-  my $merge_method = $self->config->translation_repository->{merge_method} || 'cmpmerge';
+  my $merge_method = $self->config->translation_repository->{merge_method} || '';
   foreach my $key (keys %{$self->config->translation_repository}) {
     my $class = camelize($key);
     $class = 'Tran::Repository::Translation::' . $class;
@@ -119,69 +119,29 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Quick summary of what the module does.
+see Tran::Manaual.
 
-start translation:
+=head1 METHODS
 
- % tran start CPAN Moose
+=head2 new
 
-finish translation(not yet implement):
+=head2 log
 
- % tran finish CPAN Moose
+=head2 encoding
 
-=head1 Config file
+=head2 resource
 
-~/.tran/config.yml
+=head2 resources
 
- ---
- tempolary_dir: /home/ktat/.tran/tmp/
- log:
-   class: Stderr
-   level: debug
+=head2 config
 
- notify:
-   perldocjp:
-     class: Email
-     from : 'from@example.com'
-     to   : 'to@example.com'
-     template_directory: /home/ktat/.tran/template/perldocjp/
- 
- repository:
-   original:
-     directory: /home/ktat/.tran/original/
- 
-   translation:
-     jprp-modules:
-       directory: /home/ktat/cvs/perldocjp/docs/modules/
-       path_format: "%n-%v"
- 
-     jpa:
-       directory: /home/ktat/git/github/jpa-translation/
-       path_format: "%n-Doc-JA"
- 
- resource:
-   CPAN:
-     # default translation repository
-     translation: jprp-modules
-     metafile: /home/ktat/.cpan/Metadata
-     target_only:
-       - '*.pm'
-       - '*.pod'
-       - README
-       - Changes
-     # if target_only is specified, target_ignore is ignored
-     target_ignore:
-       - '*.t'
-     target_directory:
-       - lib
-     # not default translation repository
-     targets:
-       Moose:
-         translation: jpa
-       MooseX::Getopt:
-         translation: jpa
+=head2 original
+
+=head2 translation
+
+=head2 notify
 
 =head1 AUTHOR
 

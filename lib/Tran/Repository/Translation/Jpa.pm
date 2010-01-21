@@ -17,8 +17,6 @@ sub copy_option {
          };
 }
 
-# sub merge_method { 'cmpmerge_least' } # or implement cmpmerge
-
 sub get_versions {
   # get only one version ..., need to use git(?) to fetch branches
   my ($self, $target) = @_;
@@ -61,11 +59,6 @@ sub update_version_info {
     $self->info("meta file($meta) is created.");
   }
 }
-
-# sub merge {
-#   my $self = shift;
-#   $self->SUPER::merge(@_, {omit_path => 'lib'});
-# }
 
 sub has_target {
   my ($self, $target) = @_;

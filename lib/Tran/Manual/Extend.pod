@@ -1,0 +1,133 @@
+=head1 NAME
+
+Tran::Manual::Extend - manual to extend tran
+
+=head1 DESCRIPTION
+
+Tran is not only for translation of Perl modules.
+If you create subclass of Tran::Resource and Tran::Repository,
+tran can work well for other resource or other translation repostiory.
+
+In this manual, I'll explain the way to make subclass.
+
+=head1 NAMING RULE OF CLASS
+
+Class name must match the following regular expression.
+
+ ^([A-Z][a-z\d]+)+$
+
+Class name and name in configuration.
+
+ Abc -> abc
+ AbcDef -> abc-def
+ AbcDefGhi -> abc-def-ghi
+
+=head1 Tran::Resource Subclass
+
+class about resource.
+You have to implement the following method.
+
+=head2 get
+
+implement getting the original of targets and saving it to original repository.
+Its argumetns are:
+
+ $resource->get($target [, $version]);
+
+If $version is omitted, get the latest version.
+
+The return value is 2 pattern.
+
+If target has existed alredy in original repository.
+
+ ($self->target_translation($target), version->new($version))
+
+If not,
+
+ ($self->target_translation($target), version->new($version), \@files);
+
+In @files, relative path from target directory under original repository directory.
+For example, when resource cpan, target Module::Name, version 0.01:
+
+ .tran/original/cpan/Module-Name/0.01/
+
+paths in @files are after this directory.
+
+=head2 _config
+
+This method returns hash reference as configuration.
+It is Resource::Cpan's setting.
+
+ sub _config {
+   return
+     {
+      translation => 'jprp-modules',
+      metafile => "$ENV{HOME}/.cpan/Metadata",
+      target_only => [
+                      '*.pm',
+                      '*.pod',
+                     ],
+      'targets' => {
+                    'perl',
+                    => {
+                        translation => 'jprp-core',
+                       },
+                    'Moose'
+                    => {
+                        translation => 'jpa',
+                       },
+                    'MooseX::Getopt'
+                    => {
+                        translation => 'jpa',
+                       },
+ 
+                   }
+     };
+ }
+
+=head1 Tran::Repository Subclass
+
+Class for translation repository.
+You have to implement the following methods.
+
+=head2 path_format
+
+=head2 has_target
+
+=head2 copy_option
+
+=head2 get_versions
+
+=head2 _config
+
+=head1 Tran::VCS Subclass
+
+If translation repository uses version control system(VCS) as its backend,
+this class can do some operation to the VCS.
+This class is optional.
+
+=head2 connect
+
+=head2 update
+
+=head2 add_files
+
+=head2 commit
+
+=head1 Tran::Notify Subclass
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 COPYRIGHT & LICENCE
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

@@ -105,7 +105,43 @@ sub files {
 
 =head1 NAME
 
-Tran::Repository
+Tran::Repository - base class for repository.
+
+=head1 DESCRIPTION
+
+see Tran::Manual::Extend
+
+=head1 METHODS
+
+=head2 new
+
+=head2 name
+
+=head2 type
+
+=head2 place
+
+=head2 directory
+
+=head2 reset
+
+=head2 get_versions
+
+=head2 latest_version
+
+=head2 target_path
+
+=head2 has_target
+
+=head2 has_version
+
+=head2 prev_version
+
+=head2 path_format
+
+=head2 path_of
+
+=head2 files
 
 =head1 AUTHOR
 

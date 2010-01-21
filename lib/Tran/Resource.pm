@@ -55,7 +55,27 @@ sub target_translation {
 
 =head1 NAME
 
-Tran::Resource
+Tran::Resource - base class for resource.
+
+=head1 DESCRIPTION
+
+see Tran::Manual::Extend
+
+=head1 METHODS
+
+=head2 new
+
+=head2 get
+
+=head2 config
+
+=head2 targets
+
+=head2 translation
+
+=head2 original_repository
+
+=head2 target_translation
 
 =head1 AUTHOR
 

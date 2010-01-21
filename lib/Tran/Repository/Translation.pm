@@ -83,7 +83,6 @@ sub merge {
   }
 
   my $merge_method = $self->merge_method;
-  $merge_method ||= 'cmpmerge';
   my $name_filter = $copy_option->{name_filter};
 
  FILE:
@@ -274,18 +273,18 @@ sub cmpmerge {
          $source .= $translation->as_string_range($r->range0);
          $source .= "||||||| $older_file\n";
          $source .= $old->as_string_at( $_ ) for $r->range2;
-         $source .= "=======\n";
+         $source .= "======= $newer_file\n";
          $source .= $new->as_string_range($r->range1);
-         $source .= ">>>>>>> $newer_file\n";
+         $source .= ">>>>>>> END\n";
        } elsif ( $r->type eq "0" ) { # translation is different, older == newer version
          $source .= $translation->as_string_range($r->range0);
        } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
          # it should be ignore? just use newer version
          $source .=  $new->as_string_range($r->range1);;
        } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
-         $source .= ">>>>>>> $newer_file\n";
+         $source .= "<<<<<<< $newer_file\n";
          $source .= $new->as_string_range($r->range1);
-         $source .= "<<<<<<<\n";
+         $source .= ">>>>>>> END\n";
        }
        $i2 = $r->hi2 + 1;
      } );
@@ -318,9 +317,9 @@ sub cmpmerge_least {
        if ( $r->type eq "A" ) { # conflict (all are different)
          $source .= "<<<<<<< $translation_file\n";
          $source .= $translation->as_string_range($r->range0);
-         $source .= "=======\n";
+         $source .= "======= $newer_file\n";
          $source .= $new->as_string_range($r->range1);
-         $source .= ">>>>>>> $newer_file\n";
+         $source .= ">>>>>>> END\n";
        } elsif ( $r->type eq "0" ) { # translation is different, older == newer version
          $source .= $translation->as_string_range($r->range0);
        } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
@@ -344,12 +343,12 @@ sub update_version_info { }
 
 sub merge_method {
   my $self = shift;
-  $self->{config}{merge_method};
+  $self->{config}{merge_method} || $self->{merge_method} || 'cmpmerge_least';
 }
 
 sub _config {
   return {
-          merge_method => 'cmpmerge',
+          # merge_method => 'cmpmerge_least',
          };
 }
 

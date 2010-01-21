@@ -25,6 +25,7 @@ requires:
   Clone: 0
   Cvs::Simple: 0
   Cwd: 0
+  Data::Visitor: 0
   Email::MIME: 0
   Email::Sender::Simple: 0
   File::Copy: 0
@@ -35,6 +36,7 @@ requires:
   Git::Class: 0
   IO::Prompt: 0
   IO::String: 0
+  IO::Uncompress::Bunzip2: 0
   IO::Uncompress::Gunzip: 0
   LWP::Simple: 0
   Module::Pluggable: 0

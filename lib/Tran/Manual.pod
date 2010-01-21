@@ -1,0 +1,425 @@
+=head1 NAME
+
+Tran::Manual - manual of tran
+
+=head1 DESCRIPTION
+
+I've translated some modules and perl core documentation.
+But recent years, I translated only a few modules.
+
+The translation of Perl modules is somewhat dull and hard work.
+Because ...
+
+=over 4
+
+=item 1. Modules will be updated.
+
+Of cource, modules will be released new version since you translated it.
+It means that translators need to manage modules' code by something like version control system.
+Many module has its own repository, but their places is different by each module.
+Don't you want to control them in one place?
+
+=item 2. Hard to find difference from previous version and hard to merge it.
+
+Even if translators manage modules' code, translator need to find difference and merge it.
+diff3 is not useful in this case and I don't know translators can be good at using such tools.
+
+=item 3. Don't Repeat Yourself
+
+We should do DRY. I won't repeat same thing.
+I did perldoc -u ModuleName many times. I'm bored.
+
+=back
+
+So, I wrote this tool, "tran".
+It helps translators. Let's start tran.
+
+=head1 Terms using in tran
+
+Befor staring translation, I explain some terms.
+
+=head2 Resource
+
+A resource which contains target to be translated.
+For example, CPAN is resoruce.
+
+=head2 Target
+
+A traget to be translated.
+For example, CPAN Module is target.
+
+=head2 Repository
+
+A place to store files.
+
+=head2 Original Repository
+
+A place to store original files to be translated.
+
+=head2 Translation Repository
+
+A place to store translated files.
+
+=head1 Prepare tran.
+
+Before starting translation, you have to prepare tran.
+type the commnad.
+
+ % tran init
+
+It ask you some questions. Answer them.
+
+After the command is done, it creates the configuration file in the directory,
+".tran" under your home directory.
+You can confirm contents of the configuration by the command:
+
+ % tran config
+
+It show the file content of ~/.tran/config.yml
+
+ ---
+ log:
+   class: Stderr
+   level: info
+ notify: {}
+ repository:
+   original:
+     directory: /home/user/.tran/original/
+   translation:
+     jpa:
+       directory: /home/user/git/github/jpa-translation/
+       vcs:
+         user: ktat
+         wd: /home/user/git/github/jpa-translation/
+     jprp-core:
+       directory: /home/user/cvs/perldocjp/docs/perl/
+       vcs:
+         wd: /home/user/cvs/perldocjp/docs/perl/
+     jprp-modules:
+       directory: /home/user/cvs/perldocjp/docs/modules/
+       vcs:
+         wd: /home/user/cvs/perldocjp/docs/perl/
+     merge_method: cmpmerge
+ resource:
+   cpan:
+     metafile: /home/user/.cpan/Metadata
+     target_only:
+     - '*.pm'
+     - '*.pod'
+     targets:
+       Moose:
+         translation: jpa
+       MooseX::Getopt:
+         translation: jpa
+       perl:
+         translation: jprp-core
+     translation: jprp-modules
+
+I'll explain about configuration at L<Configuration File>.
+Now, at first, try to start translation.
+
+=head1 The flow of translation
+
+After this section, I'll explain how to use tran,
+before this, I show my assuming tranlsation flow.
+
+=head2 (A) Start new translation
+
+=over 5
+
+=item 1. Start to translate Module::Name
+
+=item 2. Start to translate the latest Module::Name
+
+=back
+
+=head2 (B) Start new translation, but you've already had the translated file.
+
+=over 5
+
+=item 1. Rearrange directory structure and file name of the translated file
+
+=item 2. Get the original source of the translated version
+
+=item 3. Start to translate latest Module::Name.
+
+=item 4. Start to translate the latest Module::Name
+
+=back
+
+=head1 (A) Start new translation
+
+=head2 1. Start translation with "start" command
+
+Use start command. Its arguments are resource name and target name(in this case, module name).
+You can pass version as optional.
+
+ % tran start cpan Module::Name
+
+It means that you start to translate Module::Name in the resoruce cpan.
+
+tran get Module::Name's tar.gz file from CPAN, and extract it under the directory,
+"~/.tran/original/cpan". If the latest version of Module::Name is 0.1,
+Actually, it put in the following directory.
+
+ ~/.tran/original/cpan/Module-Name/0.1/
+
+=head2 2. Translate the latest Module::Name.
+
+Time passed, and new version of Module::Name was released.
+You can use same command "start".
+
+ % tran start cpan Module::Name
+
+Exactly same command I showed then.
+In this time, You have previous version of original and previous version of the translated.
+tran can merge the difference between older and newer original to the previous translated.
+The merged file is put in translation repository. 
+
+=head1 (B) Start new translation, but you've already had the translated file.
+
+In this case, you need to do the following steps before starting translation.
+
+=head2 1. Rearrange directory structure and file name of the translated file
+
+If the translated file is diffrent from translation repositroy assuming strucutre,
+rearrange its directory/file structure.
+
+=head2 2. Get the original source of the translated version
+
+ tran get cpan Module::Name 0.01
+
+Like this, get target from resource with version.
+If resource is cpan, module author is different, it doesn't work well.
+In such case, use URL instead.
+
+ tran get cpan http://..../Module-Name-0.01.tar.gz
+
+Then, you can get original source.
+
+=head2 3. Start to translate latest Module::Name.
+
+After that, the following steps are as same as (A).
+
+ tran start cpan Module::Name
+
+=head2 4. Start to translate the latest Module::Name
+
+ tran start cpan Module::Name
+
+=head1 Configuration File
+
+=head2 log
+
+Setting for log.
+
+ log:
+   class: Stderr
+   level: info
+
+If you want more detail information, set "debug" as level.
+
+=head2 notify
+
+Setting for notification.
+
+ notify:
+   perldocjp:
+    class: Email
+    from: from@example.com
+    to: to@example.com
+    template_directory: /home/user/.tran/template/perldocjp/
+
+The name of tempalte file put under the template_directory,
+is as same as command name.
+
+For example:
+
+"/home/user/.tran/template/perldocjp/start"
+
+ Subject: [RFC]Start translation of %n %v 
+ charset: ascii
+ 
+ Hello
+ 
+ I started to translate %n version %v.
+ 
+ -- 
+ Your Name
+ mailto: from@example.com
+
+%n will be replaced as target name.
+%v will be replaced as version number.
+
+=head2 repository/original
+
+Setting for original repositroy.
+
+   original:
+     directory: /home/user/.tran/original/
+
+No need to change this.
+
+=head2 repository/translation
+
+Setting for translation repository.
+
+   translation:
+     jpa:
+       directory: /home/user/git/github/jpa-translation/
+       vcs:
+         user: ktat
+         wd: /home/user/git/github/jpa-translation/
+     merge_method: cmpmerge_least
+
+=head2 resoruce
+
+Setting for resoruce.
+
+ resource:
+   cpan:
+     metafile: /home/user/.cpan/Metadata
+     target_only:
+     - '*.pm'
+     - '*.pod'
+     translation: jprp-modules
+     targets:
+       Moose:
+         translation: jpa
+       MooseX::Getopt:
+         translation: jpa
+       perl:
+         translation: jprp-core
+
+=head1 Commands
+
+=head2 init
+
+Do initialize setting for tran.
+
+ tran init [-f|--force]
+
+If configuration file exists, do nothing.
+But, if you use -f option, forcely recreate configuration file.
+
+=head2 start
+
+The command when you want to start new translatation.
+
+ tran start RESOURCE TARGET [VERSION]
+
+start command will do the following:
+
+=over 4
+
+=item 1. get source.
+
+Get souce from resource.
+
+=item 2. Merge the difference between older and newer original if exists
+
+If the previous version of original and the preveous version of translation are found,
+merge the difference between original latest version and previous version to the translated.
+The merged is put in translation repository as new translation.
+
+=item 3. copy files(with modification if needed).
+
+For example, abstract document part from module,
+rename .pm to .pod, change path structure for the translation repository. etc.
+
+=back
+
+=head2 get
+
+To get original files from resource.
+
+ tran get RESOURCE TARGET [VERSION]
+
+=head2 config
+
+Show config.
+
+ tran config [ITEM]
+
+If no item is given, all content is shown.
+
+For example:
+
+ tran config resource
+
+show only setting of resource.
+
+ tran config repository
+
+show only setting of repository.
+
+=head2 reconfigure
+
+Reconfigure setting.
+
+ tran reconfigure [item [sub item]]
+
+You can pass the part you want to reconfigure.
+
+=head2 merge
+
+Merge manually.
+
+ tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE NEWER_TRANSLATION_FILE
+
+Normally start command does merge automaticaly. But, in some case, it cannot do merge.
+For example, directory structure is difference between older and newer.
+
+VCS::Lite 0.04's directory structure.
+
+ VCS-Lite/0.04/Lite.pod
+ VCS-Lite/0.04/lib/VCS/Lite/Delta.pod
+
+But, 0.09 is
+
+ VCS-Lite/0.09/lib/VCS/Lite.pod
+ VCS-Lite/0.09/lib/VCS/Lite/Delta.pod
+
+In this case, cannot merge Lite.pod.
+You can merge manually using this command.
+
+ tran merge jprp-modules cpan/VCS-Lite/0.04/Lite.pod cpan/VCS-Lite/0.09/lib/VCS/Lite.pod \
+                              VCS-Lite-0.04/Lite.pod      VCS-Lite-0.09/lib/VCS/Lite.pod
+
+The merged result is written to VCS-Lite-0.09/lib/VCS/Lite.pod.
+If you don't pass newer translation file as last argument,
+The merged result is outputed to STDOUT.
+
+You can use absorute path or relative path.
+Relative paths are from original repository's directory for original,
+from translation repository's directory for translation.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Tran::Manual::Extend
+
+How to create sub class for other resources and other translation repositories.
+
+=back
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 COPYRIGHT & LICENCE
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+
+
+ 
