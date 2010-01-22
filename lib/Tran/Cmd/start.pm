@@ -21,9 +21,8 @@ sub run {
   my ($resource, $target, $version, @rest) = @$args;
 
   my($translation_name, $files);
-  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run($opt, $args);
+  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run({}, $args);
 
-  $resource = camelize($resource);
   my $tran = $self->app->tran;
 
   $self->debug("translation_name: $translation_name");
