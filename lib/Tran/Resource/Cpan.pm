@@ -184,6 +184,7 @@ sub get {
         close $fh;
       }
     } else {
+      $name =~s{^([\w:]+)\.pm\-([\d.]+/)}{$1-$2};
       $name =~s{^$target_path-([^/]+)/}{$target_path/$1/};
       $name = $original_dir . '/' . $name;
       my ($out_dir) = $name =~m{^(.+)/};
