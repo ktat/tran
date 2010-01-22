@@ -8,7 +8,13 @@ use Tran::Util -common, -debug, -string;
 use File::Path qw/make_path/;
 use IO::Prompt;
 
-sub abstract {  'start new translation'; }
+sub abstract { 'start new translation'; }
+
+sub opt_spec {
+  return (
+          ['force|f', "forcely start translation even if translation exists" ]
+         );
+}
 
 sub run {
   my ($self, $opt, $args) = @_;
@@ -24,18 +30,22 @@ sub run {
 
   my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
-  if ($translation->vcs) {
-    if ($translation->has_target($target)) {
-      $self->app->prompt("you want to update in your working directory with VCS?")
-        and $translation->vcs->update($translation->path_of($target, $version))
-          and $self->info("vcs: update $target");
-    } elsif ($translation->vcs->can('checkout_target')) {
-      $self->app->prompt("you want to checkout in your working directory with VCS?")
-        and $translation->vcs->checkout_target($translation->target_path($target), $version)
-          and $self->info("vcs: checkout $target");
+
+  if ( not my $already = $translation->has_version($target, $version) or $opt->{force}) {
+    if ($already) {
+      $self->info("forcely start translation.");
     }
-  }
-  if (not $translation->has_version($target, $version)) {
+    if ($translation->vcs) {
+      if ($translation->has_target($target)) {
+        $self->app->prompt("you want to update in your working directory with VCS?")
+          and $translation->vcs->update($translation->path_of($target, $version))
+            and $self->info("vcs: update $target");
+      } elsif ($translation->vcs->can('checkout_target')) {
+        $self->app->prompt("you want to checkout in your working directory with VCS?")
+          and $translation->vcs->checkout_target($translation->target_path($target), $version)
+            and $self->info("vcs: checkout $target");
+      }
+    }
     my $prev_version = $original->prev_version($target) || $original->latest_version($target);
     my $want_merge = 0;
     if ($prev_version < $version) {
