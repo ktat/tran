@@ -1,11 +1,11 @@
 package Tran::Util;
 
 use strict;
-use Util::Any -Base;
+use Tran::UtilAny -Base;
 use Clone qw/clone/;
 
 our $Utils = {
-              %$Util::Any::Utils,
+              %$Tran::UtilAny::Utils,
               '-common' =>  ['Tran::Util::Base'],
               '-file' =>  ['File::Slurp', 'File::Find', 'File::Copy'],
               '-prompt' => {'IO::Prompt' =>

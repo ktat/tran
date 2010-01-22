@@ -1,4 +1,4 @@
-package Util::Any;
+package Tran::UtilAny;
 
 use ExportTo ();
 use Clone ();
@@ -396,7 +396,7 @@ sub _do_base_import {
   } elsif ($import_module eq 'Sub::Exporter') {
     no strict 'refs';
     no warnings;
-    my $import_name =  ${"${pkg}::SubExporterImport"} || $Util::Any::SubExporterImport;
+    my $import_name =  ${"${pkg}::SubExporterImport"} || $Tran::UtilAny::SubExporterImport;
     eval "package $caller; $pkg" . '->$import_name(@$arg);';
   }
   die $@ if $@;
@@ -445,7 +445,7 @@ sub _use_import_module { 0 }
 
 =head1 NAME
 
-Util::Any - to export any utilities and to create your own utilitiy module
+Tran::UtilAny - ah ... It's non tested version of Util::Any.
 
 =cut
 
