@@ -185,7 +185,7 @@ sub get {
       }
     } else {
       $name =~s{^([\w:]+)\.pm\-([\d.]+/)}{$1-$2};
-      $name =~s{^$target_path-([^/]+)/}{$target_path/$1/};
+      $name =~s{^$target_path-([^/]+)/}{$target_path/$1/} or $self->fatal("'$target_path' is not included in '$name'. don't you typo?");
       $name = $original_dir . '/' . $name;
       my ($out_dir) = $name =~m{^(.+)/};
       if (not -e $out_dir) {
