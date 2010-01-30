@@ -54,8 +54,6 @@ sub run {
 }
 
 sub _diff {
-  # need to resolve encoding difference for tanslation
-  # use Encode::Guess or add method in Translation subclass
   my ($self, $mode, $translation, $old_path, $old_option, $new_path, $new_option, $files) = @_;
 
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
@@ -108,7 +106,7 @@ sub _diff {
         }
       }
     }
-  } elsif (%$old_option) { # default
+  } else { # default
     # original vs translation
     $wanted = sub {
       if (-f $File::Find::name) {
