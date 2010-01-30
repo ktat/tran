@@ -179,9 +179,7 @@ sub _apply_copy_option {
 
   my $content = encoding_slurp($file, $self->encoding);
   if ($copy_option->{contents_filter}) {
-    if (my $_content = $copy_option->{contents_filter}->($self, $file, $content)) {
-      $content = $_content;
-    }
+    $content = $copy_option->{contents_filter}->($self, $file, $content);
   }
   return (1, "$new_path/$_file", $content);
 }
