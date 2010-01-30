@@ -361,6 +361,33 @@ Reconfigure setting.
 
 You can pass the part you want to reconfigure.
 
+=head2 diff
+
+get difference between target versions.
+
+ tran diff [-o/-t] resource target [version] [version]
+
+=over 4
+
+=item no option
+
+diff between original and translation. if you don't give version,
+diff between the original latest and the translation latest.
+
+=item -o/--original
+
+diff between originals. if you don't give version.
+diff between the previous latest original and the latest original.
+
+=item -t/--translation
+
+diff between translations. if you don't give version.
+diff between the previous latest translation and the latest translation.
+
+=back
+
+If the version of the target is not found, it fails.
+
 =head2 merge
 
 Merge manually.

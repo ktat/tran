@@ -57,6 +57,11 @@ sub new {
   return $self;
 }
 
+sub original_repository {
+  my $self = shift;
+  return $self->{original};
+}
+
 sub log {
   my $self = shift;
   $self->{log};
@@ -95,6 +100,8 @@ sub translation {
   my ($self, $name) = @_;
   return @_ == 2 ? $self->{translation}->{$name} :  $self->{translation};
 }
+
+*translation_repository = \&transation;
 
 sub notify {
   my $self = shift;

@@ -5,6 +5,9 @@ use strict;
 use Tran::Util -debug, -common, -file, -list;
 use File::Path ('make_path');
 use Text::Diff3;
+use Text::Diff;
+use Text::Patch;
+use Algorithm::Merge ();
 
 use base qw/Tran::Repository/;
 
@@ -143,6 +146,44 @@ sub merge {
     }
   }
   return \%diff;
+}
+
+sub _apply_copy_option {
+  my ($self, $file, $copy_option) = @_;
+  my $_file = $file;
+  foreach my $name (qw/omit_path target_path ignore_path/) {
+    $copy_option->{$name} = [$copy_option->{$name} || ()] unless ref $copy_option->{$name};
+  }
+  my $is_target = 0;
+  foreach my $target (@{$copy_option->{target_path}}) {
+    if ($_file =~ m{^/?$target/}) {
+      $is_target = 1;
+      last;
+    }
+  }
+  foreach my $ignore (@{$copy_option->{ignore_path}}) {
+    if ($_file =~ m{^/?$ignore/}) {
+      return 0;
+    }
+  }
+  return 0 if @{$copy_option->{target_path}} and not $is_target;
+
+  foreach my $omit (@{$copy_option->{omit_path}}) {
+    if ($_file =~ s{^/?$omit/}{/}) {
+      last
+    }
+  }
+  if ($copy_option->{name_filter}) {
+    $_file = $copy_option->{name_filter}->($self, $_file);
+  }
+
+  my $content = encoding_slurp($file, $self->encoding);
+  if ($copy_option->{contents_filter}) {
+    if (my $_content = $copy_option->{contents_filter}->($self, $file, $content)) {
+      $content = $_content;
+    }
+  }
+  return (1, $_file, $content);
 }
 
 sub _write_file_auto_path {

@@ -3,8 +3,10 @@ package Tran::Util::Base;
 use warnings;
 use strict;
 use base qw/Exporter/;
+use Encode::Guess;
+use File::Slurp ();
 
-our @EXPORT_OK =qw/warn error fatal info debug/;
+our @EXPORT_OK =qw/warn error fatal info debug encoding_slurp/;
 
 BEGIN {
   require Tran::Log;
@@ -23,6 +25,20 @@ BEGIN {
       $log->$method($message);
     };
   }
+}
+
+sub encoding_slurp {
+  my ($file, $enc) = @_;
+  my $c = '';
+  eval {
+    $c = File::Slurp::slurp($file);
+  };
+  return  unless $c;
+  eval {
+    $c = Encode::decode("Guess", $c);
+    $c = Encode::encode($enc, $c);
+  };
+  return $c;
 }
 
 1;

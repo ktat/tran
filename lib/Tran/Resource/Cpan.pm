@@ -120,7 +120,7 @@ sub get {
   $self->fatal("cannot determin url for $target") unless $url;
 
   $self->debug("get $url");
-  my $targz = LWP::Simple::get($url) or $self->fatal("cannot get $url");
+  my $targz = LWP::Simple::get($url) or $self->fatal("cannot get $url\n\tsearch goole for 'site:backpan.perl.org $_target_path-$_version.tar.gz'");
   $self->debug("got $url");
   my $fh;
   $self->debug("start to extract file.");
