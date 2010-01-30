@@ -77,11 +77,13 @@ sub _diff {
     $wanted = sub {
       if (-f $File::Find::name) {
         my $old_file = $File::Find::name;
-        my ($result, $_old_file, $old_content) = $translation->_apply_copy_option($old_file, $old_option);
+        my ($result, $_old_file, $old_content)
+          = $translation->_apply_copy_option($old_file, $old_option, $old_path, $new_path);
         return if not $result;
         my $new_file = $old_file;
         $new_file =~s{^$old_path}{$new_path};
-        my ($result2, $_new_file, $new_content) = $translation->_apply_copy_option($new_file, $new_option);
+        my ($result2, $_new_file, $new_content)
+          = $translation->_apply_copy_option($new_file, $new_option, $old_path, $new_path);
         return if not $result2;
         if ($old_content and $new_content) {
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
@@ -96,7 +98,8 @@ sub _diff {
       if (-f $File::Find::name) {
         my $old_file = $File::Find::name;
         my $new_file = $old_file;
-        my ($result, $_new_file, $old_content) = $translation->_apply_copy_option($old_file, $old_option);
+        my ($result, $_new_file, $old_content)
+          = $translation->_apply_copy_option($old_file, $old_option, $old_path, $new_path);
         return if not $result or not $old_content;
         $_new_file =~s{^$old_path}{$new_path};
         my $new_content = encoding_slurp("$_new_file", $enc) or return;

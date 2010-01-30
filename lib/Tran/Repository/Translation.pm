@@ -146,8 +146,10 @@ sub merge {
 }
 
 sub _apply_copy_option {
-  my ($self, $file, $copy_option) = @_;
+  my ($self, $file, $copy_option, $old_path, $new_path) = @_;
   my $_file = $file;
+  $_file =~ s{^$old_path/?}{};
+
   foreach my $name (qw/omit_path target_path ignore_path/) {
     $copy_option->{$name} = [$copy_option->{$name} || ()] unless ref $copy_option->{$name};
   }
@@ -180,7 +182,7 @@ sub _apply_copy_option {
       $content = $_content;
     }
   }
-  return (1, $_file, $content);
+  return (1, "$new_path/$_file", $content);
 }
 
 sub _write_file_auto_path {
