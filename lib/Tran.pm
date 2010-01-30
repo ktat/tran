@@ -4,7 +4,8 @@ use warnings;
 use strict;
 use Tran::Util -debug, -string, -common;
 use Class::Inspector;
-use Module::Pluggable search_path => ['Tran::Log', 'Tran::Notify', 'Tran::Repository', 'Tran::Resource'], require => 1;
+use Tran::Log;
+use Module::Pluggable search_path => ['Tran'], require => 1;
 
 __PACKAGE__->plugins;
 

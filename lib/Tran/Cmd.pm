@@ -3,6 +3,7 @@ package Tran::Cmd;
 use warnings;
 use strict;
 use App::Cmd::Setup -app;
+use Tran;
 use IO::Prompt ();
 
 sub new {
