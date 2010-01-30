@@ -14,12 +14,15 @@ sub opt_spec {
   return (
           ['translation|t', "show difference from translation repository" ],
           ['original|o', "show difference from original repository" ],
+          ['version|v=s', "old_version / old_version:new_version" ],
          );
 }
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($resource_name, $target, $version1, $version2) = @$args;
+  my ($resource_name, $target, @files) = @$args;
+  my ($version1, $version2) = split(/:/, $opt->{version} || '', 2);
+
   $| = 1;
   my $tran = $self->app->tran;
   my $resource = $tran->resource(camelize $resource_name);
@@ -29,28 +32,28 @@ sub run {
     $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between translation $version1 and translation $version2");
-    $self->_diff($translation, $old_path, {}, $new_path, {});
+    $self->_diff($translation, $old_path, {}, $new_path, {}, \@files);
   } elsif ($opt->{original}) {
     my $copy_option = $translation->copy_option;
     my $original = $resource->original_repository;
     $old_path = $original->path_of($target, $version1 ||= $original->prev_version($target));
     $new_path = $original->path_of($target, $version2 ||= $original->latest_version($target));
     $self->debug("diff between original $version1 and original $version2");
-    $self->_diff($translation, $old_path, $copy_option, $new_path, $copy_option);
+    $self->_diff($translation, $old_path, $copy_option, $new_path, $copy_option, \@files);
   } else {
     my $original = $resource->original_repository;
     my $copy_option = $translation->copy_option;
     $old_path = $original->path_of($target   , $version1 ||= $original->latest_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between original $version1 and translation $version2");
-    $self->_diff($translation, $old_path, $copy_option, $new_path, {});
+    $self->_diff($translation, $old_path, $copy_option, $new_path, {}, \@files);
   }
 }
 
 sub _diff {
   # need to resolve encoding difference for tanslation
   # use Encode::Guess or add method in Translation subclass
-  my ($self, $translation, $old_path, $old_option, $new_path, $new_option) = @_;
+  my ($self, $translation, $old_path, $old_option, $new_path, $new_option, $files) = @_;
 
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
   $self->fatal("missing new_path: $new_path") unless -d $new_path;
@@ -119,7 +122,7 @@ sub _diff {
 }
 
 sub usage_desc {
-  return 'tran diff [-o/-t] RESOURCE TARGET [VERSION1 VERSION2]';
+  return 'tran diff [-o/-t] RESOURCE TARGET [FILES ...]';
 }
 
 sub validate_args {

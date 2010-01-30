@@ -367,7 +367,7 @@ get difference between target versions.
 If you set your favolite pager in TRAN_PAGER environmental varialbe,
 display output with pager.
 
- tran diff [-o/-t] resource target [version] [version]
+ tran diff [-v version/-o/-t] resource target [files ...]
 
 =over 4
 
@@ -385,6 +385,13 @@ diff between the previous latest original and the latest original.
 
 diff between translations. if you don't give version.
 diff between the previous latest translation and the latest translation.
+
+=item -v/--version
+
+specify version like this.
+
+ -v 0.01:0.02
+ -v 0.01
 
 =back
 
