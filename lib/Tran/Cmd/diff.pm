@@ -7,7 +7,6 @@ use Tran;
 use Tran::Util -common, -debug, -string;
 use Text::Diff ();
 use File::Find qw/find/;
-use IO::Prompt;
 
 sub abstract {  'show diffrence'; }
 

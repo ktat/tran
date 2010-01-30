@@ -5,9 +5,6 @@ use strict;
 use Tran::Util -debug, -common, -file, -list;
 use File::Path ('make_path');
 use Text::Diff3;
-use Text::Diff;
-use Text::Patch;
-use Algorithm::Merge ();
 
 use base qw/Tran::Repository/;
 
