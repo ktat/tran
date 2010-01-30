@@ -28,32 +28,35 @@ sub run {
   my $resource = $tran->resource(camelize $resource_name);
   my ($old_path, $new_path);
   my $translation = $tran->translation($resource->target_translation($target));
+  my $mode = 0;
   if ($opt->{translation}) {
+    $mode = 1;
     $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between translation $version1 and translation $version2");
-    $self->_diff($translation, $old_path, {}, $new_path, {}, \@files);
+    $self->_diff($mode, $translation, $old_path, {}, $new_path, {}, \@files);
   } elsif ($opt->{original}) {
+    $mode = 2;
     my $copy_option = $translation->copy_option;
     my $original = $resource->original_repository;
     $old_path = $original->path_of($target, $version1 ||= $original->prev_version($target));
     $new_path = $original->path_of($target, $version2 ||= $original->latest_version($target));
     $self->debug("diff between original $version1 and original $version2");
-    $self->_diff($translation, $old_path, $copy_option, $new_path, $copy_option, \@files);
+    $self->_diff($mode, $translation, $old_path, $copy_option, $new_path, $copy_option, \@files);
   } else {
     my $original = $resource->original_repository;
     my $copy_option = $translation->copy_option;
     $old_path = $original->path_of($target   , $version1 ||= $original->latest_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between original $version1 and translation $version2");
-    $self->_diff($translation, $old_path, $copy_option, $new_path, {}, \@files);
+    $self->_diff($mode, $translation, $old_path, $copy_option, $new_path, {}, \@files);
   }
 }
 
 sub _diff {
   # need to resolve encoding difference for tanslation
   # use Encode::Guess or add method in Translation subclass
-  my ($self, $translation, $old_path, $old_option, $new_path, $new_option, $files) = @_;
+  my ($self, $mode, $translation, $old_path, $old_option, $new_path, $new_option, $files) = @_;
 
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
   $self->fatal("missing new_path: $new_path") unless -d $new_path;
@@ -66,7 +69,7 @@ sub _diff {
   } else {
     $out = *STDOUT;
   }
-  if (not %$old_option and not %$new_option) { # -t
+  if ($mode == 1) { # -t
     # translation and translation
     $wanted = sub {
       if (-f $File::Find::name and $File::Find::name !~ m{/CVS/}) {
@@ -81,7 +84,7 @@ sub _diff {
         }
       }
     }
-  } elsif (%$old_option and %$new_option) { # -o
+  } elsif ($mode == 2) { # -o
     # original vs original
     $wanted = sub {
       if (-f $File::Find::name) {
@@ -92,8 +95,12 @@ sub _diff {
         my $new_file = $old_file;
         $new_file =~s{^$old_path}{$new_path};
         my ($result2, $_new_file, $new_content)
-          = $translation->_apply_copy_option($new_file, $new_option, $old_path, $new_path);
+          = $translation->_apply_copy_option($new_file, $new_option, $new_path, $new_path);
         return if not $result2;
+
+        $self->debug("old content is empty") unless $old_content;
+        $self->debug("new content is empty") unless $new_content;
+
         if ($old_content and $new_content) {
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $new_file\n$diff\n\n"
