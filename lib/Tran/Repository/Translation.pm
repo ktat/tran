@@ -165,7 +165,6 @@ sub _apply_copy_option {
       return 0;
     }
   }
-  $self->debug("ignore $file / $_file") if @{$copy_option->{target_path}} and not $is_target;
   return 0 if @{$copy_option->{target_path}} and not $is_target;
 
   foreach my $omit (@{$copy_option->{omit_path}}) {

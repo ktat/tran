@@ -34,7 +34,7 @@ sub run {
     $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between translation $version1 and translation $version2");
-    $self->_diff($mode, $translation, $old_path, {}, $new_path, {}, \@files);
+    $self->_diff($mode, $translation, $old_path, $new_path, {}, \@files);
   } elsif ($opt->{original}) {
     $mode = 2;
     my $copy_option = $translation->copy_option;
@@ -42,19 +42,19 @@ sub run {
     $old_path = $original->path_of($target, $version1 ||= $original->prev_version($target));
     $new_path = $original->path_of($target, $version2 ||= $original->latest_version($target));
     $self->debug("diff between original $version1 and original $version2");
-    $self->_diff($mode, $translation, $old_path, $copy_option, $new_path, $copy_option, \@files);
+    $self->_diff($mode, $translation, $old_path, $new_path, $copy_option, \@files);
   } else {
     my $original = $resource->original_repository;
     my $copy_option = $translation->copy_option;
     $old_path = $original->path_of($target   , $version1 ||= $original->latest_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between original $version1 and translation $version2");
-    $self->_diff($mode, $translation, $old_path, $copy_option, $new_path, {}, \@files);
+    $self->_diff($mode, $translation, $old_path, $new_path, $copy_option, \@files);
   }
 }
 
 sub _diff {
-  my ($self, $mode, $translation, $old_path, $old_option, $new_path, $new_option, $files) = @_;
+  my ($self, $mode, $translation, $old_path, $new_path, $copy_option, $files) = @_;
 
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
   $self->fatal("missing new_path: $new_path") unless -d $new_path;
@@ -67,6 +67,7 @@ sub _diff {
   } else {
     $out = *STDOUT;
   }
+  local @SIG{qw/INT KILL TERM QUIT/} = (sub {close $out; exit;}) x 4;
   if ($mode == 1) { # -t
     # translation and translation
     $wanted = sub {
@@ -88,12 +89,12 @@ sub _diff {
       if (-f $File::Find::name) {
         my $old_file = $File::Find::name;
         my ($result, $_old_file, $old_content)
-          = $translation->_apply_copy_option($old_file, $old_option, $old_path, $new_path);
+          = $translation->_apply_copy_option($old_file, $copy_option, $old_path, $new_path);
         return if not $result;
         my $new_file = $old_file;
         $new_file =~s{^$old_path}{$new_path};
         my ($result2, $_new_file, $new_content)
-          = $translation->_apply_copy_option($new_file, $new_option, $new_path, $new_path);
+          = $translation->_apply_copy_option($new_file, $copy_option, $new_path, $new_path);
         return if not $result2;
 
         $self->debug("old content is empty") unless $old_content;
@@ -113,7 +114,7 @@ sub _diff {
         my $old_file = $File::Find::name;
         my $new_file = $old_file;
         my ($result, $_new_file, $old_content)
-          = $translation->_apply_copy_option($old_file, $old_option, $old_path, $new_path);
+          = $translation->_apply_copy_option($old_file, $copy_option, $old_path, $new_path);
         return if not $result or not $old_content;
         $_new_file =~s{^$old_path}{$new_path};
         my $new_content = encoding_slurp("$_new_file", $enc) or return;
