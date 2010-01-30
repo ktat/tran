@@ -57,6 +57,12 @@ sub _diff {
 
   my $wanted;
   my $enc = $translation->encoding;
+  my $out;
+  if ($ENV{TRAN_PAGER}) {
+    open $out, "|-", $ENV{TRAN_PAGER} or $self->fatal("cannot open '$ENV{TRAN_PAGER}' with mode '|-'");
+  } else {
+    $out = *STDOUT;
+  }
   if (not %$old_option and not %$new_option) { # -t
     # translation and translation
     $wanted = sub {
@@ -68,7 +74,7 @@ sub _diff {
         $new_file =~s{^$old_path}{$new_path};
         my $new_content = encoding_slurp($new_file, $enc) or return;
         if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
-          print "--- $old_file\n+++ $new_file\n$diff\n\n";
+          print $out "--- $old_file\n+++ $new_file\n$diff\n\n";
         }
       }
     }
@@ -87,7 +93,7 @@ sub _diff {
         return if not $result2;
         if ($old_content and $new_content) {
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
-            print "--- $old_file\n+++ $new_file\n$diff\n\n"
+            print $out "--- $old_file\n+++ $new_file\n$diff\n\n"
           }
         }
       }
@@ -104,7 +110,7 @@ sub _diff {
         $_new_file =~s{^$old_path}{$new_path};
         my $new_content = encoding_slurp("$_new_file", $enc) or return;
         if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
-          print "--- $old_file\n+++ $_new_file\n$diff\n\n";
+          print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
         }
       }
     }

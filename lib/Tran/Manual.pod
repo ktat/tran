@@ -364,6 +364,8 @@ You can pass the part you want to reconfigure.
 =head2 diff
 
 get difference between target versions.
+If you set your favolite pager in TRAN_PAGER environmental varialbe,
+display output with pager.
 
  tran diff [-o/-t] resource target [version] [version]
 
