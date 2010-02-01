@@ -9,3 +9,34 @@ use Tran::Cmd;
 my $tran = Tran->new("$ENV{HOME}/.tran/config.yml");
 Tran::Cmd->new($tran)->run;
 
+=pod
+
+=head1 NAME
+
+tran -- version control prgoram for translation
+
+=head1 USAGE
+
+see help.
+
+ % tran help
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

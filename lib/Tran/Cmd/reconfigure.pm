@@ -35,7 +35,7 @@ sub run {
   foreach my $class (@$args) {
     $target_class .= '::' . camelize($class);
     $class = decamelize($class);
-    $target_config = $target_config->{$class};
+    $target_config = $target_config->{$class} ||= {};
   }
 
   foreach my $class (sort Tran->plugins) {
@@ -63,6 +63,8 @@ sub yours_or_default {
 
 sub confirm_change {
   my ($key, $yours) = @_;
+  $yours ||= '';
+  $key =~s{^\d+_}{};
   return prompt("you want to change the value of $key ?(y/n) ($yours)",
                 sub { 1 }, -yn, -default => 'n') eq 'y' ? 1 : 0;
 }
@@ -99,27 +101,29 @@ sub _exec_code {
 
 sub visit_hash {
   my ($self, $hash) = @_;
-  foreach my $key (keys %$hash) {
+  foreach my $key (sort keys %$hash) {
     my $data = $hash->{$key};
     my $org = $self->{_target_config};
+    my $org_key = $key;
+    $org_key =~s{^\d+_}{};
     if (defined ref $data) {
       if (ref $data eq "HASH") {
-        $self->{_target_config} = $org->{$key};
+        $self->{_target_config} = $org->{$org_key};
         $self->visit_hash($data);
         $self->{_target_config} = $org;
       } elsif (ref $data eq 'PROMPT') {
-        if (confirm_change($key, $org->{$key}) == 0) {
-          $data = $org->{$key};
+        if (confirm_change($key, $org->{$org_key}) == 0) {
+          $data = $org->{$org_key};
         } else {
-          $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
+          $data = _exec_code($data, $self->{_config}, $key, $org->{$org_key});
         }
       } elsif (ref $data eq 'CODE') {
-        $data = _exec_code($data, $self->{_config}, $key, $org->{$key});
+        $data = _exec_code($data, $self->{_config}, $key, $org->{$org_key});
       }
     } elsif ($org->{$key} ne $data) {
-      $data = yours_or_default($key, $org->{$key}, $data);
+      $data = yours_or_default($key, $org->{$org_key}, $data);
     }
-    $org->{$key} = $hash->{$key} = $data;
+    $org->{$org_key} = $hash->{$org_key} = $data;
   }
   return $hash;
 }

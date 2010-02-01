@@ -109,8 +109,12 @@ sub notify {
   my ($name, @args) = @_;
   if (defined $name) {
     for my $n (ref $name eq 'ARRAY' ? @$name : $name) {
-      $self->fatal("unkown notify name: $n") unless $self->{notify}->{$n};
-      $self->{notify}->{$n}->notify(@args);
+      local $@;
+      $self->fatal("unknown notify name: $n") unless $self->{notify}->{$n};
+      eval {
+        $self->{notify}->{$n}->notify(@args);
+      };
+      $self->warn("cannot notify: $@") if $@;
     }
   }
 }

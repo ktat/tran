@@ -34,6 +34,7 @@ requires
     'Cvs::Simple'            => 0,
     'Data::Visitor'          => 0,
     'Text::Diff'             => 0,
+    'Net::Twitter'           => 0,
     ;
     
 install_script 'script/tran';
