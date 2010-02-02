@@ -10,11 +10,16 @@ use IO::Prompt;
 
 sub abstract {  'get original files from resource'; }
 
+sub opt_spec {
+  return (
+          ['resource|r=s', "resource. required." ],
+         );
+}
+
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($resource, $target, $version, @rest) = @$args;
-
-  $resource = camelize($resource);
+  my ($target, $version, @rest) = @$args;
+  my $resource = camelize($opt->{resource});
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
@@ -32,12 +37,11 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran get RESOURCE TARGET [VERSION/URL]';
+  return 'tran get -r RESOURCE TARGET [VERSION/URL]';
 }
 
 sub validate_args {
-  my ($self, $opt, $args) = @_;
-  $self->usage_error("arguments are not enough.")  if @$args < 2;
+  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
 }
 
 

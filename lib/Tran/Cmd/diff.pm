@@ -12,6 +12,7 @@ sub abstract {  'show diffrence'; }
 
 sub opt_spec {
   return (
+          ['resource|r=s', "resource. required." ],
           ['translation|t', "show difference from translation repository" ],
           ['original|o', "show difference from original repository" ],
           ['version|v=s', "old_version / old_version:new_version" ],
@@ -20,7 +21,8 @@ sub opt_spec {
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($resource_name, $target, @files) = @$args;
+  my ($target, @files) = @$args;
+  my $resource_name = $opt->{resource};
   my ($version1, $version2) = split(/:/, $opt->{version} || '', 2);
 
   $| = 1;
@@ -132,8 +134,7 @@ sub usage_desc {
 }
 
 sub validate_args {
-  my ($self, $opt, $args) = @_;
-  $self->usage_error("arguments are not enough.")  if @$args < 2;
+  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
 }
 
 sub description {

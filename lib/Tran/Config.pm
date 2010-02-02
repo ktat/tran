@@ -27,6 +27,11 @@ sub resources {
   return $self->{config}{resource} || {};
 }
 
+sub default_resource {
+  my ($self, $kind) = @_;
+  return $self->{config}{default_resource};
+}
+
 sub original_repository {
   my ($self) = @_;
   $self->{config}->{repository}->{original} || {};

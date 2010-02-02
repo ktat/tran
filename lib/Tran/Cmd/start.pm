@@ -12,16 +12,18 @@ sub abstract { 'start new translation'; }
 
 sub opt_spec {
   return (
-          ['force|f', "forcely start translation even if translation exists" ]
+          ['resource|r=s', "resource. required." ],
+          ['force|f'   , "forcely start translation even if translation exists" ],
          );
 }
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($resource, $target, $version, @rest) = @$args;
+  my ($target, $version, @rest) = @$args;
+  my $resource = $opt->{resource};
 
   my($translation_name, $files);
-  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run({}, $args);
+  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run({resource => $resource}, $args);
 
   my $tran = $self->app->tran;
 
@@ -79,14 +81,12 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran start RESOURCE TARGET [VERSION/URL]';
+  return 'tran start -r RESOURCE TARGET [VERSION/URL]';
 }
 
 sub validate_args {
-  my ($self, $opt, $args) = @_;
-  $self->usage_error("arguments are not enough.")  if @$args < 2;
+  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
 }
-
 
 1;
 
