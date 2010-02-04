@@ -72,8 +72,12 @@ sub run {
         $self->info("vcs: add files and commit");
       }
     }
-    if ($translation->notify and $self->app->prompt("notify?")) {
-      $tran->notify($translation->notify, 'start', $target, $version);
+    if ($translation->can('_start_hook')) {
+      $translation->_start_hook($target, $version);
+    }
+    if ($translation->notify) {
+      $tran->notify($translation->notify, 'start', $target, $version,
+                    sub { my $kind = shift; $self->app->prompt("notify $kind ?") });
     }
   } else {
     $self->info("translation files for $target $version are found.");

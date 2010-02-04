@@ -21,6 +21,11 @@ sub new {
   return $o;
 }
 
+sub tran {
+  my $self = shift;
+  $self->{tran};
+}
+
 sub encoding {
   my $self = shift;
   $self->{encoding};

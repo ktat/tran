@@ -40,6 +40,7 @@ sub new {
     $class = Class::Inspector->loaded($class) ? $class : 'Tran::Repository::Translation';
     $self->{translation}->{$key} = $class->new
       (
+       tran     => $self,
        name     => $key,
        log      => $log,
        config   => $self->config->translation_repository->{$key},
@@ -52,7 +53,7 @@ sub new {
   foreach my $key (keys %{$self->config->notify}) {
     my $config = $self->config->notify($key);
     my $class = __PACKAGE__ . '::Notify::' . camelize($config->{class});
-    $self->{notify}->{$key} = $class->new(%$config, log => $log);
+    $self->{notify}->{$key} = $class->new(%$config, log => $log, tran => $self);
   }
 
   return $self;
@@ -106,15 +107,21 @@ sub translation {
 
 sub notify {
   my $self = shift;
+  my $prompt;
+  $prompt = pop if ref $_[-1] eq 'CODE';
   my ($name, @args) = @_;
   if (defined $name) {
     for my $n (ref $name eq 'ARRAY' ? @$name : $name) {
       local $@;
-      $self->fatal("unknown notify name: $n") unless $self->{notify}->{$n};
-      eval {
-        $self->{notify}->{$n}->notify(@args);
-      };
-      $self->warn("cannot notify: $@") if $@;
+      unless ($self->{notify}->{$n}) {
+        $self->warn("unknown notify name: $n");
+      } else {
+        next if defined $prompt and not $prompt->($n);
+        eval {
+          $self->{notify}->{$n}->notify(@args);
+        };
+        $self->warn("cannot notify: $@") if $@;
+      }
     }
   }
 }

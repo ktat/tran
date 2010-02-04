@@ -1,47 +1,29 @@
-package Tran::Notify;
+package Tran::Profile;
 
-use warnings;
 use strict;
-use version;
-use Tran::Util -common;
+use Tran::Util -prompt;
 
-sub new {
-  my ($class, %self) = @_;
-  bless \%self => $class;
+sub _config {
+  return
+    {
+     '00_name'  => bless(sub { prompt("your name:",   sub { $_[0] ? 1 : 0})}, 'PROMPT'),
+     '10_email' => bless(sub { prompt("your email:",  sub { $_[0] ? 1 : 0})}, 'PROMPT'),
+    };
 }
-
-sub tran {
-  my $self = shift;
-  $self->{tran};
-}
-
-1;
 
 =head1 NAME
 
-Tran::Notify
+Tran::Profile
 
 =head1 SYNOPSIS
 
- notify:
-  notify_name:
-    class: NotificationClass
-    param1: value1
-    param2: value2
-    ...
-
- repository:
-   # ...
-   translation:
-     translation_name:
-       # ...
-       notify: notify_name
-
-see Tran::Notify::* classes.
+ profile:
+   name: ...
+   email: ...
 
 =head1 SEE ALSO
 
-Tran::Notify::Email
+Tran::Profile
 
 =head1 AUTHOR
 
@@ -64,3 +46,4 @@ See http://dev.perl.org/licenses/ for more information.
 =cut
 
 1; # End of Tran
+

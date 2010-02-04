@@ -31,6 +31,7 @@ sub send_email {
   }
 
   $header{ucfirst $_} = $self->{$_} foreach qw/from to/;
+  $header{from} ||= $self->tran->config->profile->{email};
 
   my $charset = $self->_charset(delete $header{charset}, \%header, \$body);
   sendmail(Email::MIME->create(attributes => \%attributes,

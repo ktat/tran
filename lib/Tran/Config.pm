@@ -22,6 +22,11 @@ sub new {
                } => (ref $self ? ref $self : $self);
 }
 
+sub profile {
+  my $self = shift;
+  $self->{config}{profile};
+}
+
 sub resources {
   my ($self, $kind) = @_;
   return $self->{config}{resource} || {};
