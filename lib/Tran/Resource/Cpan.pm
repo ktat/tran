@@ -120,7 +120,18 @@ sub get {
   $self->fatal("cannot determin url for $target") unless $url;
 
   $self->debug("get $url");
-  my $targz = LWP::Simple::get($url) or $self->fatal("cannot get $url\n\tsearch goole for 'site:backpan.perl.org $_target_path-$_version.tar.gz'");
+  my $targz;
+  unless ($targz = LWP::Simple::get($url)) {
+    my $file_path = "$_target_path-$_version.tar.gz";
+    $file_path =~s{^([^-]+)-}{$1/$1-};
+    my $backpan_url = "http://backpan.cpan.org/modules/by-module/$file_path";
+    unless ($targz = LWP::Simple::get($backpan_url)) {
+      my $backpan_url2 = $backpan_url;
+      $backpan_url2 =~s{-([\d\.]+\.tar\.gz)$}{.pm-$1};
+      $targz = LWP::Simple::get($backpan_url2)
+        or $self->fatal("cannot get $url \n           $backpan_url\n           $backpan_url2\n\tsearch goole for 'site:backpan.cpan.org $_target_path-$_version.tar.gz / $backpan_url2'");
+    }
+  }
   $self->debug("got $url");
   my $fh;
   $self->debug("start to extract file.");

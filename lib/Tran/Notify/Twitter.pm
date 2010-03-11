@@ -14,7 +14,7 @@ sub notify {
      traits   => [qw/API::REST/],
      username => $self->{account},
      password => $self->{password},
-    );
+    ) or return;
   my $message = $self->{message};
 
   $message =~s{%c}{$cmd}g;
