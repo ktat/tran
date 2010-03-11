@@ -124,10 +124,13 @@ sub get {
   unless ($targz = LWP::Simple::get($url)) {
     my $file_path = "$_target_path-$_version.tar.gz";
     $file_path =~s{^([^-]+)-}{$1/$1-};
-    my $backpan_url = "http://backpan.cpan.org/modules/by-module/$file_path";
+    $url = my $backpan_url = "http://backpan.cpan.org/modules/by-module/$file_path";
+    $self->debug("get $url");
     unless ($targz = LWP::Simple::get($backpan_url)) {
       my $backpan_url2 = $backpan_url;
       $backpan_url2 =~s{-([\d\.]+\.tar\.gz)$}{.pm-$1};
+      $url = $backpan_url2;
+      $self->debug("get $url");
       $targz = LWP::Simple::get($backpan_url2)
         or $self->fatal("cannot get $url \n           $backpan_url\n           $backpan_url2\n\tsearch goole for 'site:backpan.cpan.org $_target_path-$_version.tar.gz / $backpan_url2'");
     }
