@@ -283,6 +283,14 @@ camelize, decamelizeを export します。
 
 =head2 SEE ALSO
 
+=over 4
+
+=item Tran::Manual::JA
+
+Tran自体のドキュメント。チュートリアル。
+
+=back
+
 各サブクラスのベースクラスもチェックしておいてください。
 
 =over 4

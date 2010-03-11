@@ -7,7 +7,7 @@ use Tran::Cmd -command;
 use Tran::Config;
 use base qw/Data::Visitor/;
 
-sub abstract { 'recofigure config file'; }
+sub abstract { 'reconfigure config file'; }
 
 sub validate_args {
   my $self = shift;
@@ -42,7 +42,13 @@ sub run {
     next unless $class eq $target_class;
 
     if ($class->can('_config') and %{$class->_config}) {
-      $self->info("start to recofnigure $class");
+      local $@;
+      eval "require $class";
+      if ($@) {
+        $self->info("skip reconfigure $class($@)");
+        next;
+      }
+      $self->info("start to reconfigure $class");
       my $_config = $class->_config;
       $self->{_config} = $_config;
       $self->{_target_config} = $target_config;

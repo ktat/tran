@@ -116,6 +116,34 @@ This class is optional.
 
 =head1 Tran::Notify Subclass
 
+=head2 SEE ALSO
+
+=over 4
+
+=item Tran::Manual
+
+Document of Tran itself. Tutorial.
+
+=back
+
+Check base class of each sub class.
+
+=over 4
+
+=item Tran::Resource
+
+=item Tran::Repository
+
+=item Tran::Repository::Original
+
+=item Tran::Repository::Translation
+
+=item Tran::Notify
+
+=item Tran::VCS
+
+=back
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>

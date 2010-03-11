@@ -70,11 +70,11 @@ sub _config {
   my $self = shift;
   return
     {
-     vcs => {
-             wd   => bless(sub { prompt("directory you've cloned for jpa translation", sub {-d shift || 0}) }, 'PROMPT'),
-             user => bless(sub { prompt("your github account name", sub {1})}, 'PROMPT'),
-            },
-     directory => sub { my $self = shift; return(\($self->{vcs}->{wd})) },
+     '000_vcs' => {
+                  wd   => bless(sub { prompt("directory you've cloned for jpa translation", sub {-d $_[0] ? 1 : 0}) }, 'PROMPT'),
+                  user => bless(sub { prompt("your github account name", sub {1})}, 'PROMPT'),
+                 },
+     '010_directory' => sub { my $self = shift; return(\($self->{vcs}->{wd})) },
     };
 }
 

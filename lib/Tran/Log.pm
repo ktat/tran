@@ -58,6 +58,17 @@ Tran::Log
 
 =head1 METHOD
 
+=head2 new
+
+constructor.
+
+=head2 level
+
+ $log->level;
+ $log->level(1); # 1 .. 4
+
+get/set level.
+
 =head2 fatal
 
 fatal message

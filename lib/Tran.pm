@@ -98,12 +98,12 @@ sub original {
   return $self->{original};
 }
 
-sub translation {
+sub translation_repository {
   my ($self, $name) = @_;
   return @_ == 2 ? $self->{translation}->{$name} :  $self->{translation};
 }
 
-*translation_repository = \&transation;
+*translation = \&translation_repository;
 
 sub notify {
   my $self = shift;
@@ -146,21 +146,73 @@ see Tran::Manaual.
 
 =head2 new
 
+ Tran->new("/path/to/config.yml");
+
+constructor.
+
 =head2 log
+
+ $tran->log
+
+return Tran::Log object.
 
 =head2 encoding
 
+ $tran->encoding;
+
+return encoding setting.
+
 =head2 resource
+
+ $tran->resource($resource_name);
+
+return Tran::Resource::* object.
 
 =head2 resources
 
+ $tran->resources;
+
+return hash ref which contains resource name and resource object.
+
 =head2 config
+
+ $tran->config;
+
+return Tran::Config object.
+
+=head2 original_repository
+
+ $tran->original_repository;
+
+return Tran::Repository::Original object.
 
 =head2 original
 
+ $tran->original;
+
+It is as same as original_repository.
+
+=head2 translation_repository
+
+ $tran->translation_repository($translation_name);
+
+return Tran::Repository::Translation::* object.
+
+ $tran->translation_repository;
+
+return hashref which containts translation name and its object.
+
 =head2 translation
 
+ $tran->translation;
+
+It is as same as translation_repository.
+
 =head2 notify
+
+ $tran->notify(@notify_names, [ sub { ... }]);
+
+Do notification according to @notify_names.
 
 =head1 AUTHOR
 

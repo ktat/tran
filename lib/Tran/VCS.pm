@@ -64,7 +64,25 @@ sub msg {
 
 =head1 NAME
 
-Tran::VCS
+Tran::VCS - implementation of version control system for translation
+
+=head1 METHODS
+
+=head2 add_files
+
+=head2 commit
+
+=head2 connect
+
+=head2 files
+
+=head2 finish_commit
+
+=head2 msg
+
+=head2 new
+
+=head2 wd
 
 =head1 AUTHOR
 

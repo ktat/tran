@@ -43,6 +43,18 @@ see Tran::Notify::* classes.
 
 Tran::Notify::Email
 
+=head1 METHODS
+
+=head2 new
+
+constructor.
+
+=head2 tran
+
+ $self->tran;
+
+return Tran object.
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>

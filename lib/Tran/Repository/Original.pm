@@ -61,7 +61,42 @@ sub _config {
 
 =head1 NAME
 
-Tran::
+Tran::Repository::Original
+
+=head1 METHODS
+
+=head2 get_versions
+
+ $r->get_versions($target);
+
+return target's version(version objects) as array ref.
+
+=head2 has_target
+
+ $r->has_target($target);
+
+If original repository has target, return 1;
+
+=head2 resource
+
+ $r->resource;
+ $r->resource($resource);
+
+get/set resource object.
+
+=head2 resource_directory
+
+ $r->resource_directory;
+
+return resource directory.
+need to set resource before using this.
+
+=head2 target_path
+
+ $r->target_path($target);
+
+return target path.
+need to set resource before using this.
 
 =head1 AUTHOR
 
@@ -79,7 +114,6 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

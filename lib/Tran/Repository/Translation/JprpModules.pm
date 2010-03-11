@@ -129,8 +129,9 @@ sub _config {
   my $self = shift;
   return
     {
-     vcs => {
-             wd => bless(sub { prompt("directory you've checkouted for JPRP cvs repository",
+     '010_directory' => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
+     '000_vcs' => {
+              wd => bless(sub { prompt("directory you've checkouted for JPRP cvs repository",
                                 sub {
                                   if (-d shift(@_) . '/CVS') {
                                     return 1
@@ -140,8 +141,7 @@ sub _config {
                                   }
                                 }
                                ) }, 'PROMPT'),
-            },
-     directory => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
+             },
     };
 }
 

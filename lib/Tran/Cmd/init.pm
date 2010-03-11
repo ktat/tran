@@ -34,10 +34,16 @@ sub run {
                );
   foreach my $class (sort Tran->plugins) {
     if ($class->can('_config')) {
+      local $@;
+      eval "require $class";
+      if ($@) {
+        $self->info("skip configure $class($@)");
+        next;
+      }
       my $_config = $class->_config;
       if (%$_config) {
         $self->info("start to config $class");
-        if (prompt("you want to configure $class?", sub {1}, -ynd => 'y')) {
+        if (lc(prompt("you want to configure $class?", sub {1}, -ynd => 'y')) eq 'y') {
           $self->{_config} = $_config;
           $config = $self->visit($_config);
           $class =~ s{^Tran::}{};
@@ -62,7 +68,7 @@ sub _exec_code {
   foreach my $v (@values) {
     if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
       if (ref $$v eq 'PROMPT' or ref $$v eq 'CODE') {
-        $v = $$v = _exec_code($v, $config);
+        $v = $$v = _exec_code($$v, $config);
       } else {
         $v = $$v;
       }
@@ -80,11 +86,15 @@ sub _exec_code {
 
 sub visit_hash {
   my ($self, $hash) = @_;
-  foreach my $key (keys %$hash) {
+  foreach my $key (sort keys %$hash) {
+    my $_key = $key;
+    $key =~s{^\d+_}{};
+    $hash->{$key} = delete $hash->{$_key};
     my $data = $hash->{$key};
     if (ref $data eq "HASH") {
       $self->visit_hash($data);
     } elsif (ref $data eq 'CODE' or ref $data eq 'PROMPT') {
+
       $hash->{$key} = _exec_code($data, $self->{_config});
     }
   }

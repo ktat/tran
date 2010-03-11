@@ -158,7 +158,7 @@ perldoc -u ModuleName を何回もやったので、もう飽きました。
 
 startコマンドを使います。start コマンドはリソース名とターゲット名(ここではモジュール名)を取ります。
 
- % tran start cpan Module::Name
+ % tran start -r cpan Module::Name
 
 このコマンドの意味は、「リソース cpan のターゲット Module::Name の翻訳を始める」
 という意味です。なお、必要なら、バージョン番号を後ろに続けることができます。
@@ -172,7 +172,7 @@ Module::Name の最新のバージョンが 0.1の場合、実際には次のデ
 
 時が経ち、モジュールのバージョンが上がった場合も、また、startコマンドを使います。
 
- % tran start cpan Module::Name
+ % tran start -r cpan Module::Name
 
 開始とまったく一緒です。今回は、以前のバージョンのオリジナルと、以前のバージョンの翻訳
 があるので、オリジナル間の差分を以前のバージョンの翻訳にマージしたものを、
@@ -205,13 +205,13 @@ JPAの場合、
 
 =head2 2. 以前の翻訳のオリジナルのバージョンを取得する
 
- tran get cpan Module::Name 0.01
+ tran get -r cpan Module::Name 0.01
 
 のようにバージョンを指定して取得します。
 CPANの場合、Authorが変わっている場合、うまくいきません。
 その場合は、以下のようにURLを指定します。
 
- tran get cpan http://..../Module-Name-0.01.tar.gz
+ tran get -r cpan http://..../Module-Name-0.01.tar.gz
 
 これで、オリジナルのソースを取得できます。
 
@@ -219,7 +219,7 @@ CPANの場合、Authorが変わっている場合、うまくいきません。
 
 次は、前と同様に、start してください。
 
- tran start cpan Module::Name
+ tran start -r cpan Module::Name
 
 前述の(A)と同じです。最新のバージョンのオリジナルを取得し、
 以前のバージョンのオリジナルとの差分を取り、
@@ -230,7 +230,15 @@ CPANの場合、Authorが変わっている場合、うまくいきません。
 
 前述の(A)と同様、また、start コマンドを使うだけです。
 
- tran start cpan Module::Name
+ tran start -r cpan Module::Name
+
+=head1 デフォルトのリソース
+
+基本敵にCPANしか訳さないのであれば (と言うかCPANしかリソースがないですが…)、
+-rオプションを毎回付けるのは面倒です。
+設定ファイルにデフォルトのリソースを指定できます。
+
+ default_resorce cpan
 
 =head1 設定ファイル解説
 
@@ -358,7 +366,7 @@ tran の初期設定を行います。
 
 翻訳を開始するときに使うコマンドです。
 
- tran start [-f|--force] リソース ターゲット [バージョン]
+ tran start [-f|--force] -r リソース ターゲット [バージョン]
 
 既に翻訳リポジトリにファイルがある場合、何も行いません。
 既にある翻訳リポジトリのファイルを上書きしたい場合は、-f オプションを使ってください。
@@ -392,7 +400,7 @@ start は、以下のような動きをします。
 
 リソースからオリジナルを取得する時に使います。
 
- tran get リソース ターゲット [バージョン]
+ tran get -r リソース ターゲット [バージョン]
 
 =head2 config
 
@@ -424,7 +432,7 @@ start は、以下のような動きをします。
 オプションにより、オリジナル間、翻訳間のdiffを取ります。
 環境変数 TRAN_PAGER に、お好みのページャー(less/lv/more等)を入れておくと、ページャで表示されます。
 
- tran diff [-v=version[:version]/-o/-t] リソース ターゲット [ファイル ...]
+ tran diff [-v=version[:version]/-o/-t] -r リソース ターゲット [ファイル ...]
 
 =over 4
 
@@ -488,7 +496,7 @@ mergeコマンドは引数が面倒なので、使いたくないという場合
 古いバージョンの翻訳のディレクトリ構成を、最新のバージョンに合わせるようにしてください。
 その後で、
 
- tran start -f cpan Module::Name
+ tran start -f -r cpan Module::Name
 
 すれば、マージされます。
 

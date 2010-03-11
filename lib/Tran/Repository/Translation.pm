@@ -46,10 +46,10 @@ sub has_target {
   }
 }
 
-sub original {
-  my $self = shift;
-  $self->{config}->{directory};
-}
+# sub original {
+#   my $self = shift;
+#   $self->{config}->{directory};
+# }
 
 sub original_repository {
   my $self = shift;
@@ -401,12 +401,111 @@ sub _config {
 
 Tran::Repository::Translation
 
+=head2 METHODS
+
+=head2 new
+
+constructor.
+
+=head2 tran
+
+ $t->tran;
+
+return Tran object.
+
+=head2 encoding
+
+ $t->encoding;
+
+return encoding setting.
+
+=head2 vcs
+
+ $t->vcs;
+
+reutrn Version control object if loaded.
+
+=head2 has_target
+
+ $t->has_target($target_name);
+
+If translation repository has $target_name translation,
+return true.
+
+=head2 original_repository
+
+ $t->original_repository;
+
+return original repository of translation.
+
+=head2 path_format
+
+ $self->path_format; # like '%n-%v'
+
+Path format in translation repository.
+'%n' is target name, %v is version number.
+
+=head2 merge
+
+ $t->merge($target, $prev_version, $version, $copy_option);
+
+merge difference between original old version and original newer version into old translation file.
+
+=head2 copy_option
+
+ $t->copy_option;
+
+it is defined in subclass.
+like the following(in Translation::JprpModules):
+
+ sub copy_option {
+   return {
+           ignore_path     => ['t', 'inc'],
+           # see Tran::Util
+           contents_filter => \&pm2pod,
+           name_filter     => \&pm2pod_name,
+          };
+ }
+
+=head2 copy_from_original
+
+ $t->copy_from_original($target, $version);
+
+copy target's original files to translation path.
+
+=head2 cmpmerge
+
+  $t->cmpmerge($newer_file, $older_file, $translation_file, $contents_filter);
+
+=head2 cmpmerge_least
+
+  $t->cmpmerge_least($newer_file, $older_file, $translation_file, $contents_filter);
+
+=head2 notify
+
+ $t->notify;
+
+return notify setting for translation.
+
+=head2 update_version_info
+
+ $t->update_version_info;
+
+update version information in the translation repository.
+It is implemented in subclass.
+
+=head2 merge_method
+
+ $t->merge_method;
+
+return merge_method setting.
+If not set, 'cmpmerge_least' is used.
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>
 
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 COPYRIGHT & LICENSE
 
