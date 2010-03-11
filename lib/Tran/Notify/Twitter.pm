@@ -29,7 +29,7 @@ sub _config {
      class => 'Twitter',
      '000_account'  => bless(sub {prompt("your twitter account", sub {1})}, 'PROMPT'),
      '010_password' => bless(sub {prompt("your twitter password", sub {1})}, 'PROMPT'),
-     '020_message'  => bless(sub {prompt("tweet message", sub {my $msg = shift; $msg ||= '%c translattion %n %v'})}, 'PROMPT'),
+     '020_message'  => bless(sub {prompt("tweet message", sub {1}, -d=> "'%c translattion %n %v")}, 'PROMPT'),
     }
 }
 
