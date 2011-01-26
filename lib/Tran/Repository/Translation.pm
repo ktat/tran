@@ -5,6 +5,7 @@ use strict;
 use Tran::Util -debug, -common, -file, -list;
 use File::Path ('make_path');
 use Text::Diff3;
+use Text::Diff3::Factory;
 
 use base qw/Tran::Repository/;
 

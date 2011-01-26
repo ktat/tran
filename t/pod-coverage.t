@@ -18,7 +18,7 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 my @modules = ("Tran", map "Tran::" . $_,
 		     qw/Resource
                         Repository Repository::Translation Repository::Original
-                        VCS Notify
+                        VCS Notify Log
                        /);
 
 pod_coverage_ok($_) for @modules;

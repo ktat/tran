@@ -2,7 +2,7 @@
 
 use strict;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::Bin/../lib", "$ENV{HOME}/.tran/lib/";
 use Tran;
 use Tran::Cmd;
 
