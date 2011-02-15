@@ -2,6 +2,7 @@ package Tran::Resource;
 
 use warnings;
 use strict;
+use Carp qw/confess/;
 use Tran::Util -common, -debug;
 
 sub new {
@@ -43,6 +44,7 @@ sub original_repository {
 
 sub target_translation {
   my ($self, $target) = @_;
+  confess("Configuration may be wrong(no targets).") unless $self->targets;
   my $t = $self->targets->{$target};
   if (defined $t) {
     return $t->{translation} || $self->translation;

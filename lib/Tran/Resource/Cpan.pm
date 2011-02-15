@@ -1,6 +1,8 @@
 package Tran::Resource::Cpan;
 
 use warnings;
+use Furl;
+use JSON::XS;
 use strict;
 use base qw/Tran::Resource/;
 use File::Path ();
@@ -17,7 +19,7 @@ use version;
 
 my $metadata;
 
-sub get_module_info {
+sub get_module_info_from_cpan {
   my ($self, $target, $version, $_target) = @_;
   $_target ||= '';
   unless ($metadata) {
@@ -30,13 +32,36 @@ sub get_module_info {
   }
   my $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
   if (not $version) {
-    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+)\.tar\.(gz|bz2)};
+    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
   } elsif ($_target ne 'perl' and $self->_is_perl($module_info->{CPAN_FILE})) {
-    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+)\.tar\.(gz|bz2)};
+    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
   } else {
-    $module_info->{CPAN_FILE} =~ s{-(?:[\d\.]+)\.tar\.(gz|bz2)}{-$version.tar.$1};
+    $module_info->{CPAN_FILE} =~ s{-(?:[\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)}{-$version.tar.$1};
   }
   return $module_info->{CPAN_FILE}, $version;
+}
+
+# from FrePan
+sub get_module_info {
+  my ($self, $target, $version, $_target) = @_;
+  my $download_url;
+  if ($version) {
+    $self->get_module_info_from_cpan($target, $version, $_target);
+  } else {
+    $_target ||= '';
+    $target =~s{::}{-}g;
+    my $url = 'http://frepan.org/dist/' . $target;
+    my $res = Furl->new->get($url);
+    my $c = $res->content;
+    if ($c =~m{"(http://cpan\.cpantesters\.org/authors/id/[^"]+?)"}
+     or $c =~m{"(http://search\.cpan\.org/CPAN/authors/id/[^"]+?)"}
+       ) {
+      $download_url = $1;
+      ($version) = $download_url =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
+    }
+  }
+  $version or die "cannot find url for $target";
+  return $download_url, $version;
 }
 
 sub _resolve_target_url_version {
@@ -44,7 +69,7 @@ sub _resolve_target_url_version {
   my ($target, $target_path, $url) = ($_target, $_target_path, '');
 
   if ($version and $version =~m{^http}) {
-    my ($_version) = $version =~ m{\w-([\d.]+)\.tar\.(?:gz|bz2)$};
+    my ($_version) = $version =~ m{\w-([\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
     return ($_target, $_target_path, $version, $_version)
   }
 
@@ -128,7 +153,7 @@ sub get {
     $self->debug("get $url");
     unless ($targz = LWP::Simple::get($backpan_url)) {
       my $backpan_url2 = $backpan_url;
-      $backpan_url2 =~s{-([\d\.]+\.tar\.gz)$}{.pm-$1};
+      $backpan_url2 =~s{-([\d\.]+(?:_\d+)?\.tar\.gz)$}{.pm-$1};
       $url = $backpan_url2;
       $self->debug("get $url");
       $targz = LWP::Simple::get($backpan_url2)
@@ -170,7 +195,7 @@ sub get {
  FILE:
   foreach my $file (sort {$a cmp $b} $tar->get_files(@files)) {
     my $name = $file->full_path;
-    if ($target eq 'perl' and  $name =~ s{^perl-[\d.]+/((?:lib|ext/[^/]+)/.+\.(?:pm|pod))$}{$1}) {
+    if ($target eq 'perl' and  $name =~ s{^perl-[\d.]+(?:_\d+)?/((?:lib|ext/[^/]+)/.+\.(?:pm|pod))$}{$1}) {
       my $content = $file->get_content;
       my $VERSION = 0;
       if (not $VERSION and $content =~ m{(\$(?:\w+::)?VERSION\s*=[^;]+;)}s) {
@@ -198,7 +223,7 @@ sub get {
         close $fh;
       }
     } else {
-      $name =~s{^([\w:]+)\.pm\-([\d.]+/)}{$1-$2};
+      $name =~s{^([\w:]+)\.pm\-([\d.]+(?:_\d+)?/)}{$1-$2};
       $name =~s{^$target_path-([^/]+)/}{$target_path/$1/} or $self->fatal("'$target_path' is not included in '$name'. don't you typo?");
       $name = $original_dir . '/' . $name;
       my ($out_dir) = $name =~m{^(.+)/};

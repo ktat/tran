@@ -8,11 +8,11 @@ use Tran::Util -common, -debug, -string;
 use Text::Diff ();
 use File::Find qw/find/;
 
-sub abstract {  'show diffrence'; }
+sub abstract { 'show diffrence'; }
 
 sub opt_spec {
   return (
-          ['resource|r=s', "resource. required." ],
+          ['resource|r=s', "resource. required if not set default_resource in config." ],
           ['translation|t', "show difference from translation repository" ],
           ['original|o', "show difference from original repository" ],
           ['version|v=s', "old_version / old_version:new_version" ],
@@ -60,6 +60,7 @@ sub _diff {
 
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
   $self->fatal("missing new_path: $new_path") unless -d $new_path;
+  $self->debug("diff $old_path $new_path");
 
   my $wanted;
   my $enc = $translation->encoding;
@@ -79,9 +80,13 @@ sub _diff {
 
         my $new_file = $old_file;
         $new_file =~s{^$old_path}{$new_path};
-        my $new_content = encoding_slurp($new_file, $enc) or return;
-        if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
-          print $out "--- $old_file\n+++ $new_file\n$diff\n\n";
+        if (-e $new_file) {
+          my $new_content = encoding_slurp($new_file, $enc) or return;
+          if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
+            print $out "--- $old_file\n+++ $new_file\n$diff\n\n";
+          }
+        } else {
+          $self->info("$new_file is missing");
         }
       }
     }
@@ -119,9 +124,13 @@ sub _diff {
           = $translation->_apply_copy_option($old_file, $copy_option, $old_path, $new_path);
         return if not $result or not $old_content;
         $_new_file =~s{^$old_path}{$new_path};
-        my $new_content = encoding_slurp("$_new_file", $enc) or return;
-        if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
-          print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
+        if (-e $_new_file) {
+          my $new_content = encoding_slurp("$_new_file", $enc) or return;
+          if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
+            print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
+          }
+        } else {
+          $self->debug("$_new_file is missing.");
         }
       }
     }

@@ -13,7 +13,7 @@ sub get_versions {
 
   my @versions;
   if (opendir my $d, $self->directory . '/' . $name) {
-    foreach my $version (grep /^[\d\.]+$/, readdir $d) {
+    foreach my $version (grep /^[\d\.]+(?:_\d+)?$/, readdir $d) {
       next if $version =~ m{^\.\.?$};
       push @versions, version->new($version);
     }

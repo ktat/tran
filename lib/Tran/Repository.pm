@@ -3,6 +3,7 @@ package Tran::Repository;
 use warnings;
 use strict;
 use version;
+use Carp qw/confess/;
 use Tran::Util -file => ['find'], -common;
 
 sub new {
@@ -35,7 +36,7 @@ sub reset {
   delete $self->{versions};
 }
 
-sub get_versions { die "implement in sub class"; }
+sub get_versions { confess "get_versions must be implemented in sub class: " . ref $_[0]; }
 
 sub latest_version {
   my ($self, $target) = @_;
@@ -54,7 +55,7 @@ sub target_path {
   return $target;
 }
 
-sub has_target { die "implement it in subclass"; }
+sub has_target { confess "has_target must be implemented it in subclass: " . ref $_[0]; }
 
 sub has_version {
   my ($self, $target, $version) = @_;
