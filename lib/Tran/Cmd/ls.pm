@@ -8,12 +8,12 @@ use Tran::Util -common, -debug, -string;
 use File::Path qw/make_path/;
 use IO::Prompt;
 
-sub abstract {  'list files'; }
+sub abstract {  'list directory contents'; }
 
 sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
-          ['translation|t', "list translation directory " ],
+          ['translation|t', "list translation directory contents" ],
          );
 }
 
