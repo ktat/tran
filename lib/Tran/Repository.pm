@@ -81,7 +81,7 @@ sub path_format { '' }
 sub path_of {
   my ($self, $target, $version) = @_;
   my $target_path = $self->target_path($target);
-  my $path = join "/", $self->directory;
+  my $path;
   unless (my $path_format = $self->path_format) {
     $path = join "/", $path, $target_path, $version;
   } else {
@@ -89,7 +89,7 @@ sub path_of {
     $path_format =~s{%v}{$version};
     $path = join "/", $path, $path_format;
   }
-  $path =~s{//}{/}g;
+  $path =~s{//+}{/}g;
   return $path;
 }
 

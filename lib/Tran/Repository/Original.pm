@@ -34,7 +34,9 @@ sub resource {
 sub resource_directory {
   my ($self, $resource) = @_;
   Carp::croak("set resource at first") unless $self->resource;
-  return join "/", $self->directory, lc($self->resource) , '';
+  my $dir = join "/", $self->directory, lc($self->resource) , '';
+  $dir =~ s{//+}{/}g;
+  return $dir;
 }
 
 sub path_of {
@@ -42,7 +44,7 @@ sub path_of {
   Carp::croak("set resource at first") unless $self->resource;
   Carp::croak("taget name is required") if @_ == 1;
   my $path = join '/', $self->resource_directory, $self->SUPER::target_path($target), $version ? $version : ();
-  $path =~s{//}{/}g;
+  $path =~s{/+}{/}g;
   return $path
 }
 
@@ -105,6 +107,13 @@ need to set resource before using this.
  $r->target_path($target);
 
 return target path.
+need to set resource before using this.
+
+=head2 path_of
+
+ $r->path_of($target);
+
+return full path of $target.
 need to set resource before using this.
 
 =head1 AUTHOR

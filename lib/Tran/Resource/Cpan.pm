@@ -1,7 +1,6 @@
 package Tran::Resource::Cpan;
 
 use warnings;
-use Furl;
 use JSON::XS;
 use strict;
 use base qw/Tran::Resource/;
@@ -51,8 +50,7 @@ sub get_module_info {
     $_target ||= '';
     $target =~s{::}{-}g;
     my $url = 'http://frepan.org/dist/' . $target;
-    my $res = Furl->new->get($url);
-    my $c = $res->content;
+    my $c = LWP::Simple::get($url);
     if ($c =~m{"(http://cpan\.cpantesters\.org/authors/id/[^"]+?)"}
      or $c =~m{"(http://search\.cpan\.org/CPAN/authors/id/[^"]+?)"}
        ) {

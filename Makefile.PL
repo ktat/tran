@@ -31,7 +31,6 @@ requires
     'version'                => 0,
     'Data::Visitor'          => 0,
     'Text::Diff'             => 0,
-    'Furl'                   => 0,
     ;
 
 recommends

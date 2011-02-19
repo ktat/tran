@@ -1,0 +1,55 @@
+---
+default_resource: cpan
+log:
+  class: Null
+  level: debug
+notify:
+  perldocjp:
+    class: Email
+    from: ktat@example.jp
+    template_directory: t/config/template/perldocjp/
+    to: ktat@example.jp
+profile:
+  email: ktat at example.jp
+  name: Kato Atsushi
+repository:
+  original:
+    directory: ./t/.tran/original/
+  translation:
+    jpa:
+      directory: ./t/git/github/jpa-translation/
+      vcs:
+        user: ktat
+        wd: ./t/git/github/jpa-translation/
+    module-pod-jp-modules:
+      directory: ./t/git/github/module-pod-jp/docs/modules/
+      vcs:
+        user: ktat
+        wd: ./t/git/github/module-pod-jp/
+    jprp-core:
+      directory: ./t/cvs/perldocjp/docs/perl/
+      vcs:
+        wd: ./t/cvs/perldocjp/
+    jprp-modules:
+      directory: ./t/cvs/perldocjp/docs/modules/
+      notify:
+      - perldocjp
+      - twitter
+      vcs:
+        wd: ./t/cvs/perldocjp/
+    merge_method: cmpmerge_least
+resource:
+  cpan:
+    metafile: ./t/.cpan/Metadata
+    target_only:
+    - '*.pm'
+    - '*.pod'
+    targets:
+      Moose:
+        translation: jpa
+      MooseX::Getopt:
+        translation: jpa
+      perl:
+        translation: jprp-core
+    translation: module-pod-jp-modules
+#   translation: jprp-modules

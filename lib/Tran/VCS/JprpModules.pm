@@ -26,7 +26,6 @@ sub connect {
   my $cvs = Cvs::Simple->new();
   chdir($cwd);
   return $cvs;
-
 }
 
 sub update {

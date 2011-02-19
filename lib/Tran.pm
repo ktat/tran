@@ -33,7 +33,7 @@ sub new {
        config => $config->resources->{decamelize($kind)},
       );
   }
-  my $merge_method = $self->config->translation_repository->{merge_method} || '';
+  my $merge_method = delete $self->config->translation_repository->{merge_method} || '';
   foreach my $key (keys %{$self->config->translation_repository}) {
     my $class = camelize($key);
     $class = 'Tran::Repository::Translation::' . $class;
@@ -76,7 +76,7 @@ sub encoding {
 
 sub resource {
   my ($self, $resource) = @_;
-  if (exists $self->{resource}->{$resource}) {
+  if (defined $resource and exists $self->{resource}->{$resource}) {
     $self->original->resource($resource);
     return $self->{resource}->{$resource};
   }

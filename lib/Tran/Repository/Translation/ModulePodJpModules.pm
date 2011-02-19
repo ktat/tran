@@ -31,7 +31,7 @@ sub _config {
     {
      '010_directory' => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
      '000_vcs' => {
-                   wd   => bless(sub { prompt("directory you've cloned for jpa translation", sub {-d $_[0] ? 1 : 0}) }, 'PROMPT'),
+                   wd   => bless(sub { prompt("directry you've cloned for module-pod-jp-modules translation", sub {-d $_[0] ? 1 : 0}) }, 'PROMPT'),
                    user => bless(sub { prompt("your github account name", sub {1})}, 'PROMPT'),
              },
     };
@@ -69,7 +69,7 @@ Ktat, C<< <ktat at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Ktat.
+Copyright 2011 Ktat.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
