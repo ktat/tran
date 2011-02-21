@@ -80,8 +80,9 @@ sub path_format { '' }
 
 sub path_of {
   my ($self, $target, $version) = @_;
+  $version ||= $self->latest_version($target);
   my $target_path = $self->target_path($target);
-  my $path;
+  my $path = join "/", $self->directory;
   unless (my $path_format = $self->path_format) {
     $path = join "/", $path, $target_path, $version;
   } else {

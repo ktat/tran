@@ -29,7 +29,7 @@ sub run {
 
   $self->debug("translation_name: $translation_name");
 
-  my $translation = $tran->translation($translation_name) or $self->fatal("maybe bad name: $translation_name");
+  my $translation = $tran->translation_repository($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
 
   if ( not my $already = $translation->has_version($target, $version) or $opt->{force}) {

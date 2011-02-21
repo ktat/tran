@@ -202,12 +202,6 @@ return Tran::Repository::Translation::* object.
 
 return hashref which containts translation name and its object.
 
-=head2 translation
-
- $tran->translation;
-
-It is as same as translation_repository.
-
 =head2 notify
 
  $tran->notify(@notify_names, [ sub { ... }]);

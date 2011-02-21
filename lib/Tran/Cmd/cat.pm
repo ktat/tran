@@ -25,7 +25,7 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $repo = $opt->{translation} ? $tran->translation($r->target_translation($target)) : $r->original_repository;
+  my $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
   my $path = $repo->path_of($target, $version);
   my $rest_path = join "/", @rest;
   $path .= "/" . $1 if $rest_path =~m{^/?(.+)$};

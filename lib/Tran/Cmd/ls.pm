@@ -14,6 +14,7 @@ sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
           ['translation|t', "list translation directory contents" ],
+          ['translation_repository|tr=s', "translation repository name(imply -t)" ],
          );
 }
 
@@ -24,10 +25,19 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $repo = $opt->{translation} ? $tran->translation($r->target_translation($target)) : $r->original_repository;
-  my $path = $repo->path_of($target, $version);
-  my $rest_path = join "/", @rest;
-  $path .= "/" . $1 if $rest_path =~m{^/?(.+)$};
+  my $repo;
+  my $path;
+  if ($opt->{translation_repository}) {
+    $repo = $tran->translation_repository(decamelize($opt->{translation_repository}));
+    $path = $repo->directory;
+  } else {
+    $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
+  }
+  if (defined $target and $target) {
+    $path = $repo->path_of($target, $version);
+    my $rest_path = join "/", @rest;
+    $path .= "/" . $1 if $rest_path =~m{^/?(.+)$};
+  }
   if (-f $path) {
     print "[ $path ]\n";
     print $path, "\n";
@@ -38,15 +48,22 @@ sub run {
   } else {
     die "cannot open $path: $!\n"
   }
-
 }
 
 sub usage_desc {
-  return 'tran get -r RESOURCE TARGET [VERSION] path/to/anywhere';
+  return 'tran get -r RESOURCE TARGET [VERSION] path/to/anywhere' . "\n"
+       . 'tran get --tr translation-repository\n'
 }
 
 sub validate_args {
-  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
+  my $self = shift;
+  my ($opt, $args) = @_;
+  unless ($opt->{translation_repository}) {
+    $self->Tran::Cmd::_validate_args_resource(@_, 1);
+  } else {
+    $opt->{translation} = 1;
+    $self->Tran::Cmd::_validate_args_resource(@_, 0);
+  }
 }
 
 

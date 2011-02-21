@@ -17,7 +17,7 @@ sub run {
   my $tran = $self->app->tran;
 
   my $org_path = $tran->original->directory;
-  my $tr_path  = $tran->translation->{$translation}->directory;
+  my $tr_path  = $tran->translation_repository->{$translation}->directory;
 
   if (! $translation) {
     $self->fatal("translation repository name is missing!");
@@ -36,7 +36,7 @@ sub run {
     $self->fatal("$new_file is missing!");
   }
 
-  my $class = $tran->translation->{$translation};
+  my $class = $tran->translation_repository->{$translation};
   my $copy_option = $class->copy_option || {};
   my $merge_method = $class->merge_method;
   my $merged = $class->$merge_method
