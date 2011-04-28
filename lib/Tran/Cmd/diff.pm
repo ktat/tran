@@ -58,6 +58,11 @@ sub run {
 sub _diff {
   my ($self, $mode, $translation, $old_path, $new_path, $copy_option, $files) = @_;
 
+  my $files_match;
+  if (@$files) {
+    $files_match = join '|', map {my $f = quotemeta($_); qr/$f/} @$files;
+  }
+
   $self->fatal("missing old_path: $old_path") unless -d $old_path;
   $self->fatal("missing new_path: $new_path") unless -d $new_path;
   $self->debug("diff $old_path $new_path");
@@ -81,6 +86,10 @@ sub _diff {
         my $new_file = $old_file;
         $new_file =~s{^$old_path}{$new_path};
         if (-e $new_file) {
+          if (defined $files_match and not $new_file =~ qr/$files_match/) {
+            $self->info("$new_file is skipped");
+            return;
+          }
           my $new_content = encoding_slurp($new_file, $enc) or return;
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $new_file\n$diff\n\n";
@@ -103,6 +112,10 @@ sub _diff {
         my ($result2, $_new_file, $new_content)
           = $translation->_apply_copy_option($new_file, $copy_option, $new_path, $new_path);
         return if not $result2;
+        if (defined $files_match and not $_new_file =~ qr/$files_match/) {
+          $self->info("$_new_file is skipped");
+          return;
+        }
 
         $self->debug("old content is empty") unless $old_content;
         $self->debug("new content is empty") unless $new_content;
@@ -123,8 +136,14 @@ sub _diff {
         my ($result, $_new_file, $old_content)
           = $translation->_apply_copy_option($old_file, $copy_option, $old_path, $new_path);
         return if not $result or not $old_content;
+
         $_new_file =~s{^$old_path}{$new_path};
         if (-e $_new_file) {
+          if (defined $files_match and not $_new_file =~ qr/$files_match/) {
+            $self->info("$_new_file is skipped");
+            return;
+          }
+
           my $new_content = encoding_slurp("$_new_file", $enc) or return;
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
@@ -139,7 +158,7 @@ sub _diff {
 }
 
 sub usage_desc {
-  return 'tran diff [-o/-t] RESOURCE TARGET [FILES ...]';
+  return 'tran diff [-o/-t] -r RESOURCE TARGET [FILES ...]';
 }
 
 sub validate_args {

@@ -29,7 +29,11 @@ sub get_module_info_from_cpan {
     };
     $self->fatal("cannot read metafile:" . $self->config->{metafile}) if $@;
   }
-  my $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
+  my $module_info = $metadata->{'CPAN::Module'}{$target};
+  unless ($module_info) {
+    $target =~s{-}{::}g;
+    $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
+  }
   if (not $version) {
     ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
   } elsif ($_target ne 'perl' and $self->_is_perl($module_info->{CPAN_FILE})) {
@@ -50,12 +54,14 @@ sub get_module_info {
     $_target ||= '';
     $target =~s{::}{-}g;
     my $url = 'http://frepan.org/dist/' . $target;
-    my $c = LWP::Simple::get($url);
+    my $c = LWP::Simple::get($url) || '';
     if ($c =~m{"(http://cpan\.cpantesters\.org/authors/id/[^"]+?)"}
      or $c =~m{"(http://search\.cpan\.org/CPAN/authors/id/[^"]+?)"}
        ) {
       $download_url = $1;
       ($version) = $download_url =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
+    } else {
+      return $self->get_module_info_from_cpan($target, $version, $_target);
     }
   }
   $version or die "cannot find url for $target";
@@ -242,7 +248,9 @@ sub _config {
   return
     {
      translation => 'jprp-modules',
-     metafile => "$ENV{HOME}/.cpan/Metadata",
+     metafile => ("$ENV{HOME}/.local/share/.cpan//Metadata"
+                  ? "$ENV{HOME}/.local/share/.cpan//Metadata"
+                  : "$ENV{HOME}/.cpan/Metadata"),
      target_only => [
                      '*.pm',
                      '*.pod',
