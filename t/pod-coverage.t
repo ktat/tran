@@ -21,6 +21,10 @@ my @modules = ("Tran", map "Tran::" . $_,
                         VCS Notify Log
                        /);
 
-pod_coverage_ok($_) for @modules;
+my %also_private = (
+   'Tran' => ['translation'],
+);
+
+pod_coverage_ok($_, {also_private => %also_private{$_} || []}) for @modules;
 
 done_testing;

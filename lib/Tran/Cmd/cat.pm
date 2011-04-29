@@ -13,7 +13,7 @@ sub abstract {  'show content of file'; }
 sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
-          ['translation|t', "show translation file " ],
+          ['translation|t', "show translation file" ],
           ['number|n', "show content with line number" ],
          );
 }
