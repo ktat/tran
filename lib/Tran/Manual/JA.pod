@@ -458,6 +458,7 @@ start は、以下のような動きをします。
 =back
 
 該当するバージョンのターゲットが見つからない場合は失敗します。
+ターゲットの後ろにファイルを続けることで、マッチしたファイルのみを表示します。
 
 =head2 merge
 
@@ -499,6 +500,24 @@ mergeコマンドは引数が面倒なので、使いたくないという場合
  tran start -f -r cpan Module::Name
 
 すれば、マージされます。
+
+=head2 ls
+
+  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+  tran get --tr translation-repository\n
+
+        -r --resource                    resource. required.
+        -t --translation                 list translation directory contents
+        --tr --translation_repository    translation repository name(imply -t)
+
+=head2 cat
+
+  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+
+        -r --resource      resource. required.
+        -t --translation   show translation file
+        -n --number        show content with line number
+
 
 =head1 他のドキュメント
 

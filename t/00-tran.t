@@ -37,9 +37,13 @@ subtest config =>
 subtest resource =>
   sub {
     my $cpan = $tran->resource('Cpan');
-    my ($url, $version) = $cpan->get_module_info('Test::Simple');
-    like($version, qr{^[\d._]+$});
-    like($url, qr{^http://.+});
+    is $cpan->config->{metafile}, './t/.cpan/Metadata';
+    my ($file, $version) = $cpan->get_module_info('ExportTo');
+    is($version, '0.03');
+    is($file, 'K/KT/KTAT/ExportTo-0.03.tar.gz');
+    ($file, $version) = $cpan->get_module_info('ExportTo', '0.03', 'with version');
+    is($version, '0.03');
+    is($file, 'K/KT/KTAT/ExportTo-0.03.tar.gz');
     is(ref $cpan->original_repository, 'Tran::Repository::Original');
     is_deeply([sort keys %{$cpan->targets}], ['Moose', 'MooseX::Getopt', 'perl']);
     is($cpan->target_translation('Moose'), 'jpa');

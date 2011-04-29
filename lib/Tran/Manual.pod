@@ -404,6 +404,8 @@ specify version like this.
 =back
 
 If the version of the target is not found, it fails.
+If the name of files allow to be put after target name,
+only show the files which is matched with them.
 
 =head2 merge
 
@@ -437,6 +439,24 @@ The merged result is outputed to STDOUT.
 You can use absorute path or relative path.
 Relative paths are from original repository's directory for original,
 from translation repository's directory for translation.
+
+=head2 ls
+
+  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+  tran get --tr translation-repository\n
+
+        -r --resource                    resource. required.
+        -t --translation                 list translation directory contents
+        --tr --translation_repository    translation repository name(imply -t)
+
+
+=head2 cat
+
+  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+
+        -r --resource      resource. required.
+        -t --translation   show translation file
+        -n --number        show content with line number
 
 =head1 SEE ALSO
 

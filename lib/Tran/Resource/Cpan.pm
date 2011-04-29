@@ -44,12 +44,12 @@ sub get_module_info_from_cpan {
   return $module_info->{CPAN_FILE}, $version;
 }
 
-# from FrePan
+# from FrePan. if failed, from CPAN
 sub get_module_info {
   my ($self, $target, $version, $_target) = @_;
   my $download_url;
   if ($version) {
-    $self->get_module_info_from_cpan($target, $version, $_target);
+    return $self->get_module_info_from_cpan($target, $version, $_target);
   } else {
     $_target ||= '';
     $target =~s{::}{-}g;
@@ -70,7 +70,7 @@ sub get_module_info {
 
 sub _resolve_target_url_version {
   my ($self, $_target, $_target_path, $version) = @_;
-  my ($target, $target_path, $url) = ($_target, $_target_path, '');
+  my ($target, $target_path, $url_or_file) = ($_target, $_target_path, '');
 
   if ($version and $version =~m{^http}) {
     my ($_version) = $version =~ m{\w-([\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
@@ -78,10 +78,10 @@ sub _resolve_target_url_version {
   }
 
   if ($target eq 'perl') {
-    ($url, $version) = $self->get_module_info('B', $version, $target);
+    ($url_or_file, $version) = $self->get_module_info('B', $version, $target);
   } else {
-    ($url, $version) = $self->get_module_info($target, $version);
-    if ($self->_is_perl($url)) {
+    ($url_or_file, $version) = $self->get_module_info($target, $version);
+    if ($self->_is_perl($url_or_file)) {
       $self->info("$target is Perl core module. find version from original directory.");
       if (my $versions = $self->original_repository->get_versions($target)) {
         $version = $versions->[-1];
@@ -96,17 +96,17 @@ sub _resolve_target_url_version {
   if ($target eq 'perl') {
     my $_version = $version;
     if (version->new($_version) >= version->new("5.11.0")) {
-      $url = "http://www.cpan.org/src/5.0/perl-$_version.tar.bz2";
+      $url_or_file = "http://www.cpan.org/src/5.0/perl-$_version.tar.bz2";
     } else {
-      $url = "http://www.cpan.org/src/5.0/perl-$_version.tar.gz";
+      $url_or_file = "http://www.cpan.org/src/5.0/perl-$_version.tar.gz";
     }
   }
-  return ($target, $target_path, $url, $version);
+  return ($target, $target_path, $url_or_file, $version);
 }
 
 sub _is_perl {
-  my ($self, $url) = @_;
-  if ($url and $url =~ '/perl\-\d+\.\d+\.\d+\.tar\.\w+$') {
+  my ($self, $url_or_file) = @_;
+  if ($url_or_file and $url_or_file =~ '/perl\-\d+\.\d+\.\d+\.tar\.\w+$') {
     return 1;
   } else {
     return 0;
@@ -211,8 +211,8 @@ sub get {
         {
           my $module = $name;
           $module =~s{-}{::}g;
-          my ($file, $version);
-          eval {($file, $version) = $self->get_module_info($module)};
+          my ($file_name, $version);
+          eval {($file_name, $version) = $self->get_module_info($module)};
 
           if ($@ or (defined $file and $file !~ m{/perl-})) {
             $self->warn("$module is skipped.");

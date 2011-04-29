@@ -16,11 +16,15 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
 my @modules = ("Tran", map "Tran::" . $_,
-		     qw/Resource
+                     qw/Resource
                         Repository Repository::Translation Repository::Original
                         VCS Notify Log
                        /);
 
-pod_coverage_ok($_) for @modules;
+my %also_private = (
+   'Tran' => ['translation'],
+);
+
+pod_coverage_ok($_, {also_private => $also_private{$_} || []}) for @modules;
 
 done_testing;
