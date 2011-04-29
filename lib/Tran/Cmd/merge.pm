@@ -51,7 +51,14 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE [NEWER_TRANSLATION_FILE]';
+  return 'tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE [NEWER_TRANSLATION_FILE]' . "\n"
+       . 'ARGUMENTS:' . "\n"
+       . 'TRANSLATION_REPOSITORY ... name of translation repository (for example, jprp-modules)' . "\n"
+       . 'OLDER_ORIGINAL_FILE ...... relative(from original repository root) or absorute path of an old original file' . "\n"
+       . 'NEWER_ORIGINAL_FILE ...... relative(from original repository root) or absorute path of newer original file' . "\n"
+       . 'OLDER_TRANSLATION_FILE ... relative(from translation repository root) or absorute path of older translation file' . "\n"
+       . 'NEWER_TRANSLATION_FILE ... relative(from translation repository root) or absorute path of newer translation file. If not specified, print to STDOUT' . "\n"
+
 }
 
 sub validate_args {

@@ -75,7 +75,7 @@ sub _diff {
   } else {
     $out = *STDOUT;
   }
-  local @SIG{qw/INT KILL TERM QUIT/} = (sub {close $out; exit;}) x 4;
+  local @SIG{qw/INT KILL TERM QUIT/} = (sub {close $out; exit 1;}) x 4;
   if ($mode == 1) { # -t
     # translation and translation
     $wanted = sub {

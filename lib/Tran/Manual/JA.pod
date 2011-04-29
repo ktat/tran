@@ -503,21 +503,45 @@ mergeコマンドは引数が面倒なので、使いたくないという場合
 
 =head2 ls
 
-  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
-  tran get --tr translation-repository\n
+ファイルのリストを表示します。
 
-        -r --resource                    resource. required.
-        -t --translation                 list translation directory contents
-        --tr --translation_repository    translation repository name(imply -t)
+  tran ls -r RESOURCE TARGET [VERSION] path/to/anywhere
+  tran ls --tr translation-repository
+
+=over 4
+
+=item オプションなし
+
+オリジナルリポジトリのリストを表示します。
+
+=item -t/--translation
+
+翻訳リポジトリのリストを表示します。
+
+=item --tr/--translation_repository
+
+引数に翻訳リポジトリ名を取ります(例 jprp-modules)。
+TARGET を与えない場合、その翻訳リポジトリ内のデイレクトリ一覧を表示します。
+
+=back
 
 =head2 cat
 
-  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+ファイルの内容を表示します。
 
-        -r --resource      resource. required.
-        -t --translation   show translation file
-        -n --number        show content with line number
+  tran cat -r RESOURCE TARGET [VERSION] path/to/anywhere
 
+=over 4
+
+=item -t/--translation
+
+翻訳リポジトリにあるファイルの内容を表示します。
+
+=item -n/--number
+
+表示の際に行番号を追加します。
+
+=back
 
 =head1 他のドキュメント
 

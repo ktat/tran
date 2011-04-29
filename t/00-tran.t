@@ -41,14 +41,16 @@ subtest resource =>
     my ($file, $version) = $cpan->get_module_info('ExportTo');
     is($version, '0.03');
     is($file, 'K/KT/KTAT/ExportTo-0.03.tar.gz');
-    ($file, $version) = $cpan->get_module_info('ExportTo', '0.03', 'with version');
-    is($version, '0.03');
-    is($file, 'K/KT/KTAT/ExportTo-0.03.tar.gz');
+    ($file, $version) = $cpan->get_module_info('ExportTo', '0.01');
+    is($version, '0.01');
+    is($file, 'K/KT/KTAT/ExportTo-0.01.tar.gz');
     is(ref $cpan->original_repository, 'Tran::Repository::Original');
     is_deeply([sort keys %{$cpan->targets}], ['Moose', 'MooseX::Getopt', 'perl']);
     is($cpan->target_translation('Moose'), 'jpa');
     is($cpan->target_translation('MooseX::Getopt'), 'jpa');
     is($cpan->target_translation('perl'), 'jprp-core');
+    $cpan->get('ExportTo', '0.03');
+    ok(-e './t/.tran/original/cpan/ExportTo/0.03');
   };
 
 subtest original_repo =>

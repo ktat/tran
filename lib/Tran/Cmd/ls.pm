@@ -51,8 +51,8 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran get -r RESOURCE TARGET [VERSION] path/to/anywhere' . "\n"
-       . 'tran get --tr translation-repository\n'
+  return 'tran ls -r RESOURCE TARGET [VERSION] path/to/anywhere' . "\n"
+       . 'tran ls --tr translation-repository' . "\n";
 }
 
 sub validate_args {

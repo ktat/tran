@@ -442,21 +442,45 @@ from translation repository's directory for translation.
 
 =head2 ls
 
-  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
-  tran get --tr translation-repository\n
+show list of files.
 
-        -r --resource                    resource. required.
-        -t --translation                 list translation directory contents
-        --tr --translation_repository    translation repository name(imply -t)
+  tran ls -r RESOURCE TARGET [VERSION] path/to/anywhere
+  tran ls --tr translation-repository
 
+=over 4
+
+=item no option
+
+show list of files in original repositry.
+
+=item -t/--translation
+
+show list of files in translation repositry.
+
+=item --tr/--translation_repository
+
+As an argument, the name of translation repositry(e.g. jprp-modules)
+If TARGET is not given, show directories in translation repository.
+
+=back
 
 =head2 cat
 
-  tran get -r RESOURCE TARGET [VERSION] path/to/anywhere
+display content of file
 
-        -r --resource      resource. required.
-        -t --translation   show translation file
-        -n --number        show content with line number
+  tran cat -r RESOURCE TARGET [VERSION] path/to/anywhere
+
+=over 4
+
+=item -t/--translation
+
+show file content which is in trnslation repository.
+
+=item -n/--number
+
+show file content with line number.
+
+=back
 
 =head1 SEE ALSO
 
@@ -483,7 +507,3 @@ by the Free Software Foundation; or the Artistic License.
 See http://dev.perl.org/licenses/ for more information.
 
 =cut
-
-
-
- 

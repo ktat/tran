@@ -14,6 +14,7 @@ sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
           ['translation|t', "show translation file" ],
+          ['translation_repository|tr=s', "imply -t. only make it easy to use this after ls" ],
           ['number|n', "show content with line number" ],
          );
 }
@@ -22,6 +23,8 @@ sub run {
   my ($self, $opt, $args) = @_;
   my ($target, $version, @rest) = @$args;
   my $resource = camelize($opt->{resource});
+
+  $opt->{translation} = $opt->{translation_repository};
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
@@ -36,7 +39,7 @@ sub run {
     } else {
       $out = *STDOUT;
     }
-    local @SIG{qw/INT KILL TERM QUIT/} = (sub {close $out; exit;}) x 4;
+    local @SIG{qw/INT KILL TERM QUIT/} = (sub {close $out; exit 1;}) x 4;
     my $c = slurp($path);
     my $i = 1;
     $c =~ s{^}{sprintf "%4d ", $i++}meg if $opt->{number};
@@ -48,7 +51,7 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran get -r RESOURCE TARGET [VERSION] path/to/anywhere';
+  return 'tran cat -r RESOURCE TARGET [OPTION] [VERSION] path/to/anywhere';
 }
 
 sub validate_args {
