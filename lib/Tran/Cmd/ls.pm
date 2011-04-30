@@ -35,7 +35,7 @@ sub run {
   }
   if (defined $target and $target) {
     $path = $repo->path_of($target, $version);
-    my $rest_path = path_join "/", @rest;
+    my $rest_path = path_join @rest;
     $path = path_join $path, $1 if $rest_path =~m{^/?(.+)$};
   }
   if (-f $path) {

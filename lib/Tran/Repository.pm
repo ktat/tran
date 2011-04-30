@@ -82,14 +82,14 @@ sub path_of {
   my ($self, $target, $version) = @_;
   $version ||= $self->latest_version($target);
   my $target_path = $self->target_path($target);
-  my $path = path_join "/", $self->directory;
+  my $path = $self->directory;
   my $path_format = $self->path_format;
   if (defined $path_format and not $path_format) {
-    $path = path_join "/", $path, $target_path, $version;
+    $path = path_join $path, $target_path, $version;
   } elsif (defined $path_format) {
     $path_format =~s{%n}{$target_path};
     $path_format =~s{%v}{$version};
-    $path = path_join "/", $path, $path_format;
+    $path = path_join $path, $path_format;
   }
   return $path;
 }

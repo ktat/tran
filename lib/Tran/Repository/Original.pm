@@ -34,21 +34,21 @@ sub resource {
 sub resource_directory {
   my ($self, $resource) = @_;
   Carp::croak("set resource at first") unless $self->resource;
-  return path_join "/", $self->directory, lc($self->resource) , '';
+  return path_join $self->directory, lc($self->resource) , '';
 }
 
 sub path_of {
   my ($self, $target, $version) = @_;
   Carp::croak("set resource at first") unless $self->resource;
   Carp::croak("taget name is required") if @_ == 1;
-  return path_join '/', $self->resource_directory, $self->SUPER::target_path($target), $version ? $version : ();
+  return path_join $self->resource_directory, $self->SUPER::target_path($target), $version ? $version : ();
 }
 
 sub target_path {
   my ($self, $target) = @_;
   Carp::croak("set resource at first") unless $self->resource;
   Carp::croak("taget name is required") if @_ == 1;
-  return path_join '/', lc($self->resource), $self->SUPER::target_path($target);;
+  return path_join lc($self->resource), $self->SUPER::target_path($target);;
 }
 
 sub has_target {
