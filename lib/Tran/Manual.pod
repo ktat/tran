@@ -486,7 +486,7 @@ show file content with line number.
 
 =over 4
 
-=item Tran::Manual::Extend
+=item L<Tran::Manual::Extend>
 
 How to create sub class for other resources and other translation repositories.
 

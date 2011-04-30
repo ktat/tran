@@ -233,7 +233,7 @@ VCSに$target_path以下のファイルを add します。
 
 VCSに$path以下をコミットします。
 
-=head1 Tran::Notify のサブクラス
+=head1 L<Tran::Notify> のサブクラス
 
 通知に使うサブクラスです。
 以下のメソッドを実装します。
@@ -285,7 +285,7 @@ camelize, decamelizeを export します。
 
 =over 4
 
-=item Tran::Manual::JA
+=item L<Tran::Manual::JA>
 
 Tran自体のドキュメント。チュートリアル。
 
@@ -295,17 +295,17 @@ Tran自体のドキュメント。チュートリアル。
 
 =over 4
 
-=item Tran::Resource
+=item L<Tran::Resource>
 
-=item Tran::Repository
+=item L<Tran::Repository>
 
-=item Tran::Repository::Original
+=item L<Tran::Repository::Original>
 
-=item Tran::Repository::Translation
+=item L<Tran::Repository::Translation>
 
-=item Tran::Notify
+=item L<Tran::Notify>
 
-=item Tran::VCS
+=item L<Tran::VCS>
 
 =back
 

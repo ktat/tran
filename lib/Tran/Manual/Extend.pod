@@ -92,11 +92,65 @@ You have to implement the following methods.
 
 =head2 path_format
 
+return target name and version to save.
+for example, JPRP:
+
+ sub path_format { return "%n-%v" }
+
+for example, JPA:
+
+ sub path_format { return "%n-Doc-JA" }
+
+%n is target name and %v is version.
+
 =head2 has_target
+
+ $translation->has_target($target);
+
+It checks whether translation repositry has target.
+If exists, it returns 1 otherwise 0.
+This method doesn't check version.
 
 =head2 copy_option
 
+ $translation->copy_option
+
+It returns the options when tra copy/merge orginal repository to translation repository.
+As an example, the following is Translation::JprpModules options.
+
+ sub copy_option {
+   return {
+           ignore_path     => ['t', 'inc'],
+           # see Tran::Util
+           contents_filter => \&pm2pod,
+           name_filter     => \&pm2pod_name,
+          };
+ }
+
+ignore_path is path wihch will ignores when copy & merge.
+contents_filter is function reference, if you need changing original file when copy to translation repository.
+name_filter is used if file name has to be changed when copy to translation repository.
+
+The arguments of contents_filter are:
+
+ $contents_filter->($self, $name, $content)
+
+This returns modified $content.
+
+The areguments of name_filter:
+
+ $name_filter->($self, $name);
+
+This returns modified $name.
+
 =head2 get_versions
+
+ $translation->get_versions($target);
+
+returns version of $target in translation repository.
+This returns:
+
+ $self->{versions}->{$self->target_path($target)} = [ map version->new($_), @versions];
 
 =head2 _config
 
@@ -114,7 +168,7 @@ This class is optional.
 
 =head2 commit
 
-=head1 Tran::Notify Subclass
+=head1 L<Tran::Notify> Subclass
 
 =head2 SEE ALSO
 
@@ -130,17 +184,17 @@ Check base class of each sub class.
 
 =over 4
 
-=item Tran::Resource
+=item <Tran::Resource>
 
-=item Tran::Repository
+=item <Tran::Repository>
 
-=item Tran::Repository::Original
+=item <Tran::Repository::Original>
 
-=item Tran::Repository::Translation
+=item <Tran::Repository::Translation>
 
-=item Tran::Notify
+=item <Tran::Notify>
 
-=item Tran::VCS
+=item <Tran::VCS>
 
 =back
 

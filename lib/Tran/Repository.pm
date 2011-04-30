@@ -143,6 +143,37 @@ see Tran::Manual::Extend
 
 =head2 path_of
 
+ $repo->path_of($target, $version);
+
+It returns target directory in the repository.
+This method's behavior is depend on C<path_format>.
+
+=over 4
+
+=item path_format returns undef
+
+returns repositorry's directory.
+
+=item path_format returns empty string
+
+if target name is 'AAA::BBB', it retunrs:
+
+ /path/to/repository/directory/AAA-BBB
+
+=item path_format returns string
+
+If string has %n and/or %v, it/they is/are replaced.
+
+ %n ... target name
+ %v ... version
+
+So, if string is '%n-%v' and target name is 'AAA::BBB' and version is "0.01",
+it returns:
+
+ /path/to/repository/directory/AAA-BBB-0.01
+
+=back
+
 =head2 files
 
 =head1 AUTHOR
