@@ -98,7 +98,7 @@ sub _exec_code {
   my $data;
   unless ($join_code) {
     $data = join "", @values;
-    $data =~s{/+}{/}g;
+    $data =~s{//+}{/}g;
   } else {
     $data = $code->(@values);
   }

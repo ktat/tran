@@ -51,6 +51,8 @@ sub run {
     my $want_merge = 0;
     if ($prev_version < $version) {
       $want_merge = $self->app->prompt("you want to merge with previous version?");
+    } else {
+      $self->info("older original version is not found.");
     }
     if ($want_merge) {
       if ($translation->has_version($target, $prev_version)) {

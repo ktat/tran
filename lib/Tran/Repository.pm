@@ -43,7 +43,7 @@ sub latest_version {
   die if @_ != 2;
 
   my $name = $self->target_path($target);
-  $self->get_versions($target);
+  $self->get_versions($target) if @{$self->{versions}->{$name} || []} > 0;
 
   return $self->{versions}->{$name}->[-1];
 }
@@ -82,15 +82,15 @@ sub path_of {
   my ($self, $target, $version) = @_;
   $version ||= $self->latest_version($target);
   my $target_path = $self->target_path($target);
-  my $path = join "/", $self->directory;
-  unless (my $path_format = $self->path_format) {
-    $path = join "/", $path, $target_path, $version;
-  } else {
+  my $path = path_join "/", $self->directory;
+  my $path_format = $self->path_format;
+  if (defined $path_format and not $path_format) {
+    $path = path_join "/", $path, $target_path, $version;
+  } elsif (defined $path_format) {
     $path_format =~s{%n}{$target_path};
     $path_format =~s{%v}{$version};
-    $path = join "/", $path, $path_format;
+    $path = path_join "/", $path, $path_format;
   }
-  $path =~s{//+}{/}g;
   return $path;
 }
 

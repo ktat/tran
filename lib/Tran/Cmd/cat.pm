@@ -30,8 +30,8 @@ sub run {
   my $r = $tran->resource($resource);
   my $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
   my $path = $repo->path_of($target, $version);
-  my $rest_path = join "/", @rest;
-  $path .= "/" . $1 if $rest_path =~m{^/?(.+)$};
+  my $rest_path = path_join "/", @rest;
+  $path = path_join $path, $1 if $rest_path =~m{^/?(.+)$};
   my $out;
   if (-f $path) {
     if ($ENV{TRAN_PAGER}) {

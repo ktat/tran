@@ -6,7 +6,7 @@ use base qw/Exporter/;
 use Encode::Guess;
 use File::Slurp ();
 
-our @EXPORT_OK =qw/warn error fatal info debug encoding_slurp/;
+our @EXPORT_OK =qw/warn error fatal info debug encoding_slurp path_join/;
 
 BEGIN {
   require Tran::Log;
@@ -39,6 +39,13 @@ sub encoding_slurp {
     $c = Encode::encode($enc, $c);
   };
   return $c;
+}
+
+sub path_join {
+  my (@dirs) = @_;
+  my $path = join '/', @dirs;
+  $path =~ s{//+}{/}g;
+  return $path;
 }
 
 1;

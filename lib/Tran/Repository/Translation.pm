@@ -101,7 +101,7 @@ sub merge {
 
     my $is_target = 0;
     foreach my $target (@{$copy_option->{target_path}}) {
-      if ($_file =~ m{^/?$target/}) {
+      if ($_file =~ m{^/?$target/} or $_file =~ m{^/?$target$}) {
         $is_target = 1;
         last;
       }
@@ -324,7 +324,7 @@ sub cmpmerge {
          $source .= $translation->as_string_range($r->range0);
        } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
          # it should be ignore? just use newer version
-         $source .=  $new->as_string_range($r->range1);;
+         $source .=  $new->as_string_range($r->range1);
        } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
          $source .= "<<<<<<< $newer_file\n";
          $source .= $new->as_string_range($r->range1);
@@ -368,7 +368,7 @@ sub cmpmerge_least {
          $source .= $translation->as_string_range($r->range0);
        } elsif ( $r->type eq "2" ) { # older is different. translation == newer version
          # something wrong?
-         $source .= $new->as_string_range($r->range1);;
+         $source .= $new->as_string_range($r->range1);
        } elsif ( $r->type eq "1" ) { # newer is different. translation == older version
          $source .= "<<<<<<< $newer_file\n";
          $source .= $new->as_string_range($r->range1);
@@ -445,6 +445,8 @@ return original repository of translation.
 
 Path format in translation repository.
 '%n' is target name, %v is version number.
+
+If it returns undef, any path is aded to translation directory.
 
 =head2 merge
 
