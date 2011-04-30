@@ -170,6 +170,90 @@ This class is optional.
 
 =head1 L<Tran::Notify> Subclass
 
+=head2 Translation Repostiory for Private Project
+
+tran includes C<~/.tran/lib/> in library path.
+For example, I put the follwoing module for L<KiokuDB>.
+
+ package Tran::Repository::Translation::KiokuDb;
+ 
+ use warnings;
+ use strict;
+ use base qw/Tran::Repository::Translation/;
+ use File::Slurp qw(write_file);
+ use Tran::Util -common, -list, -file, -prompt, -debug, -pod => ['pm2pod'];
+ 
+ sub path_format { undef }
+ 
+ sub copy_option {
+   return {
+           target_path => 'lib/KiokuDB/Tutorial.pod',
+           ignore_path => 'lib/POD2',
+           omit_path   => 'lib',
+           contents_filter => \&pm2pod,
+           name_filter     => \&pm2pod_name,
+          };
+ }
+ 
+ sub pm2pod_name {
+   my ($self, $name) = @_;
+   $name =~ s{\.pm}{.pod};
+   $name = 'lib/POD2/JA/' . $name;
+   $name =~s{/+}{/}g;
+   return $name
+ }
+ 
+ sub get_versions {
+   my ($self, $target) = @_;
+   Carp::croak("target is required as first argument")  if @_ != 2;
+   my $name = $self->target_path($target);
+   return if exists $self->{versions}->{$name} and $self->{versions}->{$name};
+   my $translation_target_dir = $self->path_of($name);
+   my $version_file = path_join($translation_target_dir, '.tran_version');
+   my @versions;
+   if (open my $in, '<', $version_file) {
+     chomp(my $version = <$in>);
+     $self->debug("read version from: $version_file ($version)");
+     close $in;
+     push @versions, version->new($version);
+   } else {
+     $self->fatal("cannot open file($version_file)");
+   }
+   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+ }
+ 
+ sub update_version_info {
+   my ($self, $target, $version) = @_;
+   my $target_path = $self->target_path($target);
+   my $target_dir = $self->path_of($target_path, $version);
+   my $version_file = path_join($target_dir, '.tran_version');
+   write_file($version_file, $version);
+   $self->info("version file($version_file) is created.");
+ }
+ 
+ sub has_target {
+   my ($self, $target) = @_;
+   my $target_path = $self->target_path($target);
+   return -d $self->directory . '/' . $target_path ? 1 : 0;
+ }
+ 
+ 1;
+
+config is:
+
+ repository:
+   ...
+   translation:
+     kioku-db:
+       directory: /home/ktat/git/github/kiokudb/
+ 
+ resource:
+   cpan:
+     ...
+     targets:
+       KiokuDB:
+         translation: kioku-db
+
 =head2 SEE ALSO
 
 =over 4
