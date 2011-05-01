@@ -43,7 +43,7 @@ sub latest_version {
   die if @_ != 2;
 
   my $name = $self->target_path($target);
-  $self->get_versions($target) if @{$self->{versions}->{$name} || []} > 0;
+  $self->get_versions($target);
 
   return $self->{versions}->{$name}->[-1];
 }
