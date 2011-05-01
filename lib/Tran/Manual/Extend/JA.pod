@@ -319,7 +319,7 @@ tran はライプラリのパスに、 C<~/.tran/lib/> を含めています。
    Carp::croak("target is required as first argument")  if @_ != 2;
    my $name = $self->target_path($target);
    return if exists $self->{versions}->{$name} and $self->{versions}->{$name};
-   my $translation_target_dir = $self->path_of($name);
+   my $translation_target_dir = $self->directory;
    my $version_file = path_join($translation_target_dir, '.tran_version');
    my @versions;
    if (open my $in, '<', $version_file) {
