@@ -410,7 +410,8 @@ sub _base_import {
   }
   my @unknown;
   return unless @flgs;
-  while (my $flg = lc shift @flgs) {
+  while (my $flg = shift @flgs) {
+    $flg = lc $flg;
     no strict 'refs';
     if ($flg eq '-perl6exportattrs') {
       eval {require Perl6::Export::Attrs };

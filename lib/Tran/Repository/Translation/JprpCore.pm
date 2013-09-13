@@ -44,7 +44,7 @@ sub get_versions {
 
   my @versions;
   if (opendir my $d, $self->directory) {
-    foreach my $version (grep /^[\d\.]+(?:_\d+)?$/, readdir $d) {
+    foreach my $version (grep !/^\.\.?$/, grep /^[\d\.]+(?:_\d+)?$/, readdir $d) {
       push @versions, version->new($version);
     }
     closedir $d;

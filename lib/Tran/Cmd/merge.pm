@@ -17,6 +17,10 @@ sub run {
   my $tran = $self->app->tran;
 
   my $org_path = $tran->original->directory;
+  if (not $tran->translation_repository->{$translation}) {
+    die "You may pass wrong trnaslation repository name: $translation\n  "
+      . "choose one of them: " . join(', ', keys %{$tran->translation_repository}) . "\n";
+  }
   my $tr_path  = $tran->translation_repository->{$translation}->directory;
 
   if (! $translation) {

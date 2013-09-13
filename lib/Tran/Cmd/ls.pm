@@ -29,7 +29,12 @@ sub run {
   my $path;
   if ($opt->{translation_repository}) {
     $repo = $tran->translation_repository(decamelize($opt->{translation_repository}));
-    $path = $repo->directory;
+    if (defined $repo) {
+      $path = $repo->directory;
+    } else {
+      my @repos = keys %{$tran->config->{config}->{repository}->{translation}};
+      die $opt->{translation_repository} . " is not translation ripository\nYou can use " . join(', ', @repos) . "\n";
+    }
   } else {
     $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
   }

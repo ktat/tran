@@ -31,7 +31,6 @@ sub run {
 
   my $translation = $tran->translation_repository($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
-
   if ( not my $already = $translation->has_version($target, $version) or $opt->{force}) {
     if ($already) {
       $self->info("forcely start translation.");
@@ -49,7 +48,7 @@ sub run {
     }
     my $prev_version = $original->prev_version($target) || $original->latest_version($target);
     my $want_merge = 0;
-    if ($prev_version < $version) {
+    if (defined $prev_version and $prev_version < $version) {
       $want_merge = $self->app->prompt("you want to merge with previous version?");
     } else {
       $self->info("older original version is not found.");

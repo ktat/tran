@@ -26,8 +26,8 @@ sub get_versions {
 
   my @versions;
   if (opendir my $d, $self->directory) {
-    foreach my $name_version (grep /^$name\-[\d\.]+(?:_\d+)?$/, readdir $d) {
-      my ($version) = ($name_version =~ m{^$name\-([\d\.]+(?:_\d+)?)$});
+    foreach my $name_version (grep /^$name\-v?[\d\.]+(?:_\d+)?$/, readdir $d) {
+      my ($version) = ($name_version =~ m{^$name\-(v?[\d\.]+(?:_\d+)?)$});
       push @versions, version->new($version);
     }
     closedir $d;
@@ -46,7 +46,7 @@ sub has_target {
   my ($self, $target) = @_;
   my $target_path = $self->target_path($target);
   if (opendir my $dir, $self->directory) {
-    return any {/^$target_path\-[\d\.]+(?:_\d+)?$/} readdir $dir ? 1 : 0;
+    return any {/^$target_path\-v?[\d\.]+(?:_\d+)?$/} readdir $dir ? 1 : 0;
   } else {
     $self->fatal(sprintf "cannot open directory %s", $self->directory);
   }
