@@ -11,7 +11,7 @@ sub notify {
   my ($self, $cmd, $target, $version) = @_;
   my $nt = Net::Twitter->new
     (
-     traits   => [qw/API::REST/],
+     traits   => [qw/OAuth API::REST/],
      username => $self->{account},
      password => $self->{password},
     ) or return;
@@ -27,9 +27,12 @@ sub _config {
   return
     {
      class => 'Twitter',
-     '000_account'  => bless(sub {prompt("your twitter account", sub {1})}, 'PROMPT'),
-     '010_password' => bless(sub {prompt("your twitter password", sub {1})}, 'PROMPT'),
-     '020_message'  => bless(sub {prompt("tweet message", sub {1}, -d=> "'%c translattion %n %v")}, 'PROMPT'),
+     '000_account'         => bless(sub {prompt("your twitter account", sub {1})}, 'PROMPT'),
+     '010_consumer_key'    => bless(sub {prompt("your twitter consumer key", sub {1})}, 'PROMPT'),
+     '011_consumer_secret' => bless(sub {prompt("your twitter consumer secret", sub {1})}, 'PROMPT'),
+     '020_access_token'    => bless(sub {prompt("your twitter access token", sub {1})}, 'PROMPT'),
+     '021_token_secret'    => bless(sub {prompt("your twitter token secret", sub {1})}, 'PROMPT'),
+     '030_message'         => bless(sub {prompt("tweet message", sub {1}, -d=> "'%c translattion %n %v")}, 'PROMPT'),
     }
 }
 
