@@ -31,6 +31,7 @@ requires
     'version'                => 0,
     'Data::Visitor'          => 0,
     'Text::Diff'             => 0,
+    'MetaCPAN::API'          => 0,
     ;
 
 recommends
