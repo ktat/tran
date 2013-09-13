@@ -23,7 +23,7 @@ sub run {
   my ($self, $opt, $args) = @_;
   my ($target, @files) = @$args;
   my $resource_name = $opt->{resource};
-  my ($version1, $version2) = split(/:/, $opt->{version} || '', 2);
+  my ($version1, $version2) = $opt->{version} ? split(/:/, $opt->{version} || '', 2) : ();
 
   $| = 1;
   my $tran = $self->app->tran;
