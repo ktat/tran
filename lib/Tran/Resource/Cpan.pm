@@ -73,7 +73,7 @@ sub _resolve_target_url_version {
   my ($target, $target_path, $url_or_file) = ($_target, $_target_path, '');
 
   if ($version and $version =~m{^http}) {
-    my ($_version) = $version =~ m{\w-([\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
+    my ($_version) = $version =~ m{\w-(v?[\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
     return ($_target, $_target_path, $version, $_version)
   }
 
@@ -115,15 +115,18 @@ sub _is_perl {
 
 sub regularlize_perl_dist_modules {
   my $name = shift;
+  $name =~s{^\w+/perl-([^/]+/)}{};
+  # perl 5.18.0
+  # dist/B-Deparse/Deparse.pm
   # perl5.10.0
   # ext/SDBM_File/SDBM_File.pm -> SDBM_File.pm
   # ext/MIME/Base64/Base64.pm  -> MIME/Base64.pm
-  $name =~ s{^ext/(.+/)([^/]+)/\2}{$1$2};
-  $name =~ s{^ext/([^/]+)/\1}{$1};
+  $name =~ s{^(?:ext|dist)/(.+/)([^/]+)/\2}{$1$2};
+  $name =~ s{^(?:ext|dist)/([^/]+)/\1}{$1};
   # perl 5.11.2
   # ext/PerlIO-encoding/encoding.pm -> PerlIO/encoding.pm
   # ext/Sys-Hostname/Hostname.pm    -> Sys/Hostname.pm
-  $name =~ s{^ext/(\w+)-(\w+)/\2}{$1/$2};
+  $name =~ s{^(?:ext|dist)/(\w+)-(\w+)/\2}{$1/$2};
   my $path = $name;
   $name =~s{^lib/}{};
   $name =~s{/}{-}g;
@@ -157,7 +160,7 @@ sub get {
     $self->debug("get $url");
     unless ($targz = LWP::Simple::get($backpan_url)) {
       my $backpan_url2 = $backpan_url;
-      $backpan_url2 =~s{-([\d\.]+(?:_\d+)?\.tar\.gz)$}{.pm-$1};
+      $backpan_url2 =~s{-(v?[\d\.]+(?:_\d+)?\.tar\.gz)$}{.pm-$1};
       $url = $backpan_url2;
       $self->debug("get $url");
       $targz = LWP::Simple::get($backpan_url2)
