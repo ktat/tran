@@ -68,7 +68,8 @@ our $Utils = {
                             sub {
                               # from Pod::Perldoc::ToPod
                               my($self, $name, $content) = @_;
-                              return if ($name !~ m{\.pm} and $name !~ m{\.pod$});
+                              return if ($name !~ m{\.pm} and $name !~ m{\.pod$} and $name !~ m{/[^\.]+$});
+
                               my $pod = '';
                               my $cut_mode = 1;
                               # A hack for finding things between =foo and =cut, inclusive

@@ -19,7 +19,7 @@ sub copy_option {
   $opt->{omit_path} = 'pod';
   $opt->{exchange_path} = sub {
     my ($self, $f, $original_path, $translation_path) = @_;
-    return unless $f =~m{^/?lib/.+\.pm};
+    return if not $f =~m{^/?lib/.+\.pm} and not $f =~m{^/?script/.+};
     local $@;
     eval {
       require "$original_path/$f";

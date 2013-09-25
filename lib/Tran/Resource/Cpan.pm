@@ -59,7 +59,7 @@ sub get_module_info {
      or $c =~m{"(http://search\.cpan\.org/CPAN/authors/id/[^"]+?)"}
        ) {
       $download_url = $1;
-      ($version) = $download_url =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
+      ($version) = $download_url =~m{-(v?[\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
     } else {
       return $self->get_module_info_from_cpan($target, $version, $_target);
     }
@@ -196,6 +196,8 @@ sub get {
     }
   }
 
+  $self->debug("target files are:\n" . join "\n", @files);
+
   my $cwd = cwd();
   my $original_dir = $self->original_repository->resource_directory;
 
@@ -230,8 +232,8 @@ sub get {
         close $fh;
       }
     } else {
-      $name =~s{^([\w:]+)\.pm\-([\d.]+(?:_\d+)?/)}{$1-$2};
-      $name =~s{^$target_path-([^/]+)/}{$target_path/$1/} or $self->fatal("'$target_path' is not included in '$name'. don't you typo?");
+      $name =~s{^([\w:]+)\.pm\-(v?[\d.]+(?:_\d+)?/)}{$1-$2};
+      $name =~s{^$target_path-([^/]+)/}{$target_path/$1/}i or $self->fatal("target '$target_path' is not included in '$name'. don't you typo?");
       $name = $original_dir . '/' . $name;
       my ($out_dir) = $name =~m{^(.+)/};
       if (not -e $out_dir) {
@@ -257,6 +259,7 @@ sub _config {
      target_only => [
                      '*.pm',
                      '*.pod',
+                     '^[^.]+$'
                     ],
      'targets' => {
                    'perl',
