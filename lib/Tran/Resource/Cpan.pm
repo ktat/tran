@@ -22,6 +22,7 @@ my $metadata;
 
 sub get_module_info_from_metacpan {
   my ($self, $target, $version, $_target) = @_;
+  my ($download_url);
   my $mcpan = MetaCPAN::API->new;
   my $distribution_name = $target;
   $distribution_name =~ s{::}{-}g;
@@ -128,15 +129,6 @@ sub get_core_document_from_metacpan {
     }
 }
 
-# from metacpan
-sub get_module_info {
-  my ($self, $target, $version, $_target) = @_;
-  my ($download_url, $module);
-  ($download_url, $version, $module) = $self->get_module_info_from_metacpan($target, $version, $_target);
-  return if not $version;
-  return $download_url, $version, $module;
-}
-
 sub _resolve_target_url_version {
   my ($self, $_target, $_target_path, $version) = @_;
   my ($target, $target_path, $url_or_file) = ($_target, $_target_path, '');
@@ -145,17 +137,8 @@ sub _resolve_target_url_version {
     my ($_version) = $version =~ m{\w-(v?[\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
     return ($_target, $_target_path, $version, $_version)
   }
-  ($url_or_file, $version) = $self->get_module_info($target, $version);
+  ($url_or_file, $version) = $self->get_module_info_from_metacpan($target, $version);
   return ($target, $target_path, $url_or_file, $version);
-}
-
-sub _is_perl {
-  my ($self, $url_or_file) = @_;
-  if ($url_or_file and $url_or_file =~ '/perl\-\d+\.\d+\.\d+\.tar\.\w+$') {
-    return 1;
-  } else {
-    return 0;
-  }
 }
 
 sub regularlize_perl_dist_modules {
@@ -319,15 +302,18 @@ sub get_file_and_extract {
           my $module = $name;
           $module =~s{-}{::}g;
           my ($file_name, $version);
-          eval {($file_name, $version) = $self->get_module_info($module)};
+          eval {($file_name, $version) = $self->get_module_info_from_metacpan($module)};
 
           if ($@ or (defined $file and $file !~ m{/perl-})) {
             $self->warn("$module is skipped.");
             next FILE;
           }
         }
-        ($path, $name) = ("$original_dir/$name/$VERSION/$path" =~m{^(.+)/([^/+]+)$});
-        make_path($path) or die ($path) unless -d $path;
+        ($path, $name) = ("$original_dir/$name/$VERSION/$path" =~ m{^(.+)/([^/+]+)$});
+	unless (-d $path) {
+	  $self->debug("make path: $path");
+	  make_path($path) or die ($path);
+	}
         $self->debug("write file: $path/$name");
         open my $fh, ">", "$path/$name" or die "cannot write $path/$name";
         print $fh $file->get_content;
