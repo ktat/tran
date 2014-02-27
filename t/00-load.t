@@ -8,3 +8,7 @@ BEGIN {
 }
 
 diag( "Testing Tran $Tran::VERSION, Perl $], $^X" );
+
+use File::Path;
+rmtree('t/.tran/original');
+
