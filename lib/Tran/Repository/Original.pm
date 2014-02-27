@@ -59,7 +59,7 @@ sub target_path {
 sub has_target {
   my ($self, $target) = @_;
   my $target_path = $self->target_path($target);
-  return  -d $self->directory . '/' . $target_path ? 1 : 0;
+  return  -d $self->resource_directory . '/' . $target_path ? 1 : 0;
 }
 
 sub _config {
