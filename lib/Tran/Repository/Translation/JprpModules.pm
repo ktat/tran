@@ -11,7 +11,7 @@ sub path_format { return "%n-%v" }
 
 sub copy_option {
   return {
-          ignore_path     => ['t', 'inc'],
+          ignore_path     => ['t', 'xt', 'inc'],
           # see Tran::Util
           contents_filter => \&pm2pod,
           name_filter     => \&pm2pod_name,
@@ -22,6 +22,7 @@ sub get_versions {
   my ($self, $target) = @_;
   my $name = $self->target_path($target);
   die if @_ != 2;
+
   return if exists $self->{versions}->{$name};
 
   my @versions;
@@ -34,6 +35,7 @@ sub get_versions {
   } else {
     $self->debug(sprintf "directory is not found : %s", $self->directory);
   }
+
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
 }
 

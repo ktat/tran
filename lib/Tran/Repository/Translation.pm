@@ -66,7 +66,7 @@ sub merge {
 
   my $original_repository   = $self->original_repository;
 
-  my @newer_original_files = $original_repository->files($target_path, $version);
+  my @newer_original_files = $original_repository->files($target, $version);
   my @translated_files     = $self->files($target_path, $prev_version);
 
   my %target;
@@ -93,6 +93,8 @@ sub merge {
 
  FILE:
   foreach my $file (grep $_, @newer_original_files) {
+    $self->debug("merge target file: ". $file);
+
     my $_file = $file;
     my $_translation_path     = $translation_path;
     my $_new_translation_path = $new_translation_path;
@@ -205,10 +207,9 @@ sub copy_from_original {
   my $option = $self->copy_option || {};
   my $target_path = $self->target_path($target);
   my $original_repository = $self->original_repository;
-  my $original_path       = $original_repository->path_of($target_path, $version);
-  my $translation_path    = $self->path_of($target_path, $version);
-  my @original_files      = $original_repository->files($target_path, $version);
-
+  my $original_path       = $original_repository->path_of($target, $version);
+  my $translation_path    = $self->path_of($target, $version);
+  my @original_files      = $original_repository->files($target, $version);
   foreach my $name (qw/omit_path target_path ignore_path/) {
     $option->{$name} = [$option->{$name} || ()] unless ref $option->{$name};
   }

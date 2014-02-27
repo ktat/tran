@@ -38,9 +38,9 @@ If $version is omitted, get the latest version.
 
 The return value is 2 pattern.
 
-If target has existed alredy in original repository.
+If target has existed already in original repository.
 
- ($self->target_translation($target), version->new($version))
+ ($self->target_translation($target), version->new($version));
 
 If not,
 

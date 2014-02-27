@@ -42,9 +42,9 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 返値には、2パターンあります。
 
-既に指定されたバージョンか、省略された場合は最新の、オリジナルを取得済みの場合、
+既に指定されたバージョン(省略された場合は最新)のオリジナルを取得済みの場合、
 
- ($self->target_translation($target), version->new($version))
+ ($self->target_translation($target), version->new($version));
 
 今回、新たに取得した場合、
 

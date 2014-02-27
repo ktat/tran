@@ -15,57 +15,126 @@ use IO::String;
 use IO::Uncompress::Gunzip;
 use IO::Uncompress::Bunzip2;
 use version;
+use MetaCPAN::API;
+use Module::CoreList;
 
 my $metadata;
 
-sub get_module_info_from_cpan {
+sub get_module_info_from_metacpan {
   my ($self, $target, $version, $_target) = @_;
-  $_target ||= '';
-  unless ($metadata) {
-    local $@;
-    # CPAN::Index->reload;
-    eval {
-      $metadata = retrieve($self->config->{metafile});
-    };
-    $self->fatal("cannot read metafile:" . $self->config->{metafile}) if $@;
-  }
-  my $module_info = $metadata->{'CPAN::Module'}{$target};
-  unless ($module_info) {
-    $target =~s{-}{::}g;
-    $module_info = $metadata->{'CPAN::Module'}{$target} or die "cannot find url for $target";
-  }
-  if (not $version) {
-    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
-  } elsif ($_target ne 'perl' and $self->_is_perl($module_info->{CPAN_FILE})) {
-    ($version) = $module_info->{CPAN_FILE} =~m{-([\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
-  } else {
-    $module_info->{CPAN_FILE} =~ s{-(?:[\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)}{-$version.tar.$1};
-  }
-  return $module_info->{CPAN_FILE}, $version;
-}
-
-# from FrePan. if failed, from CPAN
-sub get_module_info {
-  my ($self, $target, $version, $_target) = @_;
-  my $download_url;
+  my $mcpan = MetaCPAN::API->new;
+  my $distribution_name = $target;
+  $distribution_name =~ s{::}{-}g;
   if ($version) {
-    return $self->get_module_info_from_cpan($target, $version, $_target);
+    if (my $distv = eval {$mcpan->release(distribution => $distribution_name)}) {
+      $distv = $mcpan->release(author => $distv->{author}, release => $distribution_name . '-' . $version);
+      return @{$distv}{qw/download_url version/};
+    }
   } else {
-    $_target ||= '';
-    $target =~s{::}{-}g;
-    my $url = 'http://frepan.org/dist/' . $target;
-    my $c = LWP::Simple::get($url) || '';
-    if ($c =~m{"(http://cpan\.cpantesters\.org/authors/id/[^"]+?)"}
-     or $c =~m{"(http://search\.cpan\.org/CPAN/authors/id/[^"]+?)"}
-       ) {
-      $download_url = $1;
-      ($version) = $download_url =~m{-(v?[\d\.]+(?:_\d+)?)\.tar\.(gz|bz2)};
+    if (my $distv = eval {$mcpan->release(distribution => $distribution_name)}) {
+      return @{$distv}{qw/download_url version/};
     } else {
-      return $self->get_module_info_from_cpan($target, $version, $_target);
+      return;
     }
   }
-  $version or die "cannot find url for $target";
-  return $download_url, $version;
+}
+
+sub get_module_info_from_metacpan_with_corelist {
+  my ($self, $target, $version) = @_;
+  my ($perl_version, $got_version);
+  foreach my $_perl_version (sort {$b cmp $a} keys %Module::CoreList::version) {
+    if (exists $Module::CoreList::version{$_perl_version}->{$target}) {
+      $perl_version = $_perl_version;
+      $got_version  = $Module::CoreList::version{$_perl_version}->{$target};
+      last if not $version or $got_version eq $version;
+    }
+  }
+
+  return if not $perl_version;
+
+  # dummy version number for undef version
+  $got_version ||= '0.0';
+  my $pod = eval {
+    my $release = format_perl_version($perl_version);
+
+    my $metacpan = MetaCPAN::API->new;
+    $metacpan->pod(
+		   'module'	  => $target,
+		   'release'	  => 'perl-' . $release,
+		   'content-type' => 'text/x-pod',
+		  );
+  };
+
+  $self->warn($@) if $@;
+
+  return ($pod, $got_version);
+}
+
+sub get_core_document_from_metacpan {
+  my ($self, $target, $version) = @_;
+  my ($perl_version);
+
+  if (not $version) {
+    foreach my $_perl_version (sort {$b cmp $a} keys %Module::CoreList::version) {
+      $perl_version = format_perl_version($_perl_version);
+      last;
+    }
+  } elsif ($version =~m{^5\.\d+$} and not $Module::CoreList::version{$version}) {
+    $perl_version = format_perl_version($version);
+  } elsif (not $Module::CoreList::version{numify_version($version)}) {
+    $perl_version = $version;
+  }
+
+  return if not $perl_version;
+
+  my $pod = eval {
+    my $metacpan = MetaCPAN::API->new;
+    $metacpan->pod(
+		   'module'	  => $target,
+		   'release'	  => 'perl-' . $perl_version,
+		   'content-type' => 'text/x-pod',
+		  );
+  };
+
+  $self->warn($@) if $@;
+
+  return ($pod, $perl_version);
+}
+
+# these 3 subroutines are copied from corelist command
+{
+    my $have_version_pm;
+
+    sub have_version_pm {
+        return $have_version_pm if defined $have_version_pm;
+        return $have_version_pm = eval { require version; 1 };
+    }
+
+    sub format_perl_version {
+      my $v = shift;
+      return $v if $v < 5.006 or !have_version_pm;
+      return version->new($v)->normal;
+    }
+
+    sub numify_version {
+        my $ver = shift;
+        if ($ver =~ /\..+\./) {
+            have_version_pm()
+                or die "You need to install version.pm to use dotted version numbers\n";
+            $ver = version->new($ver)->numify;
+        }
+        $ver += 0;
+        return $ver;
+    }
+}
+
+# from metacpan
+sub get_module_info {
+  my ($self, $target, $version, $_target) = @_;
+  my ($download_url, $module);
+  ($download_url, $version, $module) = $self->get_module_info_from_metacpan($target, $version, $_target);
+  return if not $version;
+  return $download_url, $version, $module;
 }
 
 sub _resolve_target_url_version {
@@ -76,31 +145,7 @@ sub _resolve_target_url_version {
     my ($_version) = $version =~ m{\w-(v?[\d.]+(?:_\d+)?)\.tar\.(?:gz|bz2)$};
     return ($_target, $_target_path, $version, $_version)
   }
-
-  if ($target eq 'perl') {
-    ($url_or_file, $version) = $self->get_module_info('B', $version, $target);
-  } else {
-    ($url_or_file, $version) = $self->get_module_info($target, $version);
-    if ($self->_is_perl($url_or_file)) {
-      $self->info("$target is Perl core module. find version from original directory.");
-      if (my $versions = $self->original_repository->get_versions($target)) {
-        $version = $versions->[-1];
-        $self->info("$target is $version in original directory");
-        return ($target, $target_path, '', $version);
-      } else {
-        $self->fatal("$target is not in original directory. do 'tran start cpan perl'");
-      }
-    }
-  }
-
-  if ($target eq 'perl') {
-    my $_version = $version;
-    if (version->new($_version) >= version->new("5.11.0")) {
-      $url_or_file = "http://www.cpan.org/src/5.0/perl-$_version.tar.bz2";
-    } else {
-      $url_or_file = "http://www.cpan.org/src/5.0/perl-$_version.tar.gz";
-    }
-  }
+  ($url_or_file, $version) = $self->get_module_info($target, $version);
   return ($target, $target_path, $url_or_file, $version);
 }
 
@@ -140,14 +185,71 @@ sub get {
   $target_path =~s{::}{-}g;
 
   my $config = $self->config;
-  my ($_target, $_target_path, $url, $_version)
-    = $self->_resolve_target_url_version($target, $target_path, $version);
+
+  my ($pod, $_target, $_target_path, $url, $_version);
+
+  my $is_coredoc = 0;
+  if ($target =~m{^perl\w+$}) {
+    ($pod, $_version) =  $self->get_core_document_from_metacpan($target, $version);
+  }
+  if ($pod) {
+    $is_coredoc = 1;
+  } else {
+    ($_target, $_target_path, $url, $_version)
+      = $self->_resolve_target_url_version($target, $target_path, $version);
+
+    if (not $url) {
+      ($pod, $_version) = $self->get_module_info_from_metacpan_with_corelist($target, $version);
+      if (not $pod) {
+	$self->fatal("cannot find $target");
+      }
+    }
+  }
+
   $version = $_version;
 
-  return ($self->target_translation($target), version->new($version))
-    if $self->original_repository->has_version($_target_path || $target_path, $version);
+  if ($is_coredoc) {
+    if ($self->original_repository->has_version('perl', $version, "pod/$target.pod")) {
+      # implementation depends on jprp-core directory structure.
+      return (0, ($self->target_translation($target), version->new($version)), ['perl', "$target.pod"]);
+    }
+  } elsif ($self->original_repository->has_version($_target_path || $target_path, $version)) {
+    return (0, ($self->target_translation($target), version->new($version)));
+  }
 
-  $self->debug(($_target || $target) . " $version : $url");
+  if ($pod) {
+    my $original_dir = $self->original_repository->resource_directory;
+    my ($name, $file_path) = regularlize_perl_dist_modules($target_path);
+    my ($path, $file_name) = $file_path =~m{^(?:(.+)\-)*(\w+)$};
+    $file_name .= '.pod';
+
+    if ($is_coredoc) {
+      $path = path_join $original_dir, 'perl', $version, 'pod';
+    } else {
+      $path = path_join $original_dir, $name, $version , 'lib', $path;
+    }
+
+    make_path $path if not -d $path;
+
+    open my $fh, ">", "$path/$file_name" or die "cannot write $path/$file_name";
+    print $fh $pod;
+    close $fh;
+    if ($is_coredoc) {
+      return (1, $self->target_translation($target), version->new($version), ['perl', "$path/$file_name"]);
+    } else {
+      return (1, $self->target_translation($target), version->new($version), "$path/$file_name");
+    }
+  } else {
+    return (1, $self->get_file_and_extract($_target || $target, $_target_path, $target_path, $_version, $version, $url));
+  }
+}
+
+sub get_file_and_extract {
+  my ($self, $target, $_target_path, $target_path, $_version, $version, $url) = @_;
+
+  my $config = $self->config;
+
+  $self->debug($target . " $version : $url");
   $url = 'http://search.cpan.org/CPAN/authors/id/' . $url if $url !~ '^http://';
   $self->fatal("cannot determin url for $target") unless $url;
 
@@ -253,9 +355,6 @@ sub _config {
   return
     {
      translation => 'jprp-modules',
-     metafile => ("$ENV{HOME}/.local/share/.cpan//Metadata"
-                  ? "$ENV{HOME}/.local/share/.cpan//Metadata"
-                  : "$ENV{HOME}/.cpan/Metadata"),
      target_only => [
                      '*.pm',
                      '*.pod',

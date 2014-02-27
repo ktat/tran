@@ -5,6 +5,15 @@ use strict;
 use version;
 use Carp qw/confess/;
 use Tran::Util -file => ['find'], -common;
+use Data::Util qw/install_subroutine/;
+
+sub one_dir {
+  my ($self) = @_;
+  install_subroutine(
+                     (ref $self || $self),
+                     path_of => \&path_of_one_dir,
+                    );
+}
 
 sub new {
   my ($class, %self) = @_;
@@ -58,12 +67,20 @@ sub target_path {
 sub has_target { confess "has_target must be implemented it in subclass: " . ref $_[0]; }
 
 sub has_version {
-  my ($self, $target, $version) = @_;
-  die if @_ != 3;
+  my ($self, $target, $version, $optional_path) = @_;
+  die if @_ < 3;
   my $name = $self->target_path($target);
   $self->get_versions($target);
+
   foreach my $ver (@{$self->{versions}->{$name}}) {
-    return 1 if $ver eq $version;
+    if ($ver eq $version) {
+      if (not $optional_path) {
+	return 1;
+      } else {
+	my $path = $self->path_of($target, $version);
+	return -e path_join $path, $optional_path;
+      }
+    }
   }
   return 0;
 }
@@ -77,6 +94,20 @@ sub prev_version {
 }
 
 sub path_format { '' }
+
+sub path_of_one_dir {
+  my ($self, $target) = @_;
+  my $target_path = $self->target_path($target);
+  my $path = $self->directory;
+  my $path_format = $self->path_format;
+  if (defined $path_format and not $path_format) {
+    $path = path_join $path, $target_path;
+  } elsif (defined $path_format) {
+    $path_format =~s{%n}{$target_path};
+    $path = path_join $path, $path_format;
+  }
+  return $path;
+}
 
 sub path_of {
   my ($self, $target, $version) = @_;
@@ -173,6 +204,20 @@ it returns:
  /path/to/repository/directory/AAA-BBB-0.01
 
 =back
+
+=head2 path_of_one_dir
+
+ # in Translation Repository package
+ # use path_of_one_dir will be created as path_of.
+ __PACKAGE__->one_dir();
+
+see C<path_of>.
+
+=head2 one_dir
+
+This is for translation repository.
+When translation repository is not versioned by directory.
+tran creates version file.
 
 =head2 files
 

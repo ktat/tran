@@ -6,7 +6,7 @@ use base qw/Exporter/;
 use Encode::Guess;
 use File::Slurp ();
 
-our @EXPORT_OK =qw/warn error fatal info debug encoding_slurp path_join/;
+our @EXPORT_OK =qw/warn error fatal info debug encoding_slurp path_join url2path/;
 
 BEGIN {
   require Tran::Log;
@@ -48,6 +48,13 @@ sub path_join {
   return $path;
 }
 
+sub url2path {
+  my $url = shift;
+  $url =~s{^(?:http|https|ftp)://}{};
+  $url =~s{/([^/]*)$}{};
+  return $url, $1 ||  'index.html';
+}
+
 1;
 
 =head1 NAME
@@ -63,7 +70,7 @@ Ktat, C<< <ktat at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Ktat.
+Copyright 2010-2013 Ktat.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

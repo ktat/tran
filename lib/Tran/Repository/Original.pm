@@ -12,14 +12,15 @@ sub get_versions {
   return if exists $self->{versions}->{$name};
 
   my @versions;
-  if (opendir my $d, $self->directory . '/' . $name) {
+  my $search_path = path_join $self->directory, lc($self->resource), $name;
+  if (opendir my $d, $search_path) {
     foreach my $version (grep /^v?[\d\.]+(?:_\d+)?$/, readdir $d) {
       next if $version =~ m{^v?\.\.?$};
       push @versions, version->new($version);
     }
     closedir $d;
   } else {
-    $self->debug(sprintf "directory is not found : %s/%s", $self->directory, $name);
+    $self->debug(sprintf "directory is not found : " . $search_path);
     return;
   }
   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
@@ -41,14 +42,18 @@ sub path_of {
   my ($self, $target, $version) = @_;
   Carp::croak("set resource at first") unless $self->resource;
   Carp::croak("taget name is required") if @_ == 1;
-  return path_join $self->resource_directory, $self->SUPER::target_path($target), $version ? $version : ();
+  return path_join $self->resource_directory, $self->target_path($target), $version ? $version : ();
 }
 
 sub target_path {
   my ($self, $target) = @_;
-  Carp::croak("set resource at first") unless $self->resource;
+  my $resource = $self->resource;
+  Carp::croak("set resource at first") unless $resource;
   Carp::croak("taget name is required") if @_ == 1;
-  return path_join lc($self->resource), $self->SUPER::target_path($target);;
+  my $resource_class = 'Tran::Resource::' . $resource;
+  my $path = $resource_class->can('target_path') ? $resource_class->target_path($target) : $self->SUPER::target_path($target);
+#  return path_join lc($self->resource), $path;
+  return $path;
 }
 
 sub has_target {

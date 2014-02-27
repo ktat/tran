@@ -11,7 +11,7 @@ sub path_format { return "%n-%v" }
 
 sub copy_option {
   return {
-          ignore_path     => ['t', 'inc'],
+          ignore_path     => ['t', 'xt', 'inc'],
           # see Tran::Util
           contents_filter => \&pm2pod,
           name_filter     => \&pm2pod_name,

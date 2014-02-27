@@ -6,6 +6,8 @@ use Tran::Util -list, -file, -prompt, -debug, -pod;
 use base qw/Tran::Repository::Translation/;
 use File::Slurp qw(write_file);
 
+__PACKAGE__->one_dir;
+
 sub path_format { return "%n-Doc-JA" }
 
 sub copy_option {

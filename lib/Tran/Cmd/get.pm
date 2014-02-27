@@ -23,8 +23,14 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my @result = $r->get($target, $version, @rest);
-  if (@result == 2) {
+  my ($result, @result) = $r->get($target, $version, @rest);
+
+  my $optional_path;
+  if (ref $result[-1] eq 'ARRAY') {
+    ($target, $optional_path) = @{$result[-1]};
+  }
+
+  if ($result == 0) {
     if (defined $version and $version) {
       $self->info("You have $target($result[1]) in original repository");
     } else {
@@ -33,7 +39,7 @@ sub run {
   } else {
     $self->info("Got $target " . ($version || '') );
   }
-  return @result;
+  return (\@result, [$target, $optional_path]);
 }
 
 sub usage_desc {

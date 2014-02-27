@@ -13,6 +13,7 @@ sub abstract { 'start new translation'; }
 sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
+          ['translation|t=s', "translation repository. optional." ],
           ['force|f'   , "forcely start translation even if translation exists" ],
          );
 }
@@ -22,16 +23,25 @@ sub run {
   my ($target, $version, @rest) = @$args;
   my $resource = $opt->{resource};
 
-  my($translation_name, $files);
-  ($translation_name, $version, $files) = $self->Tran::Cmd::get::run({resource => $resource}, $args);
+  my ($got_result, $new_info, $translation_name, $files, $optional_path);
+  ($got_result, $new_info) = $self->Tran::Cmd::get::run({resource => $resource}, $args);
+  ($translation_name, $version, $files) = @$got_result;
+
+  if (ref $new_info) {
+    ($target, $optional_path) = @{$new_info};
+  }
 
   my $tran = $self->app->tran;
 
+  $opt->{translation} ||= $tran->get_sticked_translation($target, $opt->{resource});
+  ($translation_name = $opt->{translation}) or $self->fatal('no translation is specified');
+  $tran->stick_translation($target, $opt->{resource}, $translation_name);
   $self->debug("translation_name: $translation_name");
 
   my $translation = $tran->translation_repository($translation_name) or $self->fatal("maybe bad name: $translation_name");
   my $original    = $translation->original_repository;
-  if ( not my $already = $translation->has_version($target, $version) or $opt->{force}) {
+
+  if ( not my $already = $translation->has_version($target, $version, $optional_path) or $opt->{force}) {
     if ($already) {
       $self->info("forcely start translation.");
     }

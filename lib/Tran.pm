@@ -98,6 +98,31 @@ sub original {
   return $self->{original};
 }
 
+sub get_sticked_translation {
+  my ($self, $target, $resource) = @_;
+  my $resource_repository = $self->resource(camelize($resource));
+  my $original_repository = $resource_repository->original_repository;
+
+  my $translation_name = '';
+  my $translation_file = path_join $original_repository->path_of($target), 'tran_translation';
+  if (-e $translation_file) {
+    open my $fh, '<', $translation_file or die "$!";
+    chomp($translation_name = <$fh>);
+    close $fh;
+  }
+  return $translation_name;
+}
+
+sub stick_translation {
+  my ($self, $target, $resource, $translation_name) = @_;
+  my $resource_repository = $self->resource(camelize($resource));
+  my $original_repository = $resource_repository->original_repository;
+  my $translation_file = path_join $original_repository->path_of($target), 'tran_translation';
+  open my $fh, '>', $translation_file or die "$! : $translation_file";
+  print $fh $translation_name;
+  close $fh;
+}
+
 sub translation_repository {
   my ($self, $name) = @_;
   return @_ == 2 ? $self->{translation}->{$name} :  $self->{translation};
