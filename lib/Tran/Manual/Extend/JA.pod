@@ -44,11 +44,11 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 既に指定されたバージョン(省略された場合は最新)のオリジナルを取得済みの場合、
 
- ($self->target_translation($target), version->new($version));
+ (0, $self->target_translation($target), version->new($version));
 
 今回、新たに取得した場合、
 
- ($self->target_translation($target), version->new($version), \@files);
+ (1, $self->target_translation($target), version->new($version), \@files);
 
 @files は、保存するファイルのオリジナルリポジトリのターゲットのディレクトリからの相対パスを指定します。
 リソースcpanの、Module::Name 0.01の場合は、
