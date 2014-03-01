@@ -22,7 +22,12 @@ sub copy_option {
 sub target_path {
   my ($self, $target) = @_;
   my ($path, $filename) = url2path($target);
-  return $path;
+  my $resource = 'Tran::Resource::' . $self->{original}->resource;
+  if ($resource->not_omit_last_name) {
+    return "$path/$filename";
+  } else {
+    return $path;
+  }
 }
 
 sub get_versions {

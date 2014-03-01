@@ -50,7 +50,7 @@ sub path_join {
 
 sub url2path {
   my $url = shift;
-  $url =~s{^(?:http|https|ftp)://}{};
+  $url =~s{^(?:http|https|ftp|file):///?}{};
   $url =~s{/([^/]*)$}{};
   return $url, $1 ||  'index.html';
 }

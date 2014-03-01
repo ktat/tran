@@ -173,6 +173,13 @@ sub _apply_copy_option {
       return 0;
     }
   }
+
+  foreach my $ignore (@{$copy_option->{ignore_path_any_depth}}) {
+    if ($_file =~ m{^/?$ignore/} or $_file =~ m{/$ignore/}) {
+      return 0;
+    }
+  }
+
   return 0 if @{$copy_option->{target_path}} and not $is_target;
 
   foreach my $omit (@{$copy_option->{omit_path}}) {
@@ -205,12 +212,17 @@ sub copy_option { {} };
 sub copy_from_original {
   my ($self, $target, $version) = @_;
   my $option = $self->copy_option || {};
+
+  # todo: this setting shoud be in other place.
+  push @{$option->{ignore_path_any_depth} ||= []}, '.git';
+
   my $target_path = $self->target_path($target);
   my $original_repository = $self->original_repository;
   my $original_path       = $original_repository->path_of($target, $version);
   my $translation_path    = $self->path_of($target, $version);
   my @original_files      = $original_repository->files($target, $version);
-  foreach my $name (qw/omit_path target_path ignore_path/) {
+
+  foreach my $name (qw/omit_path target_path ignore_path ignore_path_any_depth/) {
     $option->{$name} = [$option->{$name} || ()] unless ref $option->{$name};
   }
   foreach my $f (@original_files) {
@@ -235,6 +247,12 @@ sub _copy_file_auto_path {
   }
   foreach my $ignore (@{$option->{ignore_path}}) {
     if ($file =~ m{^/?$ignore/}) {
+      return;
+    }
+  }
+
+  foreach my $ignore (@{$option->{ignore_path_any_depth}}) {
+    if ($file =~ m{^/?$ignore/} or $file =~ m{/$ignore/}) {
       return;
     }
   }
