@@ -40,18 +40,42 @@ The return value is 2 pattern.
 
 If target has existed already in original repository.
 
- ($self->target_translation($target), version->new($version));
+ (0, $self->target_translation($target), version->new($version));
 
 If not,
 
- ($self->target_translation($target), version->new($version), \@files);
+ (1, $self->target_translation($target), version->new($version));
 
-In @files, relative path from target directory under original repository directory.
-For example, when resource cpan, target Module::Name, version 0.01:
+The following is special case:
+If you want to change target name from the target which user inputted, you should pass arrayref as last return values.
+The first arugument is new target name and the second is the path of the target file(currently, only 1 file is supported).
 
- .tran/original/cpan/Module-Name/0.01/
+ ['target_name', 'file_path']
 
-paths in @files are after this directory.
+The case of the resource 'Cpan', perlootut is Perl's core document, so target is regarded as 'perl'.
+
+ (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
+
+This array reference is used for checking version.
+
+ $repository->has_version($target, $version[, $optional_path]);
+
+If $optional_path('perlootut.pod') exists, it checks whether version directory exists
+and whether $optional_path exists.
+
+For example:
+
+In perl/5.18.1/, the following files exist.
+
+ perl/5.18.1/perlrun.pod
+ perl/5.18.1/perlpod.pod
+
+Now, if target is perl and target's version 5.18.1, and user want to start translation of perlootut.pod.
+tran must check the following path.
+
+ perl/5.18.1/perlootut.pod
+
+So in such case, $optional_path is required.
 
 =head2 _config
 

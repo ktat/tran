@@ -23,9 +23,9 @@ sub run {
   my ($target, $version, @rest) = @$args;
   my $resource = $opt->{resource};
 
-  my ($got_result, $new_info, $translation_name, $files, $optional_path);
+  my ($got_result, $new_info, $translation_name, $optional_path);
   ($got_result, $new_info) = $self->Tran::Cmd::get::run({resource => $resource}, $args);
-  ($translation_name, $version, $files) = @$got_result;
+  ($translation_name, $version) = @$got_result;
 
   if (ref $new_info) {
     ($target, $optional_path) = @{$new_info};

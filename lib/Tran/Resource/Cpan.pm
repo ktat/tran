@@ -194,7 +194,7 @@ sub get {
   if ($is_coredoc) {
     if ($self->original_repository->has_version('perl', $version, "pod/$target.pod")) {
       # implementation depends on jprp-core directory structure.
-      return (0, ($self->target_translation($target), version->new($version)), ['perl', "$target.pod"]);
+      return (0, $self->target_translation($target), version->new($version), ['perl', "$target.pod"]);
     }
   } elsif ($self->original_repository->has_version($_target_path || $target_path, $version)) {
     return (0, ($self->target_translation($target), version->new($version)));
@@ -220,7 +220,7 @@ sub get {
     if ($is_coredoc) {
       return (1, $self->target_translation($target), version->new($version), ['perl', "$path/$file_name"]);
     } else {
-      return (1, $self->target_translation($target), version->new($version), "$path/$file_name");
+      return (1, $self->target_translation($target), version->new($version));
     }
   } else {
     return (1, $self->get_file_and_extract($_target || $target, $_target_path, $target_path, $_version, $version, $url));
@@ -334,7 +334,7 @@ sub get_file_and_extract {
     }
   }
   $self->original_repository->reset;
-  return ($self->target_translation($target), version->new($version), \@files);
+  return ($self->target_translation($target), version->new($version));
 }
 
 sub _config {
@@ -367,6 +367,11 @@ sub _config {
 =head1 NAME
 
 Tran::Resource::Cpan - for CPAN
+
+=head1 CAUTION
+
+If you want to start translation of perl core document or the modules in perl distribution.
+you shuld use the latest version of Module::CoreList.
 
 =head1 AUTHOR
 

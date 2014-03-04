@@ -48,14 +48,38 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 今回、新たに取得した場合、
 
- (1, $self->target_translation($target), version->new($version), \@files);
+ (1, $self->target_translation($target), version->new($version));
 
-@files は、保存するファイルのオリジナルリポジトリのターゲットのディレクトリからの相対パスを指定します。
-リソースcpanの、Module::Name 0.01の場合は、
+以下は特殊なケース:
+もし、ユーザーが入力したターゲットを変更したい場合、最後の戻り値に配列リファレンスを渡します。
+第一引数が新しいターゲットの名前で、第二引数はターゲットのファイルのパスです。
 
- .tran/original/cpan/Module-Name/0.01/
+ ['target_name', 'file_path']
 
-より後ろのファイル名になります。
+Cpanリソースの場合、perltoot は Perlのコアドキュメントなので、ターゲットは perl とみなします。
+
+ (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
+
+この配列リファレンスはバージョンのチェックに使います。
+
+ $repository->has_version($target, $version[, $optional_path]);
+
+もし$optional_path('perlootut.pod')がある場合、バージョンディレクトリがあるかどうかと、
+$optional_pathがあるかどうかも調べます。
+
+例えば:
+
+perl/5.18.1/ の中に、以下のファイルがあります。
+
+ perl/5.18.1/perlrun.pod
+ perl/5.18.1/perlpod.pod
+
+今、ターゲットが perl で、ターゲットのバージョンが 5.18.1 で、ユーザーが perlootut.pod を翻訳しようとしたとき、
+tran は以下のパスをチェックしなければいけません。
+
+ perl/5.18.1/perlootut.pod
+
+そのため、このようなケースでは、$optional_path が必要になります。
 
 =head2 _config
 
