@@ -40,8 +40,22 @@ sub get_module_info_from_metacpan {
   }
 }
 
+sub check_module_corelist_version {
+  my ($self) = @_;
+
+  return if not $self->{module_core_list_version_checking}++;
+
+  my $mcpan = MetaCPAN::API->new;
+  my $module = $mcpan->release( distribution => 'Module-CoreList');
+  if (version->new($module->{version}) > version->new(Module::CoreList->VERSION)) {
+    $self->warn(sprintf 'Module::CoreList version(%s) is older than the latest(%s)',
+		Module::CoreList->VERSION, $module->{version});
+  }
+}
+
 sub get_module_info_from_metacpan_with_corelist {
   my ($self, $target, $version) = @_;
+
   my ($perl_version, $got_version);
   foreach my $_perl_version (sort {$b cmp $a} keys %Module::CoreList::version) {
     if (exists $Module::CoreList::version{$_perl_version}->{$target}) {
@@ -80,9 +94,13 @@ sub get_core_document_from_metacpan {
       $perl_version = format_perl_version($_perl_version);
       last;
     }
-  } elsif ($version =~m{^5\.\d+$} and not $Module::CoreList::version{$version}) {
-    $perl_version = format_perl_version($version);
-  } elsif (not $Module::CoreList::version{numify_version($version)}) {
+  } elsif ($version =~ m{^5\.\d+$}) {
+    if ($Module::CoreList::version{$version}) {
+      $perl_version = format_perl_version($version);
+    } else {
+      $self->warn('not perl version:' . $version);
+    }
+  } elsif ($Module::CoreList::version{numify_version($version)}) {
     $perl_version = $version;
   }
 
@@ -98,6 +116,9 @@ sub get_core_document_from_metacpan {
   };
 
   $self->warn($@) if $@;
+
+  # for compatibility of JPRP directory name
+  $perl_version =~s{^v}{};
 
   return ($pod, $perl_version);
 }
@@ -173,6 +194,7 @@ sub get {
 
   my $is_coredoc = 0;
   if ($target =~m{^perl\w+$}) {
+    $self->check_module_corelist_version();
     ($pod, $_version) =  $self->get_core_document_from_metacpan($target, $version);
   }
   if ($pod) {
@@ -182,6 +204,7 @@ sub get {
       = $self->_resolve_target_url_version($target, $target_path, $version);
 
     if (not $url) {
+      $self->check_module_corelist_version();
       ($pod, $_version) = $self->get_module_info_from_metacpan_with_corelist($target, $version);
       if (not $pod) {
 	$self->fatal("cannot find $target");
