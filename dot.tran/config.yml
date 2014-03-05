@@ -55,8 +55,6 @@ resource:
 
     # 翻訳リポジトリとして、jprp-modules を使う
     translation: jprp-modules
-    # ~/.cpan/Metadata へのパス
-    metafile: /home/user/.cpan/Metadata
     # 以下のファイルのみ対象とする
     target_only:
       - '*.pm'
@@ -75,3 +73,17 @@ resource:
       MooseX::Getopt:
         # 翻訳リポジトリとして jpa を使う
         translation: jpa
+      CPAN::Meta:
+        # 翻訳リポジトリとして module-pod-jp-modules を使う
+        translation: module-pod-jp-modules
+      perlsecret:
+        # 翻訳リポジトリとして module-pod-jp-modules を使う
+        translation: module-pod-jp-modules
+  website:
+    scraper: {}
+    targets: {}
+  github:
+    scraper: {}
+    targets: {}
+  git:
+    targets: {}
