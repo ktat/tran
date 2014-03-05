@@ -82,7 +82,7 @@ sub _exec_code {
   $join_code = pop @values if ref $values[-1] eq 'CODE';
   foreach my $v (@values) {
     if (ref $v eq 'REF' or ref $v eq 'SCALAR') {
-      if (ref $$v eq 'PROMPT') {
+      if (ref $$v eq 'Tran::PROMPT') {
         if (confirm_change($key, $org) == 0) {
           $v = $$v = $$v->($config) || $org;
         } else {
@@ -117,7 +117,7 @@ sub visit_hash {
         $self->{_target_config} = $org->{$org_key};
         $self->visit_hash($data);
         $self->{_target_config} = $org;
-      } elsif (ref $data eq 'PROMPT') {
+      } elsif (ref $data eq 'Tran::PROMPT') {
         if (confirm_change($key, $org->{$org_key}) == 0) {
           $data = $org->{$org_key};
         } else {

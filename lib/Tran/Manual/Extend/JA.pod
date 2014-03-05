@@ -191,24 +191,24 @@ Translation::JprpModulesの内容を例として書いておきます。
    return
      {
       vcs => {
-              wd => bless(sub { prompt("directory you've checkouted for JPRP cvs repository",
-                                 sub {
-                                   if (-d shift(@_) . '/CVS') {
-                                     return 1
-                                   } else {
-                                     $self->warn("directory is not found or not directory CVS checkouted");
-                                     return 0;
-                                   }
-                                 }
-                                ) }, 'PROMPT'),
+              wd => ask("directory you've checkouted for JPRP cvs repository",
+                        sub {
+                          if (-d shift(@_) . '/CVS') {
+                            return 1
+                          } else {
+                            $self->warn("directory is not found or not directory CVS checkouted");
+                            return 0;
+                          }
+                        }
+                       ),
              },
       directory => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
      };
  }
 
-wd は、C<< bless sub {...} 'PROMPT' >> というオブジェクトになっています。
+wd は、C<< ask("質問内容", $code_ref) >> という形になっています。C<ask>関数は C<< use  Tran::Util -prompt >> でインポートされます。
 単純に関数リファレンスの場合は、値として、その関数の実行結果が入りますが、
-"PROMPT"にblessされたオブジェクトにすることで、それがインタラクティブな設定であることを明示できます。
+C<ask> 関数を使うことで、それがインタラクティブな設定であることを明示できます。
 
 directoryの設定は関数リファレンスで実行された結果が、その値となりますが、
 中身が特殊ですので、説明します。
@@ -216,7 +216,7 @@ directoryの設定は関数リファレンスで実行された結果が、そ�
  sub { my $self = shift; return(\($self->{vcs}->{wd}), '/docs/modules/')  }
 
 $self は、_config が返すハッシュリファレンスそのものです。ですので、
-C<< $self->{vcs}->{wd} >>とは、先ほど説明した、C<< bless sub {...} 'PROMPT' >> というオブジェクトになります。
+C<< $self->{vcs}->{wd} >>とは、先ほど説明した、C<< ask("質問内容", $code_ref) >> という形になります。
 ここで、さらにそのリファレンスが返されているのに注意してください。
 その先にある値が代入されるのですが、先にある値が関数リファレンスなどの場合は、実行結果が代入されます。
 なお、ここで、return は2つの値を返していますが、これらは単純に join されます。

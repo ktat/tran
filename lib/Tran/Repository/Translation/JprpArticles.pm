@@ -85,16 +85,16 @@ sub _config {
     {
      '010_directory' => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/articles/') },
      '000_vcs' => {
-              wd => bless(sub { prompt("directory you've checkouted for JPRP cvs repository",
-                                sub {
-                                  if (-d shift(@_) . '/CVS') {
-                                    return 1
-                                  } else {
-                                    $self->warn("directory is not found or not directory CVS checkouted");
-                                    return 0;
-                                  }
-                                }
-                               ) }, 'PROMPT'),
+              wd => ask("directory you've checkouted for JPRP cvs repository",
+                         sub {
+                           if (-d shift(@_) . '/CVS') {
+                             return 1
+                           } else {
+                             $self->warn("directory is not found or not directory CVS checkouted");
+                             return 0;
+                           }
+                         }
+                        ),
              },
     };
 }

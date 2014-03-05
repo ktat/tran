@@ -31,8 +31,8 @@ sub _config {
     {
      '010_directory' => sub { my $self = shift; return (\$self->{vcs}->{wd}, '/docs/modules/') },
      '000_vcs' => {
-                   wd   => bless(sub { prompt("directry you've cloned for module-pod-jp-modules translation", sub {-d $_[0] ? 1 : 0}) }, 'PROMPT'),
-                   user => bless(sub { prompt("your github account name", sub {1})}, 'PROMPT'),
+                   wd   => ask("directry you've cloned for module-pod-jp-modules translation", sub {-d $_[0] ? 1 : 0}),
+                   user => ask("your github account name", sub {1}),
              },
     };
 }

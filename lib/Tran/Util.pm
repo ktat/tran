@@ -4,37 +4,44 @@ use strict;
 use Tran::UtilAny -Base;
 use Clone qw/clone/;
 
+sub __prompt {
+  my $message = shift;
+  my $check   = shift || sub {1};
+  my @opt = @_;
+  my $answer;
+ PROMPT:
+  {
+    $message .= ": " unless $message =~ m{[\?:]\s*$};
+    $answer = IO::Prompt::prompt($message, @opt);
+    $answer->{value} ||= '';
+    my $r = $check->($answer->{value});
+    last PROMPT if $r;
+
+    if (not $r) {
+      warn "'$answer->{value}' is invalid!\n";
+      redo PROMPT;
+    } elsif (not $answer->{value}) {
+      warn "required!\n";
+      redo PROMPT;
+    }
+  }
+  return $answer->{value};
+}
+
+
 our $Utils = {
               %$Tran::UtilAny::Utils,
               '-common' =>  ['Tran::Util::Base'],
               '-file' =>  ['File::Slurp', 'File::Find', 'File::Copy'],
               '-prompt' => {'IO::Prompt' =>
-                            { prompt =>
-                              sub {
-                                sub {
-                                  my $message = shift;
-                                  my $check   = shift || sub {1};
-                                  my @opt = @_;
-                                  my $answer;
-                                PROMPT:
-                                  {
-                                    $message .= ": " unless $message =~ m{[\?:]\s*$};
-                                    $answer = IO::Prompt::prompt($message, @opt);
-                                    $answer->{value} ||= '';
-                                    my $r = $check->($answer->{value});
-                                    last PROMPT if $r;
-
-                                    if (not $r) {
-                                      warn "'$answer->{value}' is invalid!\n";
-                                      redo PROMPT;
-                                    } elsif (not $answer->{value}) {
-                                      warn "required!\n";
-                                      redo PROMPT;
-                                    }
-                                  }
-                                  return $answer->{value};
-                                }
-                              }
+                            { prompt => sub { \&__prompt },
+			      ask =>
+			      sub {
+				sub {
+				  my ($message, @rest) = @_;
+				  bless(sub { __prompt($message, @rest) } => 'Tran::PROMPT');
+				}
+			      },
                             }
                            },
               '-string' => {

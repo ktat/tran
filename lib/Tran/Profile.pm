@@ -6,8 +6,8 @@ use Tran::Util -prompt;
 sub _config {
   return
     {
-     '00_name'  => bless(sub { prompt("your name:",   sub { $_[0] ? 1 : 0})}, 'PROMPT'),
-     '10_email' => bless(sub { prompt("your email:",  sub { $_[0] ? 1 : 0})}, 'PROMPT'),
+     '00_name'  => ask("your name:",   sub { $_[0] ? 1 : 0}),
+     '10_email' => ask("your email:",  sub { $_[0] ? 1 : 0}),
     };
 }
 
