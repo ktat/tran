@@ -3,7 +3,7 @@ package Tran::Resource::Website;
 use warnings;
 use strict;
 use base qw/Tran::Resource/;
-use Tran::Util -common, -debug, -list, -common;
+use Tran::Util -common, -debug, -list, -common, -file;
 use File::Path qw/make_path/;
 use version;
 use Time::Piece;
@@ -80,9 +80,7 @@ sub _store_content_of_previous {
     my $content = $self->_get_content_from_url($url);
     if ($content) {
       my $store_path = path_join $root_path, $version, $file;
-      open my $fh, '>', $store_path or die "$! $store_path";
-      print $fh $content;
-      close $fh;
+      write_file($store_path, $content) or die "$! $store_path";
       $self->info("$url is stored to $store_path.");
     }
   }
@@ -113,9 +111,7 @@ sub _store_content {
 
   make_path($path) if ! -d $path;
   my $store_path = path_join $path, $filename;
-  open my $fh, '>', $store_path or die "$! : $target > $path/$filename";
-  print $fh $content;
-  close $fh;
+  write_file($store_path, $content) or die "$! : $target > $path/$filename";
   $self->info("$target is stored to $store_path.");
 }
 

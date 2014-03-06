@@ -2,7 +2,7 @@ package Tran;
 
 use warnings;
 use strict;
-use Tran::Util -debug, -string, -common;
+use Tran::Util -debug, -string, -common, -file;
 use Class::Inspector;
 use Tran::Log;
 use Module::Pluggable search_path => ['Tran'], require => 1;
@@ -106,9 +106,7 @@ sub get_sticked_translation {
   my $translation_name = '';
   my $translation_file = path_join $original_repository->path_of($target), '.tran_translation';
   if (-e $translation_file) {
-    open my $fh, '<', $translation_file or die "$!";
-    chomp($translation_name = <$fh>);
-    close $fh;
+    chomp($translation_name = read_file($translation_file));
   }
   return $translation_name;
 }
@@ -118,9 +116,7 @@ sub stick_translation {
   my $resource_repository = $self->resource(camelize($resource));
   my $original_repository = $resource_repository->original_repository;
   my $translation_file = path_join $original_repository->path_of($target), '.tran_translation';
-  open my $fh, '>', $translation_file or die "$! : $translation_file";
-  print $fh $translation_name;
-  close $fh;
+  write_file($translation_file, $translation_name)  or die "$! : $translation_file";
 }
 
 sub translation_repository {

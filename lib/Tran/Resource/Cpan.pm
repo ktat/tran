@@ -6,7 +6,7 @@ use strict;
 use base qw/Tran::Resource/;
 use File::Path ();
 use Cwd qw/cwd/;
-use Tran::Util -debug, -list, -common;
+use Tran::Util -debug, -list, -common, -file;
 use File::Path qw/make_path/;
 use LWP::Simple ();
 use Storable qw/retrieve/;
@@ -237,9 +237,7 @@ sub get {
 
     make_path $path if not -d $path;
 
-    open my $fh, ">", "$path/$file_name" or die "cannot write $path/$file_name";
-    print $fh $pod;
-    close $fh;
+    write_file("$path/$file_name", $pod) or die "cannot write $path/$file_name";
     if ($is_coredoc) {
       return (1, $self->target_translation($target), version->new($version), ['perl', "$path/$file_name"]);
     } else {
@@ -338,9 +336,7 @@ sub get_file_and_extract {
 	  make_path($path) or die ($path);
 	}
         $self->debug("write file: $path/$name");
-        open my $fh, ">", "$path/$name" or die "cannot write $path/$name";
-        print $fh $file->get_content;
-        close $fh;
+	write_file("$path/$name", $file->get_content) or die "cannot write $path/$name";
       }
     } else {
       $name =~s{^([\w:]+)\.pm\-(v?[\d.]+(?:_\d+)?/)}{$1-$2};
@@ -351,9 +347,7 @@ sub get_file_and_extract {
         make_path($out_dir) or die $out_dir;
       }
       $self->debug("write file: $name");
-      open my $fh, ">", $name or die "cannot write $name";
-      print $fh $file->get_content;
-      close $fh;
+      write_file($name, $file->get_content) or die "cannot write $name";
     }
   }
   $self->original_repository->reset;
