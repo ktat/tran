@@ -65,7 +65,7 @@ sub _store_content_of_previous {
   my @files;
   while (my $file = readdir $dir) {
     next if $file =~ /^\.\.?$/;
-    next if $file eq 'tran_translation' or $file eq $filename;
+    next if $file eq '.tran_translation' or $file eq $filename;
 
     $self->debug("$file will be copied.");
 
