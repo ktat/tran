@@ -154,9 +154,9 @@ before this, I show my assuming tranlsation flow.
 Use start command. Its arguments are resource name and target name(in this case, module name).
 You can pass version as optional.
 
- % tran start -r cpan Module::Name
+ % tran start -r cpan -t jprp-modules Module::Name
 
-It means that you start to translate Module::Name in the resoruce cpan.
+It means that you start to translate Module::Name in the resoruce cpan with traslation repository 'jprp-modules'.
 
 tran get Module::Name's tar.gz file from CPAN, and extract it under the directory,
 "~/.tran/original/cpan". If the latest version of Module::Name is 0.1,
@@ -171,7 +171,7 @@ You can use same command "start".
 
  % tran start -r cpan Module::Name
 
-Exactly same command I showed then.
+Almost same command I showed then. After first time, C<-t> option is not required.
 In this time, You have previous version of original and previous version of the translated.
 tran can merge the difference between older and newer original to the previous translated.
 The merged file is put in translation repository. 
@@ -209,8 +209,7 @@ After that, the following steps are as same as (A).
 
 =head1 Default Resource
 
-If you translate only CPAN(indeed, currently, resource is CPAN only),
-you may want to ommit -r option.
+If you translate only CPAN, you may want to ommit -r option.
 You can set default resource in configuration file.
 
  default_resorce cpan
