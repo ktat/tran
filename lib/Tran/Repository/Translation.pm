@@ -439,11 +439,11 @@ return Tran object.
 
 return encoding setting.
 
-=head2 vcs
+=head2 C<vcs>
 
  $t->vcs;
 
-reutrn Version control object if loaded.
+return Version control object if loaded.
 
 =head2 has_target
 
@@ -465,7 +465,7 @@ return original repository of translation.
 Path format in translation repository.
 '%n' is target name, %v is version number.
 
-If it returns undef, any path is aded to translation directory.
+If it returns undef, any path is added to translation directory.
 
 =head2 path_of
 
@@ -478,11 +478,11 @@ This method's behavior is depend on C<path_format>.
 
 =item path_format returns undef
 
-returns repositorry's directory.
+returns repository's directory.
 
 =item path_format returns empty string
 
-if target name is 'AAA::BBB', it retunrs:
+if target name is 'AAA::BBB', it returns:
 
  /path/to/repository/directory/AAA-BBB
 
@@ -528,11 +528,11 @@ like the following(in Translation::JprpModules):
 
 copy target's original files to translation path.
 
-=head2 cmpmerge
+=head2 C<cmpmerge>
 
   $t->cmpmerge($newer_file, $older_file, $translation_file, $contents_filter);
 
-=head2 cmpmerge_least
+=head2 C<cmpmerge_least>
 
   $t->cmpmerge_least($newer_file, $older_file, $translation_file, $contents_filter);
 

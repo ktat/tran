@@ -194,16 +194,19 @@ sub get {
 
   my $is_coredoc = 0;
   if ($target =~m{^perl\w+$}) {
+    # 1st. search core document
     $self->check_module_corelist_version();
     ($pod, $_version) =  $self->get_core_document_from_metacpan($target, $version);
   }
   if ($pod) {
     $is_coredoc = 1;
   } else {
+    # 2nd. search with MetaCPAN
     ($_target, $_target_path, $url, $_version)
       = $self->_resolve_target_url_version($target, $target_path, $version);
 
     if (not $url) {
+      # 3rd. search with MetaCPAN with Perl version
       $self->check_module_corelist_version();
       ($pod, $_version) = $self->get_module_info_from_metacpan_with_corelist($target, $version);
       if (not $pod) {
@@ -270,7 +273,7 @@ sub get_file_and_extract {
       $url = $backpan_url2;
       $self->debug("get $url");
       $targz = LWP::Simple::get($backpan_url2)
-        or $self->fatal("cannot get $url \n           $backpan_url\n           $backpan_url2\n\tsearch goole for 'site:backpan.cpan.org $_target_path-$_version.tar.gz / $backpan_url2'");
+        or $self->fatal("cannot get $url \n           $backpan_url\n           $backpan_url2\n\tsearch google for 'site:backpan.cpan.org $_target_path-$_version.tar.gz / $backpan_url2'");
     }
   }
   $self->debug("got $url");
@@ -388,7 +391,7 @@ Tran::Resource::Cpan - for CPAN
 =head1 CAUTION
 
 If you want to start translation of perl core document or the modules in perl distribution.
-you shuld use the latest version of Module::CoreList.
+you should use the latest version of Module::CoreList.
 
 =head1 AUTHOR
 

@@ -446,7 +446,7 @@ sub _use_import_module { 0 }
 
 =head1 NAME
 
-Tran::UtilAny - ah ... It's non tested version of Util::Any.
+Tran::UtilAny - ah ... It's not tested version of Util::Any.
 
 =cut
 
@@ -532,7 +532,7 @@ see L<"CREATE YOUR OWN Util::Any">, in detail.
 
  use Util::Any -list, -hash;
 
-Give list of kinds of modules. All functions in modules are exporeted.
+Give list of kinds of modules. All functions in modules are exported.
 
 =head2  use Util::Any KIND => [FUNCTIONS], ...;
 
@@ -615,7 +615,7 @@ If you pass debug value, warn or die.
 
 Kinds of functions and list of exported functions are below.
 Note that these modules and version are on my environment(Perl 5.8.4).
-So, it must be diffrent on your environment.
+So, it must be different on your environment.
 
 =head2 scalar
 
@@ -728,11 +728,11 @@ Like Sub::Exporter, Util::Any can export function name as you like.
 
  use Util::Yours -list => {-prefix => 'list__', miin => {-as => "lmin"}};
 
-functions in -list, are exported with prefix "list__" except 'min' and 'min' is exported as 'lmin'.
+functions in -list, are exported with prefix "list__" except C<min> and C<min> is exported as C<lmin>.
 
 =head1 PRIORITY OF THE WAYS TO CHANGE FUNCTION NAME
 
-There are some ways to chnage function name.
+There are some ways to change function name.
 Their priority is the following.
 
 =over 4
@@ -787,7 +787,7 @@ if module's prefix is defined in class(not defined in Util::Any), use 3, or use 
 
 B<all> is special keyword, so it has some restriction.
 
-=head2 use module with 'all' cannot take its arugments
+=head2 use module with 'all' cannot take its arguments
 
  use Util::Any -all; # or 'all', ':all'
 
@@ -913,7 +913,7 @@ rename rule is represented in _create_smart_rename in Util::Any.
 =head2 CHANGE smart_rename BEHAVIOUR
 
 To define _create_smart_rename, you can change smart_rename behaviour.
-_create_smart_rename get 2 argument, package name and kind of utilitiy,
+_create_smart_rename get 2 argument, package name and kind of utility,
 and should return code reference which get function name and return new name.
 As an example, see Util::Any's _create_smart_rename.
 
@@ -922,7 +922,7 @@ As an example, see Util::Any's _create_smart_rename.
 =head3 SELECT FUNCTIONS
 
 Util::Any automatically export functions from modules' @EXPORT and @EXPORT_OK.
-In some cases, it is not good idea like Data::Dumper's Dumper and DumperX.
+In some cases, it is not good idea like Data::Dumper's C<Dumper> and C<DumperX>.
 These 2 functions are same feature.
 
 So you can limit functions to be exported.
@@ -962,7 +962,7 @@ Inverse of -select option. Cannot use this option with -select.
 To rename function name, write original function name as hash key and renamed name as hash value.
 this definition is prior to -select/-except.
 
-In the following example, 'min' is not in -select list, but can be exported.
+In the following example, C<min> is not in -select list, but can be exported.
 
  our $Utils = {
       -list  => [[
@@ -1021,7 +1021,7 @@ Your script using your utility class:
  print min_under_20(100,25,30); # 5
  print min_under_20(100,1,30);  # 1
 
-If you don't specify C<-as>, exporeted function as C<min>.
+If you don't specify C<-as>, exported function as C<min>.
 But, of course, the following doesn't work.
 
  use SubExporterGenerator -test => [
@@ -1106,7 +1106,7 @@ But same kind and same function name is defined, one of them doesn't work.
 
 NOTE THAT: I don't recommend this usage, because using this may confuse user;
 some of import options are for Util::Any and others are for exporter-like module
-(especially, ussing with Sub::Exporter is confusing).
+(especially, using with Sub::Exporter is confusing).
 
 CPAN has some modules to export functions.
 Util::Any can work with some of such modules, L<Exporter>, L<Exporter::Simple>, L<Sub::Exporter> and L<Perl6::Export::Attrs>.

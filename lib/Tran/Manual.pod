@@ -14,7 +14,7 @@ Because ...
 
 =item 1. Modules will be updated.
 
-Of cource, modules will be released new version since you translated it.
+Of course, modules will be released new version since you translated it.
 It means that translators need to manage modules' code by something like version control system.
 Many module has its own repository, but their places is different by each module.
 Don't you want to control them in one place?
@@ -41,11 +41,11 @@ Befor staring translation, I explain some terms.
 =head2 Resource
 
 A resource which contains target to be translated.
-For example, CPAN is resoruce.
+For example, CPAN is resource.
 
 =head2 Target
 
-A traget to be translated.
+A target to be translated.
 For example, CPAN Module is target.
 
 =head2 Repository
@@ -63,7 +63,7 @@ A place to store translated files.
 =head1 Prepare tran.
 
 Before starting translation, you have to prepare tran.
-type the commnad.
+type the command.
 
  % tran init
 
@@ -121,7 +121,7 @@ Now, at first, try to start translation.
 =head1 The flow of translation
 
 After this section, I'll explain how to use tran,
-before this, I show my assuming tranlsation flow.
+before this, I show my assuming translation flow.
 
 =head2 (A) Start new translation
 
@@ -156,7 +156,7 @@ You can pass version as optional.
 
  % tran start -r cpan -t jprp-modules Module::Name
 
-It means that you start to translate Module::Name in the resoruce cpan with traslation repository 'jprp-modules'.
+It means that you start to translate Module::Name in the resource cpan with translation repository C<jprp-modules>.
 
 tran get Module::Name's tar.gz file from CPAN, and extract it under the directory,
 "~/.tran/original/cpan". If the latest version of Module::Name is 0.1,
@@ -182,7 +182,7 @@ In this case, you need to do the following steps before starting translation.
 
 =head2 1. Rearrange directory structure and file name of the translated file
 
-If the translated file is diffrent from translation repositroy assuming strucutre,
+If the translated file is different from translation repository assuming structure,
 rearrange its directory/file structure.
 
 =head2 2. Get the original source of the translated version
@@ -209,7 +209,7 @@ After that, the following steps are as same as (A).
 
 =head1 Default Resource
 
-If you translate only CPAN, you may want to ommit -r option.
+If you translate only CPAN, you may want to omit -r option.
 You can set default resource in configuration file.
 
  default_resorce cpan
@@ -237,7 +237,7 @@ Setting for notification.
     to: to@example.com
     template_directory: /home/user/.tran/template/perldocjp/
 
-The name of tempalte file put under the template_directory,
+The name of template file put under the template_directory,
 is as same as command name.
 
 For example:
@@ -260,7 +260,7 @@ For example:
 
 =head2 repository/original
 
-Setting for original repositroy.
+Setting for original repository.
 
    original:
      directory: /home/user/.tran/original/
@@ -279,9 +279,9 @@ Setting for translation repository.
          wd: /home/user/git/github/jpa-translation/
      merge_method: cmpmerge_least
 
-=head2 resoruce
+=head2 resource
 
-Setting for resoruce.
+Setting for resource.
 
  resource:
    cpan:
@@ -307,11 +307,11 @@ Do initialize setting for tran.
  tran init [-f|--force]
 
 If configuration file exists, do nothing.
-But, if you use -f option, forcely recreate configuration file.
+But, if you use -f option, force recreate configuration file.
 
 =head2 start
 
-The command when you want to start new translatation.
+The command when you want to start new translation.
 
  tran start -r RESOURCE TARGET [VERSION]
 
@@ -321,11 +321,11 @@ start command will do the following:
 
 =item 1. get source.
 
-Get souce from resource.
+Get source from resource.
 
 =item 2. Merge the difference between older and newer original if exists
 
-If the previous version of original and the preveous version of translation are found,
+If the previous version of original and the previous version of translation are found,
 merge the difference between original latest version and previous version to the translated.
 The merged is put in translation repository as new translation.
 
@@ -371,7 +371,7 @@ You can pass the part you want to reconfigure.
 =head2 diff
 
 get difference between target versions.
-If you set your favolite pager in TRAN_PAGER environmental varialbe,
+If you set your favorite pager in TRAN_PAGER environmental variable,
 display output with pager.
 
  tran diff [-v version/-o/-t] -r RESOURCE TARGET [files ...]
@@ -380,20 +380,20 @@ display output with pager.
 
 =item no option
 
-diff between original and translation. if you don't give version,
-diff between the original latest and the translation latest.
+C<diff> between original and translation. if you don't give version,
+C<diff> between the original latest and the translation latest.
 
-=item -o/--original
+=item C<-o/--original>
 
-diff between originals. if you don't give version.
-diff between the previous latest original and the latest original.
+C<diff> between originals. if you don't give version.
+C<diff> between the previous latest original and the latest original.
 
-=item -t/--translation
+=item C<-t/--translation>
 
-diff between translations. if you don't give version.
-diff between the previous latest translation and the latest translation.
+C<diff> between translations. if you don't give version.
+C<diff> between the previous latest translation and the latest translation.
 
-=item -v/--version
+=item C<-v/--version>
 
 specify version like this.
 
@@ -412,7 +412,7 @@ Merge manually.
 
  tran merge TRANSLATION_REPOSITORY OLDER_ORIGINAL_FILE NEWER_ORIGINAL_FILE OLDER_TRANSLATION_FILE NEWER_TRANSLATION_FILE
 
-Normally start command does merge automaticaly. But, in some case, it cannot do merge.
+Normally start command does merge automatically. But, in some case, it cannot do merge.
 For example, directory structure is difference between older and newer.
 
 VCS::Lite 0.04's directory structure.
@@ -433,9 +433,9 @@ You can merge manually using this command.
 
 The merged result is written to VCS-Lite-0.09/lib/VCS/Lite.pod.
 If you don't pass newer translation file as last argument,
-The merged result is outputed to STDOUT.
+The merged result is outputted to STDOUT.
 
-You can use absorute path or relative path.
+You can use absolute path or relative path.
 Relative paths are from original repository's directory for original,
 from translation repository's directory for translation.
 
@@ -450,15 +450,15 @@ show list of files.
 
 =item no option
 
-show list of files in original repositry.
+show list of files in original repository.
 
-=item -t/--translation
+=item C<-t/--translation>
 
-show list of files in translation repositry.
+show list of files in translation repository.
 
-=item --tr/--translation_repository
+=item C<--tr/--translation_repository>
 
-As an argument, the name of translation repositry(e.g. jprp-modules)
+As an argument, the name of translation repository(e.g. C<jprp-modules>)
 If TARGET is not given, show directories in translation repository.
 
 =back
@@ -471,11 +471,11 @@ display content of file
 
 =over 4
 
-=item -t/--translation
+=item C<-t/--translation>
 
-show file content which is in trnslation repository.
+show file content which is in translation repository.
 
-=item -n/--number
+=item C<-n/--number>
 
 show file content with line number.
 

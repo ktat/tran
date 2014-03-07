@@ -6,7 +6,7 @@ Tran::Manual::Extend - manual to extend tran
 
 Tran is not only for translation of Perl modules.
 If you create subclass of Tran::Resource and Tran::Repository,
-tran can work well for other resource or other translation repostiory.
+tran can work well for other resource or other translation repository.
 
 In this manual, I'll explain the way to make subclass.
 
@@ -30,7 +30,7 @@ You have to implement the following method.
 =head2 get
 
 implement getting the original of targets and saving it to original repository.
-Its argumetns are:
+Its arguments are:
 
  $resource->get($target [, $version]);
 
@@ -48,11 +48,11 @@ If not,
 
 The following is special case:
 If you want to change target name from the target which user inputted, you should pass arrayref as last return values.
-The first arugument is new target name and the second is the path of the target file(currently, only 1 file is supported).
+The first argument is new target name and the second is the path of the target file(currently, only 1 file is supported).
 
  ['target_name', 'file_path']
 
-The case of the resource 'Cpan', perlootut is Perl's core document, so target is regarded as 'perl'.
+The case of the resource 'Cpan', C<perlootut> is Perl's core document, so target is regarded as 'perl'.
 
  (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
 
@@ -60,8 +60,8 @@ This array reference is used for checking version.
 
  $repository->has_version($target, $version[, $optional_path]);
 
-If $optional_path('perlootut.pod') exists, it checks whether version directory exists
-and whether $optional_path exists.
+If C<$optional_path('perlootut.pod')> exists, it checks whether version directory exists
+and whether C<$optional_path> exists.
 
 For example:
 
@@ -131,7 +131,7 @@ for example, JPA:
 
  $translation->has_target($target);
 
-It checks whether translation repositry has target.
+It checks whether translation repository has target.
 If exists, it returns 1 otherwise 0.
 This method doesn't check version.
 
@@ -139,7 +139,7 @@ This method doesn't check version.
 
  $translation->copy_option
 
-It returns the options when tra copy/merge orginal repository to translation repository.
+It returns the options when tran copy/merge original repository to translation repository.
 As an example, the following is Translation::JprpModules options.
 
  sub copy_option {
@@ -151,7 +151,7 @@ As an example, the following is Translation::JprpModules options.
           };
  }
 
-ignore_path is path wihch will ignores when copy & merge.
+ignore_path is path which will ignores when copy & merge.
 contents_filter is function reference, if you need changing original file when copy to translation repository.
 name_filter is used if file name has to be changed when copy to translation repository.
 
@@ -161,7 +161,7 @@ The arguments of contents_filter are:
 
 This returns modified $content.
 
-The areguments of name_filter:
+The arguments of name_filter:
 
  $name_filter->($self, $name);
 
@@ -197,7 +197,7 @@ This class is optional.
 =head2 Translation Repostiory for Private Project
 
 tran includes C<~/.tran/lib/> in library path.
-For example, I put the follwoing module for L<KiokuDB>.
+For example, I put the following module for L<KiokuDB>.
 
  package Tran::Repository::Translation::KiokuDb;
  

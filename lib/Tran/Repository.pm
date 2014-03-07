@@ -183,11 +183,11 @@ This method's behavior is depend on C<path_format>.
 
 =item path_format returns undef
 
-returns repositorry's directory.
+returns repository's directory.
 
 =item path_format returns empty string
 
-if target name is 'AAA::BBB', it retunrs:
+if target name is 'AAA::BBB', it returns:
 
  /path/to/repository/directory/AAA-BBB
 

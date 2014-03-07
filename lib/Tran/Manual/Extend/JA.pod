@@ -56,7 +56,7 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
  ['target_name', 'file_path']
 
-Cpanリソースの場合、perltoot は Perlのコアドキュメントなので、ターゲットは perl とみなします。
+Cpanリソースの場合、C<perltoot> は Perlのコアドキュメントなので、ターゲットは perl とみなします。
 
  (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
 
@@ -64,8 +64,8 @@ Cpanリソースの場合、perltoot は Perlのコアドキュメントなの�
 
  $repository->has_version($target, $version[, $optional_path]);
 
-もし$optional_path('perlootut.pod')がある場合、バージョンディレクトリがあるかどうかと、
-$optional_pathがあるかどうかも調べます。
+もし C<$optional_path('perlootut.pod')> がある場合、バージョンディレクトリがあるかどうかと、
+C<$optional_path>があるかどうかも調べます。
 
 例えば:
 
@@ -300,7 +300,7 @@ File::Slurp, File::Find, File::Copy の関数を export します。
  use Tran::Util -string;
 
 tranで使われる、クラス名と設定ファイル内の名前との相互変換のための、
-camelize, decamelizeを export します。
+C<camelize>, C<decamelize> を export します。
 
  camelize('abc-def'); # AbcDef
  decamelize('AbcDef'); # abc-def
