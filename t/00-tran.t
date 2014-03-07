@@ -9,7 +9,7 @@ use strict;
 my @translation_repos  = qw/Jpa JprpCore JprpModules ModulePodJpModules/;
 my @original_resources = 'Cpan';
 my @original_repos     = 'directory';
-ok(my $tran = Tran->new("t/.tran/config.yml"));
+ok(my $tran = Tran->new("t/_tran/config.yml"));
 
 is(ref $tran->original_repository, 'Tran::Repository::Original');
 is(ref $tran->log, 'Tran::Log::Null');
@@ -29,7 +29,7 @@ subtest config =>
     my $config = $tran->config;
     is_deeply($config->profile, {name => 'Kato Atsushi', email => 'ktat at example.jp'});
     is($config->default_resource, 'cpan');
-    is($config->{file}, 't/.tran/config.yml');
+    is($config->{file}, 't/_tran/config.yml');
     is_deeply([sort keys %{$config->translation_repository}], [map decamelize($_), @translation_repos]);
     is_deeply([sort keys %{$config->original_repository}], [map decamelize($_), @original_repos]);
     is_deeply([sort keys %{$config->resources}], [map decamelize($_), @original_resources]);

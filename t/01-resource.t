@@ -4,7 +4,7 @@ use lib qw(lib t/lib);
 
 use Tran;
 
-my $tran = Tran->new('./t/.tran/config.yml');
+my $tran = Tran->new('./t/_tran/config.yml');
 
 my %resource;
 my $cpan    = $tran->resource('Cpan');

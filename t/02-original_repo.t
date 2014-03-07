@@ -10,7 +10,7 @@ use File::Path qw/make_path/;
 my @translation_repos  = qw/Jpa JprpCore JprpModules ModulePodJpModules/;
 my @original_resources = 'Cpan';
 my @original_repos     = 'directory';
-ok(my $tran = Tran->new("t/.tran/config.yml"));
+ok(my $tran = Tran->new("t/_tran/config.yml"));
 
 subtest original_repo => sub {
   my $o = $tran->original_repository;
