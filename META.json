@@ -75,7 +75,7 @@
             "LWP::Simple" : "0",
             "MetaCPAN::API" : "0",
             "Module::Build" : "3.07",
-            "Module::CoreList" : "0",
+            "Module::CoreList" : "3.07",
             "Module::Pluggable" : "0",
             "Storable" : "0",
             "Text::Diff" : "0",
