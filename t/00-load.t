@@ -10,6 +10,7 @@ BEGIN {
 
 diag( "Testing Tran $Tran::VERSION, Perl $], $^X" );
 
-use File::Path;
+use File::Path qw/rmtree make_path/;
 rmtree('t/.tran/original');
+make_path('t/.tran/original');
 
