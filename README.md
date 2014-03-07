@@ -68,7 +68,7 @@ return Tran::Repository::Translation::\* object.
 
     $tran->translation_repository;
 
-return hashref which containts translation name and its object.
+return hashref which contains translation name and its object.
 
 ## notify
 
