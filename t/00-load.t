@@ -2,6 +2,7 @@ package _testing_;
 
 use Moose;
 use Test::More tests => 1;
+use lib qw(./lib);
 
 BEGIN {
     use_ok( 'Tran' );

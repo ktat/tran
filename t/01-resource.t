@@ -1,6 +1,6 @@
 use Test::More;
 use strict;
-use lib qw(t/lib);
+use lib qw(lib t/lib);
 
 use Tran;
 
