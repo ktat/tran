@@ -47,6 +47,12 @@ sub _get_content_from_url {
 
 Tran::Resource::Github - base class for getting github content with URL
 
+=head1 DESCRIPTION
+
+This reource is special version of Tran::Resource::Website.
+Of cource files put on github are managed with git, so you can use Resource::Git instead.
+But if you want to translate git resource as just a website, use this resource.
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>
