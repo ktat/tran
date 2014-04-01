@@ -59,3 +59,6 @@ resource:
   git:
     translation: module-pod-jp-articles
     targets: {}
+  github:
+    translation: module-pod-jp-articles
+    targets: {}
