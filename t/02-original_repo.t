@@ -1,6 +1,5 @@
 BEGIN { $ENV{HOME} = './t/'; }
 use Test::More;
-use Test::Pretty;
 use lib qw(lib t/lib);
 use Tran;
 use Tran::Util -string;
