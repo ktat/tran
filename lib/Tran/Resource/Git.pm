@@ -20,14 +20,14 @@ sub get {
 
   my $original_dir = $self->original_repository->resource_directory;
   my $path = $target;
-
-  $path =~ s{^([a-z]+)\:/+}{$1+};
-
+  $path =~ s{^([a-z]+)\:/+}{};
   $path = path_join $original_dir, $path, $version;
-  make_path($path) if ! -d $path;
-
-  qx{git clone --branch $version --depth 1 $target $path};
-
+  if (! -d $path) {
+    make_path($path);
+    qx{git clone --branch $version --depth 1 $target $path};
+  } else {
+    qx{git pull};
+  }
   $self->info("$target is stored to $path.");
 
   return(1, $self->target_translation($target), version->new($version));
@@ -35,7 +35,7 @@ sub get {
 
 sub target_path {
   my ($self, $target) = @_;
-  $target =~ s{^([a-z]+)\:/+}{$1+};
+  $target =~ s{^([a-z]+)\:/+}{};
   return $target;
 }
 

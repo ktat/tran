@@ -44,9 +44,8 @@ sub original_repository {
 
 sub target_translation {
   my ($self, $target) = @_;
-  confess("Configuration may be wrong(no targets).") unless $self->targets;
-  my $t = $self->targets->{$target};
-  if (defined $t) {
+  confess("Configuration may be wrong(no targets).") if not $self->targets and not $self->translation;
+  if (defined $target and my $t = $self->targets->{$target}) {
     return $t->{translation} || $self->translation;
   } else {
     return $self->translation;
