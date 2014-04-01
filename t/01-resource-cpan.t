@@ -1,8 +1,13 @@
 use Test::More;
 use strict;
 use lib qw(lib t/lib);
+use File::Path qw/remove_tree/;
 
 use Tran;
+
+if (-d "./t/.tran/original/cpan/") {
+  remove_tree './t/.tran/original/cpan/';
+}
 
 my $tran = Tran->new('./t/_tran/config.yml');
 
@@ -25,7 +30,6 @@ subtest 'get core document' => sub {
 
 subtest 'get module' => sub {
   my $cpan = $tran->resource('Cpan');
-  is $cpan->config->{metafile}, './t/.cpan/Metadata';
   my ($file, $version) = $cpan->get_module_info_from_metacpan('ExportTo');
   is($version, '0.03');
   is($file, 'http://cpan.metacpan.org/authors/id/K/KT/KTAT/ExportTo-0.03.tar.gz');
