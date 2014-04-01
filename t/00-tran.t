@@ -7,7 +7,7 @@ use Tran::Util -string;
 use strict;
 
 my @translation_repos  = qw/Jpa JprpCore JprpModules ModulePodJpModules/;
-my @original_resources = 'Cpan';
+my @original_resources = qw/Cpan Git Website/;
 my @original_repos     = 'directory';
 ok(my $tran = Tran->new("t/_tran/config.yml"));
 
@@ -18,7 +18,7 @@ is($tran->encoding, 'utf8');
 foreach my $r (qw/Cpan/) {
   is(ref $tran->resource($r), 'Tran::Resource::' . $r);
 }
-is_deeply([sort keys %{$tran->resources}], [@original_resources]);
+is_deeply([sort keys %{$tran->resources}], [sort @original_resources]);
 is_deeply(ref $tran->original, 'Tran::Repository::Original');
 foreach my $t (@translation_repos) {
   is(ref $tran->translation_repository->{decamelize($t)}, 'Tran::Repository::Translation::' . $t);
