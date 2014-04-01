@@ -29,7 +29,8 @@ sub run {
   my $tran = $self->app->tran;
   my $resource = $tran->resource(camelize $resource_name);
   my ($old_path, $new_path);
-  my $translation = $tran->translation_repository($resource->target_translation($target));
+
+  my $translation = $tran->translation_repository($tran->get_sticked_translation($target, $opt->{resource}) || $resource->target_translation($target));
   my $mode = 0;
   if ($opt->{translation}) {
     $mode = 1;
