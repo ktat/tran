@@ -40,7 +40,6 @@ repository:
     merge_method: cmpmerge_least
 resource:
   cpan:
-    metafile: ./t/.cpan/Metadata
     target_only:
     - '*.pm'
     - '*.pod'
@@ -53,3 +52,10 @@ resource:
         translation: jprp-core
     translation: module-pod-jp-modules
 #   translation: jprp-modules
+  website:
+    scraper: {}
+    targets: {}
+    translation: module-pod-jp-articles
+  git:
+    translation: module-pod-jp-articles
+    targets: {}
