@@ -12,10 +12,13 @@ sub abstract { 'show diffrence'; }
 
 sub opt_spec {
   return (
-          ['resource|r=s', "resource. required if not set default_resource in config." ],
+          ['resource|r=s' , "resource. required if not set default_resource in config." ],
           ['translation|t', "show difference from translation repository" ],
-          ['original|o', "show difference from original repository" ],
-          ['version|v=s', "old_version / old_version:new_version" ],
+          ['original|o'   , "show difference from original repository" ],
+          ['trim'         , "remove whitespaces before and after" ],
+          ['strip_class'  , "remove class in HTML tag" ],
+          ['strip_tag'    , "remove HTML tag" ],
+          ['version|v=s'  , "old_version / old_version:new_version" ],
          );
 }
 
@@ -37,7 +40,7 @@ sub run {
     $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between translation $version1 and translation $version2");
-    $self->_diff($mode, $translation, $old_path, $new_path, {}, \@files);
+    $self->_diff($opt, $mode, $translation, $old_path, $new_path, {}, \@files);
   } elsif ($opt->{original}) {
     $mode = 2;
     my $copy_option = $translation->copy_option;
@@ -45,19 +48,19 @@ sub run {
     $old_path = $original->path_of($target, $version1 ||= $original->prev_version($target));
     $new_path = $original->path_of($target, $version2 ||= $original->latest_version($target));
     $self->debug("diff between original $version1 and original $version2");
-    $self->_diff($mode, $translation, $old_path, $new_path, $copy_option, \@files);
+    $self->_diff($opt, $mode, $translation, $old_path, $new_path, $copy_option, \@files);
   } else {
     my $original = $resource->original_repository;
     my $copy_option = $translation->copy_option;
     $old_path = $original->path_of($target   , $version1 ||= $original->latest_version($target));
     $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
     $self->debug("diff between original $version1 and translation $version2");
-    $self->_diff($mode, $translation, $old_path, $new_path, $copy_option, \@files);
+    $self->_diff($opt, $mode, $translation, $old_path, $new_path, $copy_option, \@files);
   }
 }
 
 sub _diff {
-  my ($self, $mode, $translation, $old_path, $new_path, $copy_option, $files) = @_;
+  my ($self, $diff_option, $mode, $translation, $old_path, $new_path, $copy_option, $files) = @_;
 
   my $files_match;
   if (@$files) {
@@ -146,6 +149,21 @@ sub _diff {
           }
 
           my $new_content = encoding_slurp("$_new_file", $enc) or return;
+
+	  if ($diff_option->{strip_class}) {
+	    $new_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
+	    $old_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
+	  }
+	  if ($diff_option->{strip_tag}) {
+	    $new_content =~ s{<[^<]+?>}{}gs;
+	    $old_content =~ s{<[^<]+?>}{}gs;
+	  }
+	  if ($diff_option->{trim}) {
+	    $new_content =~ s{^[\s\t]+}{}gm;
+	    $new_content =~ s{[\s\t]+$}{}gm;
+	    $old_content =~ s{^[\s\t]+}{}gm;
+	    $old_content =~ s{[\s\t]+$}{}gm;
+	  }
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
           }
