@@ -52,6 +52,8 @@ sub target_translation {
   }
 }
 
+sub not_omit_last_name { 0 }
+
 1;
 
 =head1 NAME
