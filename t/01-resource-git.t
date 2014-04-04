@@ -4,6 +4,7 @@ use lib qw(lib t/lib);
 use File::Path qw/remove_tree/;
 use Cwd qw/cwd/;
 use File::Slurp qw/slurp/;
+use Tran::Util -os;
 
 use Tran;
 
@@ -14,8 +15,8 @@ foreach my $dir (qw(t/git_test t/git_clone)) {
   mkdir $dir or die "cannot mkdir $dir";
 }
 
-if ($^O !~ m{linux}i and $^O != m{bsd}i  and $^O != m{darwin}i) {
-  plan 'skip_all', "test can be run on Linux/BSD/Mac OS X only.";
+if (not like_unix()) {
+  plan 'skip_all', "test can be run on OS like Unix.";
   exit 1;
 }
 

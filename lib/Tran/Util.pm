@@ -100,6 +100,16 @@ our $Utils = {
                           }
                          }
                         },
+              '-os' => {
+                         'Perl::OSType',
+                         {
+			  like_unix => sub {
+			    sub {
+			      return Perl::OSType::is_os_type('Unix');
+			    }
+			  }
+			 }
+			},
              };
 
 1;

@@ -24,7 +24,7 @@ subtest 'get github web page' => sub {
   my $cwd = cwd();
   my $index_file = $cwd . '/t/.tran/original/github/github.com/ktat/tran/blob/master/'. $date . '/README.md';
   ok -e $index_file, 'got HTML';
-  ok slurp($index_file) =~ m{Version Control for Translation}, "HTML contains 'Version Control for Translation'";
+  ok slurp($index_file) =~ m{Tran::Manual - manual of tran}, "HTML contains 'Tran::Manual - manual of tran'";
 };
 
 done_testing;

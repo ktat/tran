@@ -4,9 +4,10 @@ use warnings;
 use strict;
 use Tran::Cmd -command;
 use Tran;
-use Tran::Util -common, -debug, -string;
+use Tran::Util -common, -debug, -string, -os ;
 use Text::Diff ();
 use File::Find qw/find/;
+use Term::ANSIColor;
 
 sub abstract { 'show diffrence'; }
 
@@ -18,6 +19,8 @@ sub opt_spec {
           ['trim'         , "remove whitespaces before and after" ],
           ['strip_class'  , "remove class in HTML tag" ],
           ['strip_tag'    , "remove HTML tag" ],
+          ['diff_cmd|x=s' , "use external diff command. ex: diff_cmd='diff -w -u'" ],
+          ['use_pager'    , "use TRAN_PAGER as pager even if using --cmd option" ],
           ['version|v=s'  , "old_version / old_version:new_version" ],
          );
 }
@@ -74,7 +77,7 @@ sub _diff {
   my $wanted;
   my $enc = $translation->encoding;
   my $out;
-  if ($ENV{TRAN_PAGER}) {
+  if (not $diff_option->{diff_cmd} and $ENV{TRAN_PAGER}) {
     open $out, "|-", $ENV{TRAN_PAGER} or $self->fatal("cannot open '$ENV{TRAN_PAGER}' with mode '|-'");
   } else {
     $out = *STDOUT;
@@ -94,6 +97,8 @@ sub _diff {
             $self->info("$new_file is skipped");
             return;
           }
+          use_diff_cmd($old_file, $new_file) and return;;
+
           my $new_content = encoding_slurp($new_file, $enc) or return;
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $new_file\n$diff\n\n";
@@ -116,6 +121,9 @@ sub _diff {
         my ($result2, $_new_file, $new_content)
           = $translation->_apply_copy_option($new_file, $copy_option, $new_path, $new_path);
         return if not $result2;
+
+        use_diff_cmd($diff_option, $old_file, $_new_file) and return;;
+
         if (defined $files_match and not $_new_file =~ qr/$files_match/) {
           $self->info("$_new_file is skipped");
           return;
@@ -148,22 +156,24 @@ sub _diff {
             return;
           }
 
+          use_diff_cmd($diff_option, $old_file, $_new_file) and return;
+
           my $new_content = encoding_slurp("$_new_file", $enc) or return;
 
-	  if ($diff_option->{strip_class}) {
-	    $new_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
-	    $old_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
-	  }
-	  if ($diff_option->{strip_tag}) {
-	    $new_content =~ s{<[^<]+?>}{}gs;
-	    $old_content =~ s{<[^<]+?>}{}gs;
-	  }
-	  if ($diff_option->{trim}) {
-	    $new_content =~ s{^[\s\t]+}{}gm;
-	    $new_content =~ s{[\s\t]+$}{}gm;
-	    $old_content =~ s{^[\s\t]+}{}gm;
-	    $old_content =~ s{[\s\t]+$}{}gm;
-	  }
+          if ($diff_option->{strip_class}) {
+            $new_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
+            $old_content =~ s{(<.+?) class\s*=\s*(["']).+?\2(.*?>)}{$1$3}g;
+          }
+          if ($diff_option->{strip_tag}) {
+            $new_content =~ s{<[^<]+?>}{}gs;
+            $old_content =~ s{<[^<]+?>}{}gs;
+          }
+          if ($diff_option->{trim}) {
+            $new_content =~ s{^[\s\t]+}{}gm;
+            $new_content =~ s{[\s\t]+$}{}gm;
+            $old_content =~ s{^[\s\t]+}{}gm;
+            $old_content =~ s{[\s\t]+$}{}gm;
+          }
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
             print $out "--- $old_file\n+++ $_new_file\n$diff\n\n";
           }
@@ -174,6 +184,31 @@ sub _diff {
     }
   }
   File::Find::find({no_chdir => 1, wanted => $wanted}, $old_path,);
+}
+
+sub use_diff_cmd {
+  my ($diff_option, $old_file, $new_file) = @_;
+  if (my $cmd = $diff_option->{diff_cmd}) {
+    if (-f $old_file and -f $new_file) {
+      my $command = "$cmd '$old_file' '$new_file'";
+      if (like_unix()) {
+	$command = 'clear; ' . $command;
+	if ($diff_option->{use_pager}) {
+	  $command .= " | " . $ENV{TRAN_PAGER}
+	}
+      }
+      system $command;
+
+      print STDERR color('green');
+      print STDERR "Enter to continue or type 'q' to exit: ";
+      print STDERR color('reset');
+      chomp(my $input = <STDIN>);
+
+      exit if $input eq 'q';
+    }
+    return 1;
+  }
+  return;
 }
 
 sub usage_desc {
