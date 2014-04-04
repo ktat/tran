@@ -80,6 +80,8 @@ see Tran::Manual::Extend
 
 =head2 target_translation
 
+=head2 not_omit_last_name
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>
