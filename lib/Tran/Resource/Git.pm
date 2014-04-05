@@ -50,6 +50,10 @@ sub _config {
 
 Tran::Resource::Git - base class for getting git repository
 
+=head1 SYNOPSIS
+
+ tran start -r git -t jprp-articles git@github.com:tokuhirom/plenv.git 2.1.1
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>

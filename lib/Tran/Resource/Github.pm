@@ -47,6 +47,10 @@ sub _get_content_from_url {
 
 Tran::Resource::Github - base class for getting github content with URL
 
+=head1 SYNOPSIS
+
+ tran start -r github https://github.com/tokuhirom/plenv/blob/master/README.md
+
 =head1 DESCRIPTION
 
 This resource is special version of Tran::Resource::Website.

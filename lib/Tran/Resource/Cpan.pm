@@ -388,6 +388,11 @@ sub _config {
 
 Tran::Resource::Cpan - for CPAN
 
+=head1 SYNOPSIS
+
+ tran start -r cpan -t module-pod-jp Minilla
+ tran start -r cpan -t jprp-core perlootut v5.19.1
+
 =head1 CAUTION
 
 If you want to start translation of perl core document or the modules in perl distribution.

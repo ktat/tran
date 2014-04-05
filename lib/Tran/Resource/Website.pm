@@ -147,6 +147,10 @@ sub _config {
 
 Tran::Resource::Website - base class for getting web site with URL
 
+=head1 SYNOPSIS
+
+ tran start -r website -t jprp-articles http://qntm.org/files/perl/perl.html
+
 =head1 AUTHOR
 
 Ktat, C<< <ktat at cpan.org> >>
