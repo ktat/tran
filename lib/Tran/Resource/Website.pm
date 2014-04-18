@@ -145,7 +145,7 @@ sub _config {
 
 =head1 NAME
 
-Tran::Resource::Website - base class for getting web site with URL
+Tran::Resource::Website - for Website
 
 =head1 SYNOPSIS
 

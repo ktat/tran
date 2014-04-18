@@ -3,7 +3,8 @@ package Tran::Resource;
 use warnings;
 use strict;
 use Carp qw/confess/;
-use Tran::Util -common, -debug;
+use Tran::Util -common, -debug, -string;
+use File::Spec qw/path_join/;
 
 sub new {
   my ($class, %self) = @_;
@@ -17,9 +18,21 @@ sub new {
   bless \%self, $class;
 }
 
+sub name {
+  my ($self) = @_;
+  my $name = ref $self;
+  $name =~ s{^Tran::Resource::}{};
+  decamelize $name;
+}
+
 sub get {
   # getting target in resource
   die;
+}
+
+sub has_target {
+  my ($self, $target) = @_;
+  return $self->original_repository->has_target($target);
 }
 
 sub config {
@@ -54,6 +67,35 @@ sub target_translation {
 
 sub not_omit_last_name { 0 }
 
+sub find_target_resource {
+  my ($self, $target) = @_;
+  my $resource;
+  if (not $self->has_target($target)) {
+    my $resource_found = 0;
+    my $tran = $self->{tran};
+
+    foreach my $r (keys %{$self->{tran}->resources}) {
+      next if camelize $r eq ref $self;
+
+      $resource = $tran->resource($r);
+      if ($resource->has_target($target)) {
+	$resource_found = 1;
+	last;
+      }
+    }
+    if (not $resource_found) {
+      $self->fatal("$target is not in any resource");
+    }
+  }
+  return $resource;
+}
+
+sub find_translation_repository {
+  my ($self, $target) = @_;
+  my $tran = $self->{tran};
+  return $tran->translation_repository($self->target_translation($target) || $tran->get_sticked_translation($target, $self->name || $self->target_translation($target)));
+}
+
 1;
 
 =head1 NAME
@@ -68,6 +110,8 @@ see Tran::Manual::Extend
 
 =head2 new
 
+=head2 name
+
 =head2 get
 
 =head2 config
@@ -76,11 +120,23 @@ see Tran::Manual::Extend
 
 =head2 translation
 
+=head2 has_target
+
 =head2 original_repository
 
 =head2 target_translation
 
+ $resoruce->target_translation($target);
+
 =head2 not_omit_last_name
+
+=head2 find_target_resource
+
+ $resoruce->find_resource($target);
+
+=head2 find_translation_repository
+
+ $resoruce->find_translation_repository($target);
 
 =head1 AUTHOR
 

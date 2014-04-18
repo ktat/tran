@@ -12,7 +12,7 @@ sub abstract { 'start new translation'; }
 
 sub opt_spec {
   return (
-          ['resource|r=s', "resource. required." ],
+          ['resource|r=s', "resource." ],
           ['translation|t=s', "translation repository. optional." ],
           ['force|f'   , "forcely start translation even if translation exists" ],
          );
@@ -100,7 +100,11 @@ sub usage_desc {
 }
 
 sub validate_args {
-  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
+  my ($self, $opt, $args) = @_;
+  unless ($opt->{resource} ||= $self->app->tran->config->default_resource) {
+    $self->usage_error("-r option is required or you can set default_resource in you ~/.tran/config.yml");
+  }
+  $self->Tran::Cmd::_validate_args_resource($opt, $args, 1);
 }
 
 1;

@@ -14,32 +14,27 @@ sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
           ['translation|t', "list translation directory contents" ],
-          ['translation_repository|tr=s', "translation repository name(imply -t)" ],
+          ['version|s', "specify version" ],
          );
 }
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($target, $version, @rest) = @$args;
+  my ($target, @rest) = @$args;
+  my $version = $opt->{version};
+
   my $resource = camelize($opt->{resource});
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $repo;
-  my $path;
-  if ($opt->{translation_repository}) {
-    $repo = $tran->translation_repository(decamelize($opt->{translation_repository}));
-    if (defined $repo) {
-      $path = $repo->directory;
-    } else {
-      my @repos = keys %{$tran->config->{config}->{repository}->{translation}};
-      die $opt->{translation_repository} . " is not translation ripository\nYou can use " . join(', ', @repos) . "\n";
-    }
-  } else {
-    $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
+  if (not $r->has_target($target)) {
+    $r = $r->find_target_resource($target);
   }
+  my $path;
+  my $repo = $opt->{translation} ? $r->find_translation_repository($target) : $r->original_repository;
+
   if (defined $target and $target) {
-    $path = $repo->path_of($target, $version);
+    $path = $repo->path_of($target, $version || $repo->latest_version($target));
     my $rest_path = path_join @rest;
     $path = path_join $path, $1 if $rest_path =~m{^/?(.+)$};
   }
@@ -56,19 +51,13 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran ls -r RESOURCE TARGET [VERSION] path/to/anywhere' . "\n"
-       . 'tran ls --tr translation-repository' . "\n";
+  return 'tran ls [OPTIONS] TARGET path/to/anywhere';
 }
 
 sub validate_args {
   my $self = shift;
   my ($opt, $args) = @_;
-  unless ($opt->{translation_repository}) {
-    $self->Tran::Cmd::_validate_args_resource(@_, 1);
-  } else {
-    $opt->{translation} = 1;
-    $self->Tran::Cmd::_validate_args_resource(@_, 0);
-  }
+  $self->Tran::Cmd::_validate_args_resource(@_, 1);
 }
 
 

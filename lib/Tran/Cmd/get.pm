@@ -23,6 +23,10 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
+  if (not $r->has_target($target)) {
+    my $r_test = $r->find_target_resource($target);
+    $r = $r_test if $r_test;
+  }
   my ($result, @result) = $r->get($target, $version, @rest);
 
   my $optional_path;

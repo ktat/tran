@@ -48,7 +48,7 @@ sub _config {
 
 =head1 NAME
 
-Tran::Resource::Git - base class for getting git repository
+Tran::Resource::Git - for Git repository
 
 =head1 SYNOPSIS
 

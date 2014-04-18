@@ -5,9 +5,15 @@ use strict;
 use Tran::Util -debug, -string, -common, -file;
 use Class::Inspector;
 use Tran::Log;
+use Scalar::Util qw/weaken/;
 use Module::Pluggable search_path => ['Tran'], require => 1;
 
-__PACKAGE__->plugins;
+my @RESOURCES;
+foreach my $plugin (__PACKAGE__->plugins) {
+  if ($plugin =~ m{^Tran::Resource::(.+)$}) {
+    push @RESOURCES, $1;
+  }
+}
 
 sub new {
   my ($class, $config_file) = @_;
@@ -23,15 +29,16 @@ sub new {
 
   $self->{original} = $original_repository;
 
-  foreach my $kind (keys %{$config->resources}) {
-    $kind = camelize($kind);
+  foreach my $kind (@RESOURCES) {
     my $class = "Tran::Resource::$kind";
     $self->{resource}->{$kind} = $class->new
       (
+       tran => $self,
        log  => $log,
        original => $original_repository,
        config => $config->resources->{decamelize($kind)},
       );
+    weaken $self->{resource}->{$kind}->{tran};
   }
   my $merge_method = delete $self->config->translation_repository->{merge_method} || '';
   foreach my $key (keys %{$self->config->translation_repository}) {

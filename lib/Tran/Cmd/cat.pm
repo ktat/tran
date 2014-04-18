@@ -14,30 +14,34 @@ sub opt_spec {
   return (
           ['resource|r=s', "resource. required." ],
           ['translation|t', "show translation file" ],
-          ['translation_repository|tr=s', "imply -t. only make it easy to use this after ls" ],
           ['number|n', "show content with line number" ],
+          ['version|s', "specify version" ],
          );
 }
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($target, $version, @rest) = @$args;
+  my ($target, @rest) = @$args;
+  my $version = $opt->{version};
+
   if (defined $version and ($version =~m{/} or $version =~m{.pod$} or $version =~m{.pm})) {
     ($target, @rest) = @$args;
     undef $version;
   }
   my $resource = camelize($opt->{resource});
 
-  $opt->{translation} = $opt->{translation_repository};
-
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $repo = $opt->{translation} ? $tran->translation_repository($r->target_translation($target)) : $r->original_repository;
+  if (not $r->has_target($target)) {
+    $r = $r->find_target_resource($target);
+  }
+  my $repo = $opt->{translation} ? $r->find_translation_repository($target) : $r->original_repository;
   my $path = $repo->path_of($target, $version || $repo->latest_version($target));
   my $rest_path = path_join @rest;
   $path = path_join $path, $1 if $rest_path =~m{^/?(.+)$};
+
   my $out;
-  if (-f $path or -e ($opt->{translation} ? ($path .= '.pod') : ($path .= '.pm'))) {
+  if (-f $path) {
     if ($ENV{TRAN_PAGER}) {
       open $out, "|-", $ENV{TRAN_PAGER} or $self->fatal("cannot open '$ENV{TRAN_PAGER}' with mode '|-'");
     } else {
@@ -55,11 +59,11 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran cat -r RESOURCE TARGET [OPTION] [VERSION] path/to/anywhere';
+  return 'tran cat [OPTIONS] TARGET path/to/anywhere';
 }
 
 sub validate_args {
-  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
+  shift()->Tran::Cmd::_validate_args_resource(@_, 2);
 }
 
 

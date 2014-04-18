@@ -5,7 +5,7 @@ use strict;
 use Tran::Util -common;
 use Tran::Cmd -command;
 
-sub abstract {  'finish translation'; }
+sub abstract {  'finish translation(not yet implemented)'; }
 
 sub run {
   CORE::warn "not yet implemented";

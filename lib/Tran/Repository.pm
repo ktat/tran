@@ -13,6 +13,10 @@ sub one_dir {
                      (ref $self || $self),
                      path_of => \&path_of_one_dir,
                     );
+  install_subroutine(
+                     (ref $self || $self),
+                     is_one_dir => sub { 1 },
+                    );
 }
 
 sub new {

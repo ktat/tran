@@ -35,9 +35,6 @@ sub prompt {
 
 sub _validate_args_resource {
   my ($self, $opt, $args, $n) = @_;
-  unless ($opt->{resource} ||= $self->app->tran->config->default_resource) {
-    $self->usage_error("-r option is required or you can set default_resource in you ~/.tran/config.yml");
-  }
   $self->usage_error("arguments are not enough.")  if @$args < $n;
 }
 

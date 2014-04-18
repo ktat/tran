@@ -8,7 +8,7 @@ use Tran::Util -common, -debug, -string;
 use File::Path qw/make_path/;
 use IO::Prompt;
 
-sub abstract {  'list directory contents'; }
+sub abstract {  'edit target'; }
 
 sub opt_spec {
   return (
@@ -18,7 +18,10 @@ sub opt_spec {
 
 sub run {
   my ($self, $opt, $args) = @_;
-  my ($target, $version, @rest) = @$args;
+  my ($target, @rest) = @$args;
+
+  my $version = $opt->{version};
+
   if (defined $version and ($version =~m{/} or $version =~m{.pod$})) {
     ($target, @rest) = @$args;
     undef $version;
@@ -30,7 +33,11 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
-  my $repo = $tran->translation_repository($r->target_translation($target));
+  if (not $r->has_target($target)) {
+    $r = $r->find_target_resource($target);
+  }
+  my $repo = $r->find_translation_repository($target);
+
   my $path = $repo->path_of($target, $version || $repo->latest_version($target));
   my $rest_path = path_join @rest;
   $path = path_join $path, $1 if $rest_path =~m{^/?(.+)$};
@@ -43,11 +50,11 @@ sub run {
 }
 
 sub usage_desc {
-  return 'tran cat -r RESOURCE TARGET [OPTION] [VERSION] path/to/anywhere';
+  return 'tran cat [OPTIONS] TARGET path/to/anywhere';
 }
 
 sub validate_args {
-  shift()->Tran::Cmd::_validate_args_resource(@_, 1);
+  shift()->Tran::Cmd::_validate_args_resource(@_, 2);
 }
 
 

@@ -45,7 +45,7 @@ sub _get_content_from_url {
 
 =head1 NAME
 
-Tran::Resource::Github - base class for getting github content with URL
+Tran::Resource::Github - for Github website
 
 =head1 SYNOPSIS
 

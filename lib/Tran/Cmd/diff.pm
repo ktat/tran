@@ -13,6 +13,7 @@ sub abstract { 'show diffrence'; }
 
 sub opt_spec {
   return (
+          ['translation_repository|tr=s', "translation repository"],
           ['resource|r=s' , "resource. required if not set default_resource in config." ],
           ['translation|t', "show difference from translation repository" ],
           ['original|o'   , "show difference from original repository" ],
@@ -33,17 +34,28 @@ sub run {
 
   $| = 1;
   my $tran = $self->app->tran;
+
   my $resource = $tran->resource(camelize $resource_name);
+  if (not $resource->has_target($target)) {
+    $resource = $resource->find_target_resource($target);
+  }
   my ($old_path, $new_path);
 
-  my $translation = $tran->translation_repository($tran->get_sticked_translation($target, $opt->{resource}) || $resource->target_translation($target));
+  $self->debug("resource : " . ref $resource);
+  my $translation = $resource->find_translation_repository($target);
+  $self->debug("translation of '$target': " . ref $translation);
   my $mode = 0;
   if ($opt->{translation}) {
     $mode = 1;
-    $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
-    $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
-    $self->debug("diff between translation $version1 and translation $version2");
-    $self->_diff($opt, $mode, $translation, $old_path, $new_path, {}, \@files);
+    if ($translation->is_one_dir) {
+      $old_path = $translation->path_of($target);
+      $self->fatal("This translaiton cannot use diff. Please use vcs's diff command(ex. git) in `" . $old_path . "'");
+    } else {
+      $old_path = $translation->path_of($target, $version1 ||= $translation->prev_version($target));
+      $new_path = $translation->path_of($target, $version2 ||= $translation->latest_version($target));
+      $self->debug("diff between translation $version1 and translation $version2");
+      $self->_diff($opt, $mode, $translation, $old_path, $new_path, {}, \@files);
+    }
   } elsif ($opt->{original}) {
     $mode = 2;
     my $copy_option = $translation->copy_option;
@@ -212,7 +224,7 @@ sub use_diff_cmd {
 }
 
 sub usage_desc {
-  return 'tran diff [-o/-t] -r RESOURCE TARGET [FILES ...]';
+  return 'tran diff [OPTIONS] TARGET [FILES ...]';
 }
 
 sub validate_args {
@@ -230,7 +242,7 @@ DESC
 
 =head1 NAME
 
-Tran::Cmd::diff - difference of translation/original/original and translation
+Tran::Cmd::diff - show difference of translation/original/original and translation
 
 =head1 AUTHOR
 
