@@ -45,7 +45,7 @@ sub _get_content_from_url {
 
 =head1 NAME
 
-Tran::Resource::Github - for Github website
+Tran::Resource::Github - for Github web site
 
 =head1 SYNOPSIS
 

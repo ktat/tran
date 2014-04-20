@@ -148,6 +148,9 @@ Actually, it put in the following directory.
 
     ~/.tran/original/cpan/Module-Name/0.1/
 
+The translation repository which you specified with `-t` option is recorded as target's default translation repository.
+So you don't need to specify `-t` option when you `start` translation again.
+
 ## 2\. Translate the latest Module::Name.
 
 Time passed, and new version of Module::Name was released.
@@ -300,7 +303,7 @@ But, if you use -f option, force recreate configuration file.
 
 The command when you want to start new translation.
 
-    tran start -r RESOURCE TARGET [VERSION]
+    tran start -r RESOURCE [-t TRNSLATION_REPOSITORY] TARGET [VERSION]
 
 start command will do the following:
 
