@@ -45,9 +45,10 @@ sub run {
   my $translation = $resource->find_translation_repository($target);
   $self->debug("translation of '$target': " . ref $translation);
   my $mode = 0;
+
   if ($opt->{translation}) {
     $mode = 1;
-    if ($translation->is_one_dir) {
+    if ($translation->can('is_one_dir') and $translation->is_one_dir) {
       $old_path = $translation->path_of($target);
       $self->fatal("This translaiton cannot use diff. Please use vcs's diff command(ex. git) in `" . $old_path . "'");
     } else {
@@ -109,7 +110,7 @@ sub _diff {
             $self->info("$new_file is skipped");
             return;
           }
-          use_diff_cmd($old_file, $new_file) and return;;
+          use_diff_cmd($diff_option, $old_file, $new_file) and return;;
 
           my $new_content = encoding_slurp($new_file, $enc) or return;
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
