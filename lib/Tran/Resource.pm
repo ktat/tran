@@ -93,7 +93,7 @@ sub find_target_resource {
 sub find_translation_repository {
   my ($self, $target) = @_;
   my $tran = $self->{tran};
-  return $tran->translation_repository($self->target_translation($target) || $tran->get_sticked_translation($target, $self->name || $self->target_translation($target)));
+  return $tran->translation_repository($tran->get_sticked_translation($target, $self->name || $self->target_translation($target)));
 }
 
 1;

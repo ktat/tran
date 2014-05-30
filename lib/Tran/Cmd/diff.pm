@@ -13,7 +13,6 @@ sub abstract { 'show diffrence'; }
 
 sub opt_spec {
   return (
-          ['translation_repository|tr=s', "translation repository"],
           ['resource|r=s' , "resource. required if not set default_resource in config." ],
           ['translation|t', "show difference from translation repository" ],
           ['original|o'   , "show difference from original repository" ],
