@@ -18,6 +18,11 @@ sub new {
   bless \%self => $class;
 }
 
+sub config {
+  my $self = shift;
+  return $self->{config};
+}
+
 sub connect { die "implement it in subclass" }
 
 sub add_files { die "implement it in subclass" }
@@ -42,7 +47,7 @@ sub files {
 
 sub _method {
   my ($self, $sub, @argv) = @_;
-  chdir($self->wd);
+  chdir($self->wd) or die "cannot change directory to " . $self->wd . " : "  . $!;
   my $vcs = $self->connect;
   my $r;
   if (@_ > 1) {
