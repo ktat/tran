@@ -1,9 +1,11 @@
-package Tran::VCS::Jpa;
+package Tran::VCS::Git;
 
-use strict;
 use Tran::Util -common;
 use base qw/Tran::VCS/;
 use Git::Class;
+
+use strict;
+use warnings;
 
 sub connect {
   my ($self, $target) = @_;
@@ -14,23 +16,6 @@ sub connect {
 sub wd {
   my $self = shift;
   return $self->{wd} . '/'. $self->{plus_path};
-}
-
-sub checkout_target {
-  my ($self, $target_path, $version) = @_;
-  $self->_method
-    (sub {
-       my $git = shift;
-       $target_path .= '-Doc-JA';
-       my $module = $self->relative_path($target_path);
-       my $uri = "git://github.com/jpa/$module.git";
-       $self->{plus_path} = $module;
-       local $@;
-       eval {
-         $git->clone($uri);
-       };
-       return $@ ? 0 : 1;
-     });
 }
 
 sub update {
@@ -78,7 +63,7 @@ sub relative_path {
 
 =head1 NAME
 
-Tran::VCS::Jpa
+Tran::VCS::Git
 
 =head1 AUTHOR
 
@@ -89,7 +74,7 @@ Ktat, C<< <ktat at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010 Ktat.
+Copyright 2014 Ktat.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -100,5 +85,3 @@ See http://dev.perl.org/licenses/ for more information.
 =cut
 
 1; # End of Tran
-
-

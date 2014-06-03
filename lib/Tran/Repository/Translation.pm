@@ -12,7 +12,7 @@ use base qw/Tran::Repository/;
 sub new {
   my ($class, %self) = @_;
   my $o = $class->SUPER::new(%self);
-  if ($class =~s{::Repository::Translation::}{::VCS::}) {
+  if ($class =~s{(::Repository::Translation::[^:+])}{$1::VCS}) {
     if (Class::Inspector->loaded($class)) {
       $o->debug("repository has vcs: $class");
       $o->{vcs} = $class->new(%{$self{config}->{vcs}});

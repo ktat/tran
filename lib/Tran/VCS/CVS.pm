@@ -1,4 +1,7 @@
-package Tran::VCS::JprpModules;
+package Tran::VCS::CVS;
+
+use strict;
+use warnings;
 
 use strict;
 use Tran::Util -common, -file;
@@ -9,14 +12,7 @@ use Cwd qw/cwd/;
 sub new {
   my $class = shift;
   my %opt = @_;
-  my %self = (
-              wd      => $opt{wd},
-              path    => 'docs/modules/',
-              project => '.',
-             );
-  $self{repo} = ":ext:$opt{vcs_user}\@cvs.sourceforge.jp:/cvsroot/perldocjp"
-    if defined $opt{vcs_user};
-  return $class->SUPER::new(%self);
+  return $class->SUPER::new(%opt);
 }
 
 sub connect {
@@ -71,7 +67,7 @@ sub commit {
 
 =head1 NAME
 
-Tran::VCS::JprpModules
+Tran::VCS::Base::CVS
 
 =head1 AUTHOR
 
@@ -94,4 +90,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 1; # End of Tran
 
+
+
+1;
 

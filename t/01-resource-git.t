@@ -8,6 +8,11 @@ use Tran::Util -os;
 
 use Tran;
 
+if (not like_unix()) {
+  plan 'skip_all', "test can be run on OS like Unix.";
+  exit 1;
+}
+
 foreach my $dir (qw(t/git_test t/git_clone)) {
   if (-d $dir) {
     remove_tree $dir;
@@ -15,18 +20,12 @@ foreach my $dir (qw(t/git_test t/git_clone)) {
   mkdir $dir or die "cannot mkdir $dir";
 }
 
-if (not like_unix()) {
-  plan 'skip_all', "test can be run on OS like Unix.";
-  exit 1;
-}
-
-my $cwd = cwd();
-my $result = system(<<_SHELL_);
+my $result = system(<<'_SHELL_');
 (
 cd t/git_test/              || exit 1;
 git init --bare             || exit 1;
 cd -                        || exit 1;
-git clone file:///$cwd/t/git_test t/git_clone || exit 1;
+git clone file:///$(pwd)/t/git_test t/git_clone || exit 1;
 cd t/git_clone              || exit 1;
 touch README                || exit 1;
 git add "README"            || exit 1;
