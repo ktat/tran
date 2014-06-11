@@ -37,8 +37,9 @@ sub update {
 }
 
 sub add_files {
-  my ($self, $target_path) = @_;
-  my @files = $self->files($target_path);
+  my ($self, $path) = @_;
+  $path = $self->relative_path($path) || './';
+  my @files = $self->files(path_join $self->{wd},  $path);
   return $self->_method
     (
      sub {
@@ -53,12 +54,11 @@ sub add_files {
 }
 
 sub commit {
-  my ($self, $path) = @_;
+  my ($self) = @_;
   return $self->_method
     (
      sub {
        my ($cvs) = @_;
-       chdir $path if defined $path;
        $cvs->update;
        $cvs->commit;
      }
@@ -89,8 +89,3 @@ See http://dev.perl.org/licenses/ for more information.
 =cut
 
 1; # End of Tran
-
-
-
-1;
-

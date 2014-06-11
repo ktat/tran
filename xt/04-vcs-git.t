@@ -30,9 +30,9 @@ git clone file:///$(pwd)/t/git_test t/git_clone || exit 1;
 cd t/git_clone || exit 1;
 git config user.email 'test@exapmle.com'
 git config user.name  'test'
-cd -;
+cd - || exit 1;
 touch t/git_clone/test.txt || exit 1;
-) 
+)
 _SHELL_
 
 is $result, 0, "prepare git repository";
@@ -46,6 +46,6 @@ my $vcs = Tran::VCS::Git->new(
 			      wd => 't/git_clone/',
 			     );
 $vcs->add_files();
-$vcs->commit('test.txt');
+$vcs->commit();
 
 done_testing;

@@ -15,7 +15,7 @@ sub connect {
 
 sub wd {
   my $self = shift;
-  return $self->{wd} . '/'. $self->{plus_path};
+  return $self->{wd} . '/'. ($self->{plus_path} || '');
 }
 
 sub update {
@@ -54,12 +54,6 @@ sub commit {
     );
 }
 
-sub relative_path {
-  my ($self, $path) = @_;
-  my $wd = quotemeta($self->{wd});
-  $path =~s{^$wd/?}{};
-  return $path;
-}
 
 =head1 NAME
 

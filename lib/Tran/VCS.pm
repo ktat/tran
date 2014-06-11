@@ -47,7 +47,7 @@ sub files {
 
 sub _method {
   my ($self, $sub, @argv) = @_;
-  chdir($self->wd) or die "cannot change directory to " . $self->wd . " : "  . $!;
+  chdir($self->wd) or Carp::confess "cannot change directory to " . $self->wd . " : "  . $!;
   my $vcs = $self->connect;
   my $r;
   if (@_ > 1) {
@@ -65,6 +65,14 @@ sub wd {
 sub msg {
   my ($self, $method) = @_;
   return $MSG{$method};
+}
+
+sub relative_path {
+  my ($self, $path) = @_;
+  return if not defined $path or $path eq '';
+  my $wd = quotemeta($self->{wd});
+  $path =~s{^$wd/?}{};
+  return $path;
 }
 
 =head1 NAME
@@ -88,6 +96,8 @@ Tran::VCS - implementation of version control system for translation
 =head2 new
 
 =head2 wd
+
+=head2 relative_path
 
 =head1 AUTHOR
 
