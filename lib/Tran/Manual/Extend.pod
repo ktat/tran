@@ -184,7 +184,9 @@ If translation repository uses version control system(VCS) as its backend,
 this class can do some operation to the VCS.
 This class is optional.
 
-=head2 connect
+=head2 new_vcs
+
+This creates the vcs implementation object and returns it.
 
 =head2 update
 

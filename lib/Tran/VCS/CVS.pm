@@ -15,7 +15,7 @@ sub new {
   return $class->SUPER::new(%opt);
 }
 
-sub connect {
+sub new_vcs {
   my $self = shift;
   my $cwd = cwd;
   chdir($self->{wd});

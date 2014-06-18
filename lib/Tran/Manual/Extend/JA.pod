@@ -233,11 +233,11 @@ C<< $self->{vcs}->{wd} >>とは、先ほど説明した、C<< ask("質問内容"
 
 実装するメソッドは以下になります。
 
-=head2 connect
+=head2 new_vcs
 
- $vcs->connect;
+ $vcs->new_vcs;
 
-VCSへ接続します。
+VCSを実装しているクラス(Git::Class, CSV::Simple など)を使ってオブジェクトを作って返します。
 
 =head2 update
 
@@ -255,7 +255,7 @@ VCSに$target_path以下のファイルを add します。
 
  $vcs->commit($path);
 
-VCSに$path以下をコミットします。
+VCSにワーキングディレクトリ以下の$path以下をコミットします。
 
 =head1 L<Tran::Notify> のサブクラス
 

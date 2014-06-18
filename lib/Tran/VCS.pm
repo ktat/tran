@@ -18,12 +18,7 @@ sub new {
   bless \%self => $class;
 }
 
-sub config {
-  my $self = shift;
-  return $self->{config};
-}
-
-sub connect { die "implement it in subclass" }
+sub new_vcs { die "implement it in subclass" }
 
 sub add_files { die "implement it in subclass" }
 
@@ -48,7 +43,7 @@ sub files {
 sub _method {
   my ($self, $sub, @argv) = @_;
   chdir($self->wd) or Carp::confess "cannot change directory to " . $self->wd . " : "  . $!;
-  my $vcs = $self->connect;
+  my $vcs = $self->new_vcs;
   my $r;
   if (@_ > 1) {
     $r = $sub->($vcs, @argv);
@@ -83,9 +78,21 @@ Tran::VCS - implementation of version control system for translation
 
 =head2 add_files
 
+ $vcs->add_files;
+
+This adds files under translation target directory in vcs working directory.
+
 =head2 commit
 
-=head2 connect
+ $vcs->commit;
+
+This committs files under translation target directory in vcs working directory.
+
+=head2 new_vcs
+
+ $vcs->new_vcs;
+
+This create the vcs implementation object like Git::Class, Cvs::Simple.
 
 =head2 files
 

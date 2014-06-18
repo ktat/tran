@@ -7,7 +7,7 @@ use Git::Class;
 use strict;
 use warnings;
 
-sub connect {
+sub new_vcs {
   my ($self, $target) = @_;
   my $git = Git::Class::Cmd->new(die_on_error => 1, verbose => 1);
   return $git;
