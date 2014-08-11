@@ -71,7 +71,6 @@ sub find_target_resource {
   my ($self, $target) = @_;
   my $resource;
   if (not $self->has_target($target)) {
-    my $resource_found = 0;
     my $tran = $self->{tran};
 
     foreach my $r (keys %{$self->{tran}->resources}) {
@@ -79,12 +78,9 @@ sub find_target_resource {
 
       $resource = $tran->resource($r);
       if ($resource->has_target($target)) {
-	$resource_found = 1;
 	last;
       }
-    }
-    if (not $resource_found) {
-      $self->fatal("$target is not in any resource");
+      undef $resource;
     }
   }
   return $resource;
