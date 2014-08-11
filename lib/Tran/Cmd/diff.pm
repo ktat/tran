@@ -109,7 +109,7 @@ sub _diff {
             $self->info("$new_file is skipped");
             return;
           }
-          use_diff_cmd($diff_option, $old_file, $new_file) and return;;
+          use_diff_cmd($diff_option, $old_file, $new_file) and return;
 
           my $new_content = encoding_slurp($new_file, $enc) or return;
           if (my $diff = Text::Diff::diff(\$old_content, \$new_content)) {
@@ -134,7 +134,7 @@ sub _diff {
           = $translation->_apply_copy_option($new_file, $copy_option, $new_path, $new_path);
         return if not $result2;
 
-        use_diff_cmd($diff_option, $old_file, $_new_file) and return;;
+        use_diff_cmd($diff_option, $old_file, $_new_file) and return;
 
         if (defined $files_match and not $_new_file =~ qr/$files_match/) {
           $self->info("$_new_file is skipped");

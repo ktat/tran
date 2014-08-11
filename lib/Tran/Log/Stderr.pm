@@ -6,7 +6,7 @@ use warnings;
 use base qw(Tran::Log);
 
 sub _do_log {
-  my ($self, $message) = @_;;
+  my ($self, $message) = @_;
   print STDERR $message, "\n";
 }
 
