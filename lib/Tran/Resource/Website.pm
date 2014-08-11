@@ -3,7 +3,7 @@ package Tran::Resource::Website;
 use warnings;
 use strict;
 use base qw/Tran::Resource/;
-use Tran::Util -common, -debug, -list, -common, -file;
+use Tran::Util -common, -debug, -list, -file;
 use File::Path qw/make_path/;
 use version;
 use Time::Piece;
@@ -57,6 +57,7 @@ $content
 _HTML_
 }
 
+# get and store pages in previous version directory
 sub _store_content_of_previous {
   my ($self, $target, $root_path, $previous_version, $version) = @_;
   my ($path, $filename) = url2path($target);

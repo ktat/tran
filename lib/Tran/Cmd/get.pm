@@ -25,7 +25,13 @@ sub run {
   my $r = $tran->resource($resource);
   if (not $r->has_target($target)) {
     my $r_test = $r->find_target_resource($target);
-    $r = $r_test if $r_test;
+    if ($r_test) {
+      my $resource_name = ref $r_test;
+      $resource_name =~ s{Tran::Resource::}{};
+      $resource_name = decamelize($resource_name);
+      $self->app->prompt("other resource(not " . lc($resource) . ") is found: use resouce '" . $resource_name . "' ?")
+	and $r = $r_test;
+    }
   }
   my ($result, @result) = $r->get($target, $version, @rest);
 
