@@ -8,7 +8,7 @@ use File::Spec qw/path_join/;
 
 sub new {
   my ($class, %self) = @_;
-  my $target = $self{config}->{targets};
+  my $target = $self{config}->{targets} || {};
 #  my %target;
 #  foreach my $name (keys %$target) {
 #    $target{$name} = Tran::Resource::Target->new($target->{$name} || {});
@@ -69,9 +69,10 @@ sub not_omit_last_name { 0 }
 
 sub find_target_resource {
   my ($self, $target) = @_;
+  my $tran = $self->{tran};
+
   my $resource;
   if (not $self->has_target($target)) {
-    my $tran = $self->{tran};
 
     foreach my $r (keys %{$self->{tran}->resources}) {
       next if camelize $r eq ref $self;
@@ -83,6 +84,7 @@ sub find_target_resource {
       undef $resource;
     }
   }
+  $tran->resource(ucfirst $self->name) if not $resource;
   return $resource;
 }
 

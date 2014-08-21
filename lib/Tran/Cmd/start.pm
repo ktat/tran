@@ -15,6 +15,7 @@ sub opt_spec {
           ['resource|r=s', "resource." ],
           ['translation|t=s', "translation repository. optional." ],
           ['force|f'   , "forcely start translation even if translation exists" ],
+          ['merge-method|m=s', 'merge method' ],
          );
 }
 
@@ -65,7 +66,8 @@ sub run {
     }
     if ($want_merge) {
       if ($translation->has_version($target, $prev_version)) {
-        $translation->merge($target, $prev_version, $version);
+        my $merge_opt = $opt->{merge_method} ? {merge_method => $opt->{merge_method}} : {};
+        $translation->merge($target, $prev_version, $version, $merge_opt);
         $self->info("copy previous version($prev_version) to new version($version) with patch.");
       } else {
         $self->debug("translation for $prev_version is not found.");

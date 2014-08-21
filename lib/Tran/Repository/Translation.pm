@@ -88,7 +88,7 @@ sub merge {
     $copy_option->{$name} = [$copy_option->{$name} || ()] unless ref $copy_option->{$name};
   }
 
-  my $merge_method = $self->merge_method;
+  my $merge_method = $option->{merge_method} ? $option->{merge_method} : $self->merge_method;
   my $name_filter = $copy_option->{name_filter};
 
  FILE:
