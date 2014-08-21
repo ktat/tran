@@ -23,10 +23,15 @@ sub get {
   $path =~ s{^([a-z]+)\:/+}{};
   $path = path_join $original_dir, $path, $version;
   if (! -d $path) {
+    $self->debug("create path: $path");
     make_path($path);
+    $self->debug("git clone $target");
     qx{git clone --branch $version --depth 1 $target $path};
+    $self->fatal("cannot git clone $target") if $? != 0;
   } else {
     qx{git pull};
+    $self->debug("git pull $target");
+    $self->fatal("cannot git pull $target") if $? != 0;
   }
   $self->info("$target is stored to $path.");
 

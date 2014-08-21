@@ -23,12 +23,11 @@ sub run {
 
   my $tran = $self->app->tran;
   my $r = $tran->resource($resource);
+  $self->debug("resource: " . $r->name);
   if (not $r->has_target($target)) {
     my $r_test = $r->find_target_resource($target);
     if ($r_test) {
-      my $resource_name = ref $r_test;
-      $resource_name =~ s{Tran::Resource::}{};
-      $resource_name = decamelize($resource_name);
+      my $resource_name = $r_test->name;
       $self->app->prompt("other resource(not " . lc($resource) . ") is found: use resouce '" . $resource_name . "' ?")
 	and $r = $r_test;
     }
