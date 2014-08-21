@@ -40,11 +40,11 @@ The return value is 2 pattern.
 
 If target has existed already in original repository.
 
- (0, $self->target_translation($target), version->new($version));
+ (0, $self->target_translation($target), version->parse($version));
 
 If not,
 
- (1, $self->target_translation($target), version->new($version));
+ (1, $self->target_translation($target), version->parse($version));
 
 The following is special case:
 If you want to change target name from the target which user inputted, you should pass arrayref as last return values.
@@ -54,7 +54,7 @@ The first argument is new target name and the second is the path of the target f
 
 The case of the resource 'Cpan', C<perlootut> is Perl's core document, so target is regarded as 'perl'.
 
- (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
+ (1, $self->target_translation($target), version->parse($version), undef, ['perl', 'perlootut.pod']);
 
 This array reference is used for checking version.
 
@@ -174,7 +174,7 @@ This returns modified $name.
 returns version of $target in translation repository.
 This returns:
 
- $self->{versions}->{$self->target_path($target)} = [ map version->new($_), @versions];
+ $self->{versions}->{$self->target_path($target)} = [ map version->parse($_), @versions];
 
 =head2 _config
 
@@ -241,11 +241,11 @@ For example, I put the following module for L<KiokuDB>.
      chomp(my $version = <$in>);
      $self->debug("read version from: $version_file ($version)");
      close $in;
-     push @versions, version->new($version);
+     push @versions, version->parse($version);
    } else {
      $self->fatal("cannot open file($version_file)");
    }
-   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+   return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
  }
  
  sub update_version_info {

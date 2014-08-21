@@ -35,7 +35,7 @@ sub get {
   }
   $self->info("$target is stored to $path.");
 
-  return(1, $self->target_translation($target), version->new($version));
+  return(1, $self->target_translation($target), version->parse($version));
 }
 
 sub target_path {

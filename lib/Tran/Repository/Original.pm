@@ -16,14 +16,14 @@ sub get_versions {
   if (opendir my $d, $search_path) {
     foreach my $version (grep /^v?[\d\.]+(?:_\d+)?$/, readdir $d) {
       next if $version =~ m{^v?\.\.?$};
-      push @versions, version->new($version);
+      push @versions, version->parse($version);
     }
     closedir $d;
   } else {
     $self->debug(sprintf "directory is not found : " . $search_path);
     return;
   }
-  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+  return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
 }
 
 sub resource {

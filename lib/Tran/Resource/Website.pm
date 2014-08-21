@@ -122,7 +122,7 @@ sub get {
   my $version = $t->strftime('%Y.%m.%d');
   my $content = $self->_get_content_from_url($target);
   $self->_store_content($target, $content, $version);
-  return (1, $self->target_translation($target), version->new($version));
+  return (1, $self->target_translation($target), version->parse($version));
 }
 
 sub target_path {
