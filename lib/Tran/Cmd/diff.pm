@@ -19,7 +19,7 @@ sub opt_spec {
           ['trim'         , "remove whitespaces before and after" ],
           ['strip_class'  , "remove class in HTML tag" ],
           ['strip_tag'    , "remove HTML tag" ],
-          ['diff_cmd|x=s' , "use external diff command. ex: diff_cmd='diff -w -u'" ],
+          ['diff_cmd|x=s' , "use external diff command. ex: --diff_cmd='diff -w -u'" ],
           ['use_pager'    , "use TRAN_PAGER as pager even if using --cmd option" ],
           ['version|v=s'  , "old_version / old_version:new_version" ],
          );
@@ -98,7 +98,7 @@ sub _diff {
   if ($mode == 1) { # -t
     # translation and translation
     $wanted = sub {
-      if (-f $File::Find::name and $File::Find::name !~ m{/CVS/}) {
+      if (-f $File::Find::name and $File::Find::name !~ m{/CVS/} and $File::Find::name !~ m{~$}) {
         my $old_file = $File::Find::name;
         my $old_content = encoding_slurp($old_file, $enc) or return;
 
@@ -234,7 +234,7 @@ sub validate_args {
 sub description {
   return <<DESC;
 show difference of target in repositories.
-normaly, show difference between original and translation.
+no option shows difference between original and translation.
 DESC
 }
 
