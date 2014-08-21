@@ -45,13 +45,13 @@ sub get_versions {
   my @versions;
   if (opendir my $d, $self->directory) {
     foreach my $version (grep !/^\.\.?$/, grep /^[\d\.]+(?:_\d+)?$/, readdir $d) {
-      push @versions, version->new($version);
+      push @versions, version->parse($version);
     }
     closedir $d;
   } else {
     $self->debug(sprintf "directory is not found : %s", $self->directory);
   }
-  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+  return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
 }
 
 sub _config {

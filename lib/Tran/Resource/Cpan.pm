@@ -47,7 +47,7 @@ sub check_module_corelist_version {
 
   my $mcpan = MetaCPAN::API->new;
   my $module = $mcpan->release( distribution => 'Module-CoreList');
-  if (version->new($module->{version}) > version->new(Module::CoreList->VERSION)) {
+  if (version->parse($module->{version}) > version->parse(Module::CoreList->VERSION)) {
     $self->warn(sprintf 'Module::CoreList version(%s) is older than the latest(%s)',
 		Module::CoreList->VERSION, $module->{version});
   }
@@ -57,7 +57,7 @@ sub get_module_info_from_metacpan_with_corelist {
   my ($self, $target, $version) = @_;
 
   my ($perl_version, $got_version);
-  foreach my $_perl_version (sort {$b cmp $a} keys %Module::CoreList::version) {
+  foreach my $_perl_version (sort {version->parse($b) <=> version->parse($a)} keys %Module::CoreList::version) {
     if (exists $Module::CoreList::version{$_perl_version}->{$target}) {
       $perl_version = $_perl_version;
       $got_version  = $Module::CoreList::version{$_perl_version}->{$target};
@@ -90,7 +90,7 @@ sub get_core_document_from_metacpan {
   my ($perl_version);
 
   if (not $version) {
-    foreach my $_perl_version (sort {$b cmp $a} keys %Module::CoreList::version) {
+    foreach my $_perl_version (sort {version->parse($b) <=> version->parse($a)} keys %Module::CoreList::version) {
       $perl_version = format_perl_version($_perl_version);
       last;
     }
@@ -135,7 +135,7 @@ sub get_core_document_from_metacpan {
     sub format_perl_version {
       my $v = shift;
       return $v if $v < 5.006 or !have_version_pm;
-      return version->new($v)->normal;
+      return version->parse($v)->normal;
     }
 
     sub numify_version {
@@ -143,7 +143,7 @@ sub get_core_document_from_metacpan {
         if ($ver =~ /\..+\./) {
             have_version_pm()
                 or die "You need to install version.pm to use dotted version numbers\n";
-            $ver = version->new($ver)->numify;
+            $ver = version->parse($ver)->numify;
         }
         $ver += 0;
         return $ver;
@@ -220,10 +220,10 @@ sub get {
   if ($is_coredoc) {
     if ($self->original_repository->has_version('perl', $version, "pod/$target.pod")) {
       # implementation depends on jprp-core directory structure.
-      return (0, $self->target_translation($target), version->new($version), ['perl', "$target.pod"]);
+      return (0, $self->target_translation($target), version->parse($version), ['perl', "$target.pod"]);
     }
   } elsif ($self->original_repository->has_version($_target_path || $target_path, $version)) {
-    return (0, ($self->target_translation($target), version->new($version)));
+    return (0, ($self->target_translation($target), version->parse($version)));
   }
 
   if ($pod) {
@@ -242,9 +242,9 @@ sub get {
 
     write_file("$path/$file_name", $pod) or die "cannot write $path/$file_name";
     if ($is_coredoc) {
-      return (1, $self->target_translation($target), version->new($version), ['perl', "$path/$file_name"]);
+      return (1, $self->target_translation($target), version->parse($version), ['perl', "$path/$file_name"]);
     } else {
-      return (1, $self->target_translation($target), version->new($version));
+      return (1, $self->target_translation($target), version->parse($version));
     }
   } else {
     return (1, $self->get_file_and_extract($_target || $target, $_target_path, $target_path, $_version, $version, $url));
@@ -354,7 +354,7 @@ sub get_file_and_extract {
     }
   }
   $self->original_repository->reset;
-  return ($self->target_translation($target), version->new($version));
+  return ($self->target_translation($target), version->parse($version));
 }
 
 sub _config {

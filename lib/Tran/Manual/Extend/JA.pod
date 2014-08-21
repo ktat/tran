@@ -44,11 +44,11 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 既に指定されたバージョン(省略された場合は最新)のオリジナルを取得済みの場合、
 
- (0, $self->target_translation($target), version->new($version));
+ (0, $self->target_translation($target), version->parse($version));
 
 今回、新たに取得した場合、
 
- (1, $self->target_translation($target), version->new($version));
+ (1, $self->target_translation($target), version->parse($version));
 
 以下は特殊なケース:
 もし、ユーザーが入力したターゲットを変更したい場合、最後の戻り値に配列リファレンスを渡します。
@@ -58,7 +58,7 @@ Tran::ResourceやTran::Repository::Translationのサブクラスを作ること�
 
 Cpanリソースの場合、C<perltoot> は Perlのコアドキュメントなので、ターゲットは perl とみなします。
 
- (1, $self->target_translation($target), version->new($version), undef, ['perl', 'perlootut.pod']);
+ (1, $self->target_translation($target), version->parse($version), undef, ['perl', 'perlootut.pod']);
 
 この配列リファレンスはバージョンのチェックに使います。
 
@@ -177,7 +177,7 @@ name_filter の引数は、
 
 翻訳リポジトリに保存されている $target のバージョン情報を返します。
 
- $self->{versions}->{$self->target_path($target)} = [ map version->new($_), @versions];
+ $self->{versions}->{$self->target_path($target)} = [ map version->parse($_), @versions];
 
 を返します。
 
@@ -350,11 +350,11 @@ tran はライプラリのパスに、 C<~/.tran/lib/> を含めています。
      chomp(my $version = <$in>);
      $self->debug("read version from: $version_file ($version)");
      close $in;
-     push @versions, version->new($version);
+     push @versions, version->parse($version);
    } else {
      $self->fatal("cannot open file($version_file)");
    }
-   return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+   return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
  }
  
  sub update_version_info {

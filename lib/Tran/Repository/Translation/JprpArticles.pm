@@ -48,14 +48,14 @@ sub get_versions {
     chomp($version = eval { slurp($meta_file) });
     unless ($@) {
       $self->debug("read version from: $meta_file ($version)");
-      push @versions, version->new($version);
+      push @versions, version->parse($version);
     } else {
       $self->debug("cannot read version information from version file: $meta_file");
     }
   } else {
     $self->debug("no version file: $meta_file");
   }
-  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+  return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
 }
 
 sub update_version_info {

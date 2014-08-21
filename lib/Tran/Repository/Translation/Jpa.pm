@@ -36,14 +36,14 @@ sub get_versions {
   unless ($@) {
     if (my ($version) = $c =~m{^version:\s*(.+)$}m) {
       $self->debug("read version from: $meta_file ($version)");
-      push @versions, version->new($version);
+      push @versions, version->parse($version);
     } else {
       $self->debug("cannot read version information from metafile: $meta_file");
     }
   } else {
     $self->debug("cannot open metafile: $meta_file");
   }
-  return $self->{versions}->{$name} = [sort {$a cmp $b} @versions];
+  return $self->{versions}->{$name} = [sort {$a <=> $b} @versions];
 }
 
 sub update_version_info {
