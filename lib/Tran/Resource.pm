@@ -8,7 +8,7 @@ use File::Spec qw/path_join/;
 
 sub new {
   my ($class, %self) = @_;
-  my $target = $self{config}->{targets};
+  my $target = $self{config}->{targets} || {};
 #  my %target;
 #  foreach my $name (keys %$target) {
 #    $target{$name} = Tran::Resource::Target->new($target->{$name} || {});
