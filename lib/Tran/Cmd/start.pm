@@ -106,6 +106,9 @@ sub validate_args {
   unless ($opt->{resource} ||= $self->app->tran->config->default_resource) {
     $self->usage_error("-r option is required or you can set default_resource in you ~/.tran/config.yml");
   }
+  if ($opt->{merge_method} and $opt->{merge_method} ne 'cmpmerge' and $opt->{merge_method} ne 'cmpmerge_least') {
+    $self->usage_error("--merge_method option is 'cmpmerge' or 'cmpmerge_least'");
+  }
   $self->Tran::Cmd::_validate_args_resource($opt, $args, 1);
 }
 
