@@ -141,6 +141,7 @@ sub merge {
 
     if (exists $target{$translation_file} and -f $nf and -f $of and -f $tf) {
       $self->debug("merge target: $translation_file");
+      $self->debug("diff3 $nf, $of, $tf");
       my $merged = $self->$merge_method($nf, $of, $tf, $copy_option->{contents_filter});
       my $ntf = "$_new_translation_path/$translation_file";
       $ntf = $name_filter->($self, $ntf) if $name_filter;
