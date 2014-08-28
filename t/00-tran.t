@@ -6,7 +6,7 @@ use Tran::Util -string;
 use strict;
 
 my @translation_repos  = qw/Jpa JprpCore JprpModules ModulePodJpModules/;
-my @original_resources = qw/Cpan Git Github Website/;
+my @original_resources = qw/Cpan File Git Github Website/;
 my @original_repos     = 'directory';
 ok(my $tran = Tran->new("t/_tran/config.yml"));
 

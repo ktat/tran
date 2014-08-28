@@ -135,7 +135,12 @@ sub files {
   my $dir = quotemeta($path);
   my @files;
   find({wanted => sub {push @files, $_}, no_chdir => 1}, $path);
-  return grep {s{^$dir}{}} @files;
+
+  my @f;
+  foreach my $f (@files) {
+     $f =~s{^$dir}{} and push @f, $f;
+  }
+  return @f;
 }
 
 1;
