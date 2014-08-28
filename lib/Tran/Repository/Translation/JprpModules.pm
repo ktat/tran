@@ -85,9 +85,10 @@ sub make_xml {
   my @files;
   File::Find::find({wanted => sub {push @files, $File::Find::name if $File::Find::name =~m{\.pod$}}}, $path);
   my $files = join "\n", map {
-    s{^$path/?}{};
-    my $file_path = $_;
-    my $file_name = $_;
+    my $f = $_;
+    $f =~ s{^$path/?}{};
+    my $file_path = $f;
+    my $file_name = $f;
     $file_name =~s{^/?lib/}{};
     $file_name =~s{/}{::}g;
     $file_name =~s{\.pod}{};
