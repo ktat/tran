@@ -62,3 +62,5 @@ resource:
   github:
     translation: module-pod-jp-articles
     targets: {}
+  file:
+    targets: {}
