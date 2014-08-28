@@ -28,7 +28,7 @@ sub opt_spec {
 sub run {
   my ($self, $opt, $args) = @_;
   my ($target, @files) = @$args;
-  my $resource_name = $opt->{resource};
+  my $resource_name = $opt->{resource} || $self->app->tran->config->default_resource || 'File'; # File as temporary
   my ($version1, $version2) = $opt->{version} ? split(/:/, $opt->{version} || '', 2) : ();
 
   $| = 1;
